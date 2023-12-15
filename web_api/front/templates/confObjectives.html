@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Progreso laboratorio SOPER</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    </head>
+    <body>
+        <div class="container-fluid d-flex flex-column py-3">
+            <h1>Añadir Objetivos</h1>
+            <div class="form-group d-flex flex-row py-3 gap-3">
+                <label for="objectiveName">Nombre Del Objetivo</label>
+                <input class="form-control" type="text" id="objectiveName" style="width: 300px;"/>
+                <button type="button" class="btn btn-success" id="addObjt">añadir</button>
+            </div>
+            <h4 class="my-3">Resumen Objetivos</h4>
+            <form method="post">
+                {% csrf_token %}
+                <ul class="list-group" id="objList">
+                </ul>
+                <button type='submit' class='btn btn-success my-3' id='submBtn'>Confirmar</button>
+
+                <input type="hidden" name="teacherMail" value="{{teacherMail}}" />
+                <input type="hidden" name="courseId" value="{{courseId}}" />
+                <input type="hidden" name="courseName" value="{{courseName}}" />
+            </form>
+        </div>
+    </body>
+    <script>
+
+        $(document).ready(function() {
+
+            $('#objectiveName').on('keydown', function (e) {
+                var codigoTecla = event.which || event.keyCode;
+
+                if (codigoTecla === 190 || codigoTecla === 188) {
+                // Evitamos la acción por defecto (añadir el punto o la coma)
+                event.preventDefault();
+                }
+            });
+
+            $('#submBtn').hide();
+
+            $('#addObjt').on('click', function () {
+                var objName = document.getElementById("objectiveName");
+                var appendObj = "<li class='list-group-item d-flex flex-row justify-content-between'><span class='py-2'>"+String(objName.value).trim()+" </span><button type='button' class='btn btn-primary-outline' id='deleteObj'><i class='bi bi-trash'></i></button></li>"
+                var uls = document.getElementsByTagName('li');
+                
+                for(var i=0;i<uls.length;i++){
+                    if(String(uls[i].children[0].innerHTML).trim() == String(objName.value).trim()) {
+                        alert("Ya existe un objetivo con el nombre " + String(objName.value));
+                        return;
+                    }
+                    
+                }
+                
+
+                if(String(objName.value).length == 0) {
+                    alert("Objective name can not be empty.");
+                    return;
+                }
+
+                $('ul').append(appendObj);
+                $('ul').append("<input type='hidden' name='objectives[]' value='"+String(objName.value).trim()+"' id='"+String(objName.value).trim()+"'/>");
+                
+                if($("ul li").length >= 1) {
+                    $('#submBtn').show();
+                }
+
+                $("#objectiveName").val('');
+            });
+    
+            $(document).on('click', '#deleteObj', function () {
+                
+                var objId = "#" + String($(this).parent().children().html()).trim();
+                $(objId).remove();
+                
+                $(this).parent().remove();
+
+                if($("ul li").length == 0) {
+                    $('#submBtn').hide();
+                }
+
+
+            });
+
+        });
+    
+
+    </script>
+</html>

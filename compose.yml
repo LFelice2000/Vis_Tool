@@ -1,0 +1,37 @@
+version: '3.1'
+
+services:
+  db:
+    container_name: "tfgdb"
+    image: "postgres:latest"
+    restart: "always"
+    environment:
+      POSTGRES_PASSWORD: "alefelice01"
+    ports:
+      - "5432:5432"
+    networks:
+      - "tfg-network"
+  
+  web_service:
+    container_name: "tfgservice"
+    build: .
+    command: bash -c "python3 manage.py migrate && python3 manage.py runserver 0.0.0.0:8080"
+    restart: "always"
+    ports:
+      - "8080:8080"
+    networks:
+      - "tfg-network"
+    depends_on:
+      - "db"
+    expose: 
+      - "8080"
+      - "4000"
+  
+networks:
+  tfg-network:
+      external: true
+      driver: "bridge"
+      name: "tfg-network"
+
+
+    

@@ -1,0 +1,524 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Progreso laboratorio SOPER</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"> 
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <script type="text/javascript" src='js/bootstrap.min.js'></script>
+    </head>
+    <body>
+        <form class='container-fluid min-vh-100 d-flex justify-content-center align-items-center bg-ligth' method="POST" action="{% url 'confWeigth' %}">
+            <input type="hidden" name="students" value="{{students}}"/>
+            <input type="hidden" name="courseName" value="{{courseName}}"/>
+            <input type="hidden" name="teacher" value="{{teacher}}"/>
+            <input type="hidden" name="studentGrades" value="{{studentGrades}}"/>
+            <input type="hidden" name="objectiveList" value="{{objectiveList}}"/>
+            <input type="hidden" name="activitiesInfo" id="activitiesInfo"/>
+    
+            <div class="d-flex flex-column">
+    
+                <div class="d-flex flex-column mt-3">
+                    <div class="d-flex gap-2 mx-2">
+                        <button type='button' class="btn btn-secondary" id="quizBtn">Quiz</button>
+                        <button type='button' class="btn btn-success" id="assignmentBtn">Tarea</button>
+                        <button type='button' class="btn btn-success" id="attendanceBtn">Asistencia</button>
+                        <button type='button' class="btn btn-success" id="resumeBtn">Resumen</button>
+                    </div>
+                    <div class="my-3"><p id="headerInfo">Por favor, inserte el peso de cada actividad: </p></div>
+                </div>  
+                
+    
+                <div class="d-flex flex-column container-wrapper"  id="quizCont">
+    
+                    {% for quiz in quizList %}
+                    <div class='d-flex my-2 gap-3' id="q{{quiz.tmpId}}">
+                        <div class="mx-2"><h5 id="qtype{{quiz.tmpId}}">{{quiz.type}}:</h5></div>
+                        <div class="mx-1 mt-0.5"><p id="qname{{quiz.tmpId}}">{{quiz.name}}</p></div>
+                        <select class="form-select mr-3" aria-label="Default select example" style="width: 300px;" id="qoption{{quiz.tmpId}}">
+                            {% for objective in objectiveList %}    
+                            <option>{{objective.name}}</option>
+                            {% endfor %}
+                        </select>
+                        <input class="mb-2 px-3" min="0" max="100" id="qweigth{{quiz.tmpId}}" type="number" onkeypress="return false" name="qweigth{{quiz.tmpId}}" value="50" style="width: 11%; heigth: 10px;"/>
+                        <div class=""><p class="">  %</p></div>
+                    </div>
+                    {% endfor %}
+                    
+                    <button type='button' class='btn btn-success' id="addQuiz">Confirmar</button>
+                </div>
+    
+                <div class="d-flex flex-column container-wrapper d-none"  id="assignmentCont">
+    
+                    {% for assignment in assignmentList %}
+                    <div class='d-flex my-2 gap-3' id="as{{assignment.tmpId}}">
+                        <div class="mx-2"><h5 id="astype{{assignment.tmpId}}">{{assignment.type}}:</h5></div>
+                        <div class="mx-1 mt-0.5"><p id="asname{{assignment.tmpId}}">{{assignment.name}}</p></div>
+                        <select class="form-select mr-3" aria-label="Default select example" style="width: 300px;" id="asoption{{assignment.tmpId}}">
+                            {% for objective in objectiveList %}    
+                            <option>{{objective.name}}</option>
+                            {% endfor %}
+                        </select>
+                        <input class="mb-2 px-3" min="0" max="100" id="asweigth{{assignment.tmpId}}" type="number" onkeypress="return false" name="asweigth{{assignment.tmpId}}" value="50" style="width: 11%; heigth: 10px;"/>
+                        <div class=""><p class="">  %</p></div>
+                    </div>
+                    {% endfor %}
+                    
+                    <button type='button' class='btn btn-success' id="addAssignment">Confirmar</button>
+                </div>
+    
+                <div class="d-flex flex-column container-wrapper d-none"  id="attendanceCont">
+                    
+                    <div class="d-flex">
+                        <h5>Porcentaje de la actividad: </h5>
+                        <input class="mb-2 mx-3" min="0" max="100" id="atweigth" type="number" onkeypress="return false" name="atweigth" value="50" style="width: 15%; heigth: 10px;"/>
+                        <div class=""><p class="">  %</p></div>
+                    </div>
+    
+                    {% for attendance in attendanceList %}
+                    <div class='d-flex my-2 gap-3 sesionCont'>
+                        <div class="mx-1 mt-0.5"><p class="" id="atses{{attendance.tmpId}}">{{attendance.sesion}}</p></div>
+                        <input type="hidden" id="atname{{attendance.tmpId}}" value={{attendance.name}}/>
+                        <select class="form-select mr-3 sesionObj" aria-label="Default select example" style="width: 300px;" id="atoption{{attendance.tmpId}}">
+                            <option>None</option>
+                            {% for objective in objectiveList %}    
+                            <option>{{objective.name}}</option>
+                            {% endfor %}
+                        </select>
+                        
+                    </div>
+                    {% endfor %}
+                    
+                    <button type='button' class='btn btn-success' id="addAttendance">Confirmar</button>
+                </div>
+    
+                <div class="d-flex flex-column container-wrapper d-none"  id="resumeCont">
+                    <table class="table" id="resumeList">
+                        <thead>
+                            <tr>
+                                <th scope="col">Objetivo</th>
+                                <th scope="col">Actividades</th>
+                                <th scope="col">Peso</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <button type='submit' class='btn btn-success d-none mb-3' id="submitAll">Confirmar</button>
+                </div>
+            </div>
+    
+        </form>
+    </body>
+
+    <script>
+
+        $(document).ready(function (){
+
+            var activitiesDict = {"quiz": [], "assignment": [], "asistance": []};
+            
+
+            //Quiz
+            $('#addQuiz').on('click', function () {
+
+                
+                var activitiesInfo = document.getElementById("quizCont").children;
+                
+                if(activitiesDict['quiz'].length != 0) {
+                    activitiesDict['quiz'] = [];
+                }
+
+                for(var i = 0; i < (activitiesInfo.length - 1); i++) {
+
+                    var typeId = "#qtype" + i.toString();
+                    var nameId = "#qname" + i.toString();
+                    var optionId = "#qoption" + i.toString();
+                    var weigthId = "#qweigth" + i.toString();
+
+                    activitiesDict['quiz'].push({'activityType': 'Quiz', 'activityName': $(nameId).html(), 'objective': $(optionId+" :selected").text(), 'weigth': $(weigthId).val()})
+
+                }
+
+                $('#assignmentBtn').trigger("click");
+                
+                
+            });
+
+            //assignment
+            $('#addAssignment').on('click', function () {
+
+                
+                var activitiesInfo = document.getElementById("assignmentCont").children;
+                
+                if(activitiesDict['assignment'].length != 0) {
+                    activitiesDict['assignment'] = [];
+                }
+
+                for(var i = 0; i < (activitiesInfo.length - 1); i++) {
+
+                    var typeId = "#astype" + i.toString();
+                    var nameId = "#asname" + i.toString();
+                    var optionId = "#asoption" + i.toString();
+                    var weigthId = "#asweigth" + i.toString();
+
+                    activitiesDict['assignment'].push({'activityType': $(typeId).html().replace(':', ''), 'activityName': $(nameId).html(), 'objective': $(optionId+" :selected").text(), 'weigth': $(weigthId).val()})
+                    
+                }
+
+                $('#attendanceBtn').trigger("click");
+                
+                
+            });
+
+            //Atendance
+            $('#addAttendance').on('click', function () {
+
+                
+                var activitiesInfo = document.getElementById("attendanceCont").children;
+                var weigthId = "#atweigth";
+                
+                var numObjectives = 0;
+                for(var i = 0; i < (activitiesInfo.length - 2); i++) {
+                    var optionId = "#atoption" + i.toString();
+                    if($(optionId+" :selected").text() != 'None') {
+                        numObjectives++;
+                    }
+                }
+
+                if(activitiesDict['asistance'].length != 0) {
+                    activitiesDict['asistance'] = [];
+                }
+
+                for(i = 0; i < (activitiesInfo.length - 2); i++) {
+
+                    var nameId = "#atname" + i.toString();
+                    var optionId = "#atoption" + i.toString();
+                    var sesionId = "#atses" + i.toString();
+
+                    if($(optionId+" :selected").text() != "None") {
+                        activitiesDict['asistance'].push({'activityType': 'Asistencia', 'activityName': $(nameId).val().replace('/',''), 'objective': $(optionId+" :selected").text(), 'weigth': $(weigthId).val(), 'sesion': $(sesionId).text()})
+                    }
+
+                }
+                
+                $('#resumeBtn').trigger("click");
+                
+
+            });
+
+            $('#assignmentBtn').on('click', function (){
+
+                if (document.getElementById("assignmentBtn").classList[1] === 'btn-success') {
+
+                    if(document.getElementById("quizBtn").classList[1] === 'btn-secondary') {
+                        
+                        document.getElementById("quizCont").classList.add("d-none");
+                        document.getElementById("quizCont").classList.remove("d-flex");
+
+                        document.getElementById("assignmentCont").classList.add("d-flex");
+                        document.getElementById("assignmentCont").classList.remove("d-none");
+
+                        document.getElementById("quizBtn").classList.remove("btn-secondary");
+                        document.getElementById("quizBtn").classList.add("btn-success");
+
+                        document.getElementById("assignmentBtn").classList.remove("btn-success");
+                        document.getElementById("assignmentBtn").classList.add("btn-secondary");
+                    }
+                    else if (document.getElementById("resumeBtn").classList[1] === 'btn-secondary') {
+
+                        document.getElementById("resumeCont").classList.add("d-none");
+                        document.getElementById("resumeCont").classList.remove("d-flex");
+
+                        document.getElementById("assignmentCont").classList.add("d-flex");
+                        document.getElementById("assignmentCont").classList.remove("d-none");
+
+                        document.getElementById("resumeBtn").classList.remove("btn-secondary");
+                        document.getElementById("resumeBtn").classList.add("btn-success");
+
+                        document.getElementById("assignmentBtn").classList.remove("btn-success");
+                        document.getElementById("assignmentBtn").classList.add("btn-secondary");
+
+                        $('#headerInfo').text('Por favor, inserte el peso de cada actividad: ');
+                    }
+                    else if (document.getElementById("attendanceBtn").classList[1] === 'btn-secondary') {
+                        document.getElementById("attendanceCont").classList.add("d-none");
+                        document.getElementById("attendanceCont").classList.remove("d-flex");
+
+                        document.getElementById("assignmentCont").classList.add("d-flex");
+                        document.getElementById("assignmentCont").classList.remove("d-none");
+            
+                        document.getElementById("assignmentBtn").classList.remove("btn-success");
+                        document.getElementById("assignmentBtn").classList.add("btn-secondary");
+                        
+                        document.getElementById("attendanceBtn").classList.remove("btn-secondary");
+                        document.getElementById("attendanceBtn").classList.add("btn-success");
+
+                    } 
+                }
+                
+            });
+            
+            $('#attendanceBtn').on('click', function (){
+
+                if (document.getElementById("attendanceBtn").classList[1] === 'btn-success') {
+
+                    if(document.getElementById("quizBtn").classList[1] === 'btn-secondary') {
+                        
+                        document.getElementById("quizCont").classList.add("d-none");
+                        document.getElementById("quizCont").classList.remove("d-flex");
+
+                        document.getElementById("attendanceCont").classList.add("d-flex");
+                        document.getElementById("attendanceCont").classList.remove("d-none");
+
+                        document.getElementById("quizBtn").classList.remove("btn-secondary");
+                        document.getElementById("quizBtn").classList.add("btn-success");
+
+                        document.getElementById("attendanceBtn").classList.remove("btn-success");
+                        document.getElementById("attendanceBtn").classList.add("btn-secondary");
+                    }
+                    else if (document.getElementById("resumeBtn").classList[1] === 'btn-secondary') {
+
+                        document.getElementById("resumeCont").classList.add("d-none");
+                        document.getElementById("resumeCont").classList.remove("d-flex");
+
+                        document.getElementById("attendanceCont").classList.add("d-flex");
+                        document.getElementById("attendanceCont").classList.remove("d-none");
+
+                        document.getElementById("resumeBtn").classList.remove("btn-secondary");
+                        document.getElementById("resumeBtn").classList.add("btn-success");
+
+                        document.getElementById("attendanceBtn").classList.remove("btn-success");
+                        document.getElementById("attendanceBtn").classList.add("btn-secondary");
+
+                        $('#headerInfo').text('Por favor, inserte el peso de cada actividad: ');
+                    }
+                    else if (document.getElementById("assignmentBtn").classList[1] === 'btn-secondary') {
+
+                        document.getElementById("assignmentCont").classList.add("d-none");
+                        document.getElementById("assignmentCont").classList.remove("d-flex");
+
+                        document.getElementById("attendanceCont").classList.add("d-flex");
+                        document.getElementById("attendanceCont").classList.remove("d-none");
+
+                        document.getElementById("assignmentBtn").classList.remove("btn-secondary");
+                        document.getElementById("assignmentBtn").classList.add("btn-success");
+
+                        document.getElementById("attendanceBtn").classList.remove("btn-success");
+                        document.getElementById("attendanceBtn").classList.add("btn-secondary");
+
+                    }
+                }
+                
+            });
+
+            $('#quizBtn').on('click', function (){
+
+                if (document.getElementById("quizBtn").classList[1] === 'btn-success') {
+                    
+                    if (document.getElementById("attendanceBtn").classList[1] === 'btn-secondary') {
+                        document.getElementById("attendanceCont").classList.add("d-none");
+                        document.getElementById("attendanceCont").classList.remove("d-flex");
+
+                        document.getElementById("quizCont").classList.add("d-flex");
+                        document.getElementById("quizCont").classList.remove("d-none");
+            
+                        document.getElementById("quizBtn").classList.remove("btn-success");
+                        document.getElementById("quizBtn").classList.add("btn-secondary");
+                        
+                        document.getElementById("attendanceBtn").classList.remove("btn-secondary");
+                        document.getElementById("attendanceBtn").classList.add("btn-success");
+
+                    } else if (document.getElementById("resumeBtn").classList[1] === 'btn-secondary') {
+
+                        document.getElementById("resumeCont").classList.add("d-none");
+                        document.getElementById("resumeCont").classList.remove("d-flex");
+
+                        document.getElementById("quizCont").classList.add("d-flex");
+                        document.getElementById("quizCont").classList.remove("d-none");
+
+                        document.getElementById("quizBtn").classList.remove("btn-success");
+                        document.getElementById("quizBtn").classList.add("btn-secondary");
+                        
+                        document.getElementById("resumeBtn").classList.remove("btn-secondary");
+                        document.getElementById("resumeBtn").classList.add("btn-success");
+
+                        $('#headerInfo').text('Por favor, inserte el peso de cada actividad: ');
+                    }
+                    else if (document.getElementById("assignmentBtn").classList[1] === 'btn-secondary') {
+
+                        document.getElementById("assignmentCont").classList.add("d-none");
+                        document.getElementById("assignmentCont").classList.remove("d-flex");
+
+                        document.getElementById("quizCont").classList.add("d-flex");
+                        document.getElementById("quizCont").classList.remove("d-none");
+
+                        document.getElementById("assignmentBtn").classList.remove("btn-secondary");
+                        document.getElementById("assignmentBtn").classList.add("btn-success");
+
+                        document.getElementById("quizBtn").classList.remove("btn-success");
+                        document.getElementById("quizBtn").classList.add("btn-secondary");
+
+                    }
+
+                }
+                
+            });
+
+            $('#resumeBtn').on('click', function (){
+
+                if (document.getElementById("resumeBtn").classList[1] === 'btn-success') {
+                    
+                    if(document.getElementById("attendanceBtn").classList[1] === 'btn-secondary') {
+                        
+                        document.getElementById("attendanceCont").classList.add("d-none");
+                        document.getElementById("attendanceCont").classList.remove("d-flex");
+
+                        document.getElementById("resumeCont").classList.add("d-flex");
+                        document.getElementById("resumeCont").classList.remove("d-none");
+            
+                        document.getElementById("resumeBtn").classList.remove("btn-success");
+                        document.getElementById("resumeBtn").classList.add("btn-secondary");
+
+                        document.getElementById("attendanceBtn").classList.remove("btn-secondary");
+                        document.getElementById("attendanceBtn").classList.add("btn-success");
+
+                        $('#headerInfo').text('Resumen de todas las actividades:');
+
+                    } else if (document.getElementById("quizBtn").classList[1] === 'btn-secondary') {
+                        
+                        document.getElementById("quizCont").classList.add("d-none");
+                        document.getElementById("quizCont").classList.remove("d-flex");
+
+                        document.getElementById("resumeCont").classList.add("d-flex");
+                        document.getElementById("resumeCont").classList.remove("d-none");
+
+                        document.getElementById("resumeBtn").classList.remove("btn-success");
+                        document.getElementById("resumeBtn").classList.add("btn-secondary");
+
+                        document.getElementById("quizBtn").classList.remove("btn-secondary");
+                        document.getElementById("quizBtn").classList.add("btn-success");
+
+                        $('#headerInfo').text('Resumen de todas las actividades:');
+                    }
+                    else if (document.getElementById("assignmentBtn").classList[1] === 'btn-secondary') {
+
+                        document.getElementById("assignmentCont").classList.add("d-none");
+                        document.getElementById("assignmentCont").classList.remove("d-flex");
+
+                        document.getElementById("resumeCont").classList.add("d-flex");
+                        document.getElementById("resumeCont").classList.remove("d-none");
+
+                        document.getElementById("assignmentBtn").classList.remove("btn-secondary");
+                        document.getElementById("assignmentBtn").classList.add("btn-success");
+
+                        document.getElementById("resumeBtn").classList.remove("btn-success");
+                        document.getElementById("resumeBtn").classList.add("btn-secondary");
+
+                    }
+                }
+
+                
+                
+                if ($('#resumeList tbody tr th').length > 0) {
+                    $('#resumeList tbody tr').remove();
+                }
+                
+                var totalWeigth = 0;
+                var rowCounter = 1;
+                var objectivesWeigth = {};
+                var objectiveActivities = {};
+
+                for(var i = 0; i < activitiesDict['quiz'].length; i++) {
+                    if (Object.keys(objectivesWeigth).includes(activitiesDict['quiz'][i]['objective'])) {
+                        objectivesWeigth[activitiesDict['quiz'][i]['objective']] += parseInt(activitiesDict['quiz'][i]['weigth'])
+                        objectiveActivities[activitiesDict['quiz'][i]['objective']].push({"type": "Quiz", "name": activitiesDict['quiz'][i]['activityName'], "weigth": activitiesDict['quiz'][i]['weigth']})
+                    } else {
+                        objectivesWeigth[activitiesDict['quiz'][i]['objective']] = parseInt(activitiesDict['quiz'][i]['weigth'])
+                        objectiveActivities[activitiesDict['quiz'][i]['objective']] = [{"type": "Quiz", "name": activitiesDict['quiz'][i]['activityName'], "weigth": activitiesDict['quiz'][i]['weigth']}]
+                    }
+
+                    totalWeigth += parseInt(activitiesDict['quiz'][i]['weigth'])
+                }
+
+                for(i = 0; i < activitiesDict['assignment'].length; i++) {
+                    if (Object.keys(objectivesWeigth).includes(activitiesDict['assignment'][i]['objective'])) {
+                        objectivesWeigth[activitiesDict['assignment'][i]['objective']] += parseInt(activitiesDict['assignment'][i]['weigth'])
+                        objectiveActivities[activitiesDict['assignment'][i]['objective']].push({"type": "Assignment", "name": activitiesDict['assignment'][i]['activityName'], "weigth": activitiesDict['assignment'][i]['weigth']})
+                    } else {
+                        objectivesWeigth[activitiesDict['assignment'][i]['objective']] = parseInt(activitiesDict['assignment'][i]['weigth'])
+                        objectiveActivities[activitiesDict['assignment'][i]['objective']] = [{"type": "Assignment", "name": activitiesDict['assignment'][i]['activityName'], "weigth": activitiesDict['assignment'][i]['weigth']}]
+                    }
+
+                    totalWeigth += parseInt(activitiesDict['assignment'][i]['weigth'])
+                }
+
+                for(i = 0; i < activitiesDict['asistance'].length; i++) {
+                    if (Object.keys(objectivesWeigth).includes(activitiesDict['asistance'][i]['objective'])) {
+                        objectivesWeigth[activitiesDict['asistance'][i]['objective']] += parseInt(activitiesDict['asistance'][i]['weigth'])
+                        objectiveActivities[activitiesDict['asistance'][i]['objective']].push({"type": "Asistance", "name": activitiesDict['asistance'][i]['activityName'], "weigth": activitiesDict['asistance'][i]['weigth']})
+                    } else {
+                        objectivesWeigth[activitiesDict['asistance'][i]['objective']] = parseInt(activitiesDict['asistance'][i]['weigth'])
+                        objectiveActivities[activitiesDict['asistance'][i]['objective']] = [{"type": "Asistance", "name": activitiesDict['asistance'][i]['activityName'], "weigth": activitiesDict['asistance'][i]['weigth']}]
+                    }
+
+                    totalWeigth += parseInt(activitiesDict['asistance'][i]['weigth'])
+                }
+
+                var numObjectives = Object.keys(objectivesWeigth).length;
+                var realWeight = (totalWeigth/numObjectives);
+                var rowString = "";
+                var objectivesWeightCorrect = true;
+                
+                alert(JSON.stringify(objectiveActivities));
+                alert(JSON.stringify(objectivesWeigth));
+
+                for(i = 0; i < Object.keys(objectivesWeigth).length; i++) {
+                    
+                    rowString = "<tr><th rowspan='" + (objectiveActivities[Object.keys(objectivesWeigth)[i]].length + 1) +"' scope='rowgroup'>" + Object.keys(objectivesWeigth)[i] + " (" + objectivesWeigth[Object.keys(objectivesWeigth)[i]].toString() + "%)" + "</th></tr>"
+
+                    for(var j = 0; j < objectiveActivities[Object.keys(objectivesWeigth)[i]].length; j++) {
+                        rowInfo = "<tr><td>" + objectiveActivities[Object.keys(objectivesWeigth)[i]][j]["type"] + ": " + objectiveActivities[Object.keys(objectivesWeigth)[i]][j]["name"] + "</td><td>" + objectiveActivities[Object.keys(objectivesWeigth)[i]][j]["weigth"] + " %</td></tr>"
+                        rowString += rowInfo;
+                    } 
+                    
+                    //var objectiveColor = "green";
+                    //if (objectivesWeigth[Object.keys(objectivesWeigth)[i]] != 100) {
+                    //    objectiveColor = "red";
+                     //   objectivesWeightCorrect = false;
+                    //}
+
+                    
+                    //rowInfo = "</select></td><td style='color: " + objectiveColor +"'>" + objectivesWeigth[Object.keys(objectivesWeigth)[i]] + "%</td></tr>"
+
+                    //rowString += rowInfo;
+                    
+                    $('#resumeList tbody').append(rowString);
+                }
+                
+
+                var color = "green;";
+
+                if (realWeight != 100 || !objectivesWeightCorrect) {
+                    color = "red;";
+                    document.getElementById("submitAll").classList.remove("d-flex");
+                    document.getElementById("submitAll").classList.add("d-none");
+                } else {
+                    document.getElementById("submitAll").classList.add("d-flex");
+                    document.getElementById("submitAll").classList.remove("d-none");
+                }
+
+                var totalWeigthRow = "<tr>" + "<th scope='row'>Total: </th><td></td><td style='color: " + color + "'>" + realWeight.toString() + "%" + "</td>" + "</tr>";
+                $('#resumeList tbody').append(totalWeigthRow);
+            });
+
+            $("#submitAll").on('click', function() {
+                $('#activitiesInfo').val(JSON.stringify(activitiesDict));
+            });
+
+        });
+
+
+    </script>
+</html>

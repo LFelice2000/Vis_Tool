@@ -1,0 +1,730 @@
+{
+    "students": [
+        {
+            "progress": [
+                {
+                    "id": "hilos-bar-usr",
+                    "value": 10
+                },
+                {
+                    "id": "procesos-bar-usr",
+                    "value": 0
+                },
+                {
+                    "id": "ficheros-bar-usr",
+                    "value": 0
+                },
+                {
+                    "id": "senyales-bar-usr",
+                    "value": 0
+                },
+                {
+                    "id": "semaforos-bar-usr",
+                    "value": 0
+                },
+                {
+                    "id": "memoria-bar-usr",
+                    "value": 0
+                },
+                {
+                    "id": "colas-bar-usr",
+                    "value": 0
+                }
+            ],
+            "username": "jose.jorro@uam.es"
+        },
+        {
+            "progress": [
+                {
+                    "id": "hilos-bar-usr",
+                    "value": 50
+                },
+                {
+                    "id": "procesos-bar-usr",
+                    "value": 50
+                },
+                {
+                    "id": "ficheros-bar-usr",
+                    "value": 50
+                },
+                {
+                    "id": "senyales-bar-usr",
+                    "value": 50
+                },
+                {
+                    "id": "semaforos-bar-usr",
+                    "value": 50
+                },
+                {
+                    "id": "memoria-bar-usr",
+                    "value": 50
+                },
+                {
+                    "id": "colas-bar-usr",
+                    "value": 50
+                }
+            ],
+            "username": "carlos.alaiz@uam.es"
+        },
+        {
+            "progress": [
+                {
+                    "id": "hilos-bar-usr",
+                    "value": 47.1
+                },
+                {
+                    "id": "procesos-bar-usr",
+                    "value": 38.35
+                },
+                {
+                    "id": "ficheros-bar-usr",
+                    "value": 41.03
+                },
+                {
+                    "id": "senyales-bar-usr",
+                    "value": 52.05
+                },
+                {
+                    "id": "semaforos-bar-usr",
+                    "value": 52.05
+                },
+                {
+                    "id": "memoria-bar-usr",
+                    "value": 52.9
+                },
+                {
+                    "id": "colas-bar-usr",
+                    "value": 52.9
+                }
+            ],
+            "username": "pablo.antona@estudiante.uam.es"
+        },
+        {
+            "progress": [
+                {
+                    "id": "hilos-bar-usr",
+                    "value": 90.27
+                },
+                {
+                    "id": "procesos-bar-usr",
+                    "value": 74.94
+                },
+                {
+                    "id": "ficheros-bar-usr",
+                    "value": 83.28
+                },
+                {
+                    "id": "senyales-bar-usr",
+                    "value": 75.1
+                },
+                {
+                    "id": "semaforos-bar-usr",
+                    "value": 71.1
+                },
+                {
+                    "id": "memoria-bar-usr",
+                    "value": 86.2
+                },
+                {
+                    "id": "colas-bar-usr",
+                    "value": 86.2
+                }
+            ],
+            "username": "joseba.arranz@estudiante.uam.es"
+        },
+        {
+            "progress": [
+                {
+                    "id": "hilos-bar-usr",
+                    "value": 90.4
+                },
+                {
+                    "id": "procesos-bar-usr",
+                    "value": 67.41
+                },
+                {
+                    "id": "ficheros-bar-usr",
+                    "value": 67.64
+                },
+                {
+                    "id": "senyales-bar-usr",
+                    "value": 100.05
+                },
+                {
+                    "id": "semaforos-bar-usr",
+                    "value": 100.05
+                },
+                {
+                    "id": "memoria-bar-usr",
+                    "value": 87.65
+                },
+                {
+                    "id": "colas-bar-usr",
+                    "value": 87.65
+                }
+            ],
+            "username": "josea.benito@estudiante.uam.es"
+        },
+        {
+            "progress": [
+                {
+                    "id": "hilos-bar-usr",
+                    "value": 81.0
+                },
+                {
+                    "id": "procesos-bar-usr",
+                    "value": 63.5
+                },
+                {
+                    "id": "ficheros-bar-usr",
+                    "value": 73.14
+                },
+                {
+                    "id": "senyales-bar-usr",
+                    "value": 65.67
+                },
+                {
+                    "id": "semaforos-bar-usr",
+                    "value": 72.34
+                },
+                {
+                    "id": "memoria-bar-usr",
+                    "value": 68.61
+                },
+                {
+                    "id": "colas-bar-usr",
+                    "value": 87.28
+                }
+            ],
+            "username": "miguel.blasg@estudiante.uam.es"
+        },
+        {
+            "progress": [
+                {
+                    "id": "hilos-bar-usr",
+                    "value": 90.6
+                },
+                {
+                    "id": "procesos-bar-usr",
+                    "value": 81.28
+                },
+                {
+                    "id": "ficheros-bar-usr",
+                    "value": 84.17
+                },
+                {
+                    "id": "senyales-bar-usr",
+                    "value": 64.84
+                },
+                {
+                    "id": "semaforos-bar-usr",
+                    "value": 81.5
+                },
+                {
+                    "id": "memoria-bar-usr",
+                    "value": 92.67
+                },
+                {
+                    "id": "colas-bar-usr",
+                    "value": 86.0
+                }
+            ],
+            "username": "luis.felice@estudiante.uam.es"
+        },
+        {
+            "progress": [
+                {
+                    "id": "hilos-bar-usr",
+                    "value": 70.78
+                },
+                {
+                    "id": "procesos-bar-usr",
+                    "value": 31.6
+                },
+                {
+                    "id": "ficheros-bar-usr",
+                    "value": 40.17
+                },
+                {
+                    "id": "senyales-bar-usr",
+                    "value": 81.43
+                },
+                {
+                    "id": "semaforos-bar-usr",
+                    "value": 74.1
+                },
+                {
+                    "id": "memoria-bar-usr",
+                    "value": 86.77
+                },
+                {
+                    "id": "colas-bar-usr",
+                    "value": 88.1
+                }
+            ],
+            "username": "alfonso.fernandez03@estudiante.uam.es"
+        },
+        {
+            "progress": [
+                {
+                    "id": "hilos-bar-usr",
+                    "value": 85.5
+                },
+                {
+                    "id": "procesos-bar-usr",
+                    "value": 75.42
+                },
+                {
+                    "id": "ficheros-bar-usr",
+                    "value": 78.1
+                },
+                {
+                    "id": "senyales-bar-usr",
+                    "value": 85.65
+                },
+                {
+                    "id": "semaforos-bar-usr",
+                    "value": 85.65
+                },
+                {
+                    "id": "memoria-bar-usr",
+                    "value": 52.9
+                },
+                {
+                    "id": "colas-bar-usr",
+                    "value": 52.9
+                }
+            ],
+            "username": "alvaro.gilm@estudiante.uam.es"
+        },
+        {
+            "progress": [
+                {
+                    "id": "hilos-bar-usr",
+                    "value": 46.1
+                },
+                {
+                    "id": "procesos-bar-usr",
+                    "value": 18.6
+                },
+                {
+                    "id": "ficheros-bar-usr",
+                    "value": 40.03
+                },
+                {
+                    "id": "senyales-bar-usr",
+                    "value": 33.67
+                },
+                {
+                    "id": "semaforos-bar-usr",
+                    "value": 47.67
+                },
+                {
+                    "id": "memoria-bar-usr",
+                    "value": 0
+                },
+                {
+                    "id": "colas-bar-usr",
+                    "value": 0
+                }
+            ],
+            "username": "yaser.jafar@estudiante.uam.es"
+        },
+        {
+            "progress": [
+                {
+                    "id": "hilos-bar-usr",
+                    "value": 85.1
+                },
+                {
+                    "id": "procesos-bar-usr",
+                    "value": 67.27
+                },
+                {
+                    "id": "ficheros-bar-usr",
+                    "value": 75.84
+                },
+                {
+                    "id": "senyales-bar-usr",
+                    "value": 81.7
+                },
+                {
+                    "id": "semaforos-bar-usr",
+                    "value": 81.7
+                },
+                {
+                    "id": "memoria-bar-usr",
+                    "value": 88.3
+                },
+                {
+                    "id": "colas-bar-usr",
+                    "value": 88.3
+                }
+            ],
+            "username": "german.marting@estudiante.uam.es"
+        },
+        {
+            "progress": [
+                {
+                    "id": "hilos-bar-usr",
+                    "value": 94.6
+                },
+                {
+                    "id": "procesos-bar-usr",
+                    "value": 79.6
+                },
+                {
+                    "id": "ficheros-bar-usr",
+                    "value": 73.17
+                },
+                {
+                    "id": "senyales-bar-usr",
+                    "value": 85.05
+                },
+                {
+                    "id": "semaforos-bar-usr",
+                    "value": 85.05
+                },
+                {
+                    "id": "memoria-bar-usr",
+                    "value": 91.25
+                },
+                {
+                    "id": "colas-bar-usr",
+                    "value": 91.25
+                }
+            ],
+            "username": "lucia.martinez-valero@estudiante.uam.es"
+        },
+        {
+            "progress": [
+                {
+                    "id": "hilos-bar-usr",
+                    "value": 63.66
+                },
+                {
+                    "id": "procesos-bar-usr",
+                    "value": 54.18
+                },
+                {
+                    "id": "ficheros-bar-usr",
+                    "value": 54.47
+                },
+                {
+                    "id": "senyales-bar-usr",
+                    "value": 74.67
+                },
+                {
+                    "id": "semaforos-bar-usr",
+                    "value": 80.0
+                },
+                {
+                    "id": "memoria-bar-usr",
+                    "value": 88.88
+                },
+                {
+                    "id": "colas-bar-usr",
+                    "value": 88.88
+                }
+            ],
+            "username": "laura.naranjob@estudiante.uam.es"
+        },
+        {
+            "progress": [
+                {
+                    "id": "hilos-bar-usr",
+                    "value": 89.4
+                },
+                {
+                    "id": "procesos-bar-usr",
+                    "value": 82.66
+                },
+                {
+                    "id": "ficheros-bar-usr",
+                    "value": 81.54
+                },
+                {
+                    "id": "senyales-bar-usr",
+                    "value": 76.93
+                },
+                {
+                    "id": "semaforos-bar-usr",
+                    "value": 72.93
+                },
+                {
+                    "id": "memoria-bar-usr",
+                    "value": 79.95
+                },
+                {
+                    "id": "colas-bar-usr",
+                    "value": 83.95
+                }
+            ],
+            "username": "andrese.navarro@estudiante.uam.es"
+        },
+        {
+            "progress": [
+                {
+                    "id": "hilos-bar-usr",
+                    "value": 75.11
+                },
+                {
+                    "id": "procesos-bar-usr",
+                    "value": 83.1
+                },
+                {
+                    "id": "ficheros-bar-usr",
+                    "value": 82.03
+                },
+                {
+                    "id": "senyales-bar-usr",
+                    "value": 85.8
+                },
+                {
+                    "id": "semaforos-bar-usr",
+                    "value": 89.8
+                },
+                {
+                    "id": "memoria-bar-usr",
+                    "value": 86.45
+                },
+                {
+                    "id": "colas-bar-usr",
+                    "value": 86.45
+                }
+            ],
+            "username": "diego.nunnezg@estudiante.uam.es"
+        },
+        {
+            "progress": [
+                {
+                    "id": "hilos-bar-usr",
+                    "value": 49.0
+                },
+                {
+                    "id": "procesos-bar-usr",
+                    "value": 39.0
+                },
+                {
+                    "id": "ficheros-bar-usr",
+                    "value": 54.0
+                },
+                {
+                    "id": "senyales-bar-usr",
+                    "value": 65.24
+                },
+                {
+                    "id": "semaforos-bar-usr",
+                    "value": 61.24
+                },
+                {
+                    "id": "memoria-bar-usr",
+                    "value": 89.4
+                },
+                {
+                    "id": "colas-bar-usr",
+                    "value": 89.4
+                }
+            ],
+            "username": "javier.perezc01@estudiante.uam.es"
+        },
+        {
+            "progress": [
+                {
+                    "id": "hilos-bar-usr",
+                    "value": 82.5
+                },
+                {
+                    "id": "procesos-bar-usr",
+                    "value": 72.93
+                },
+                {
+                    "id": "ficheros-bar-usr",
+                    "value": 63.82
+                },
+                {
+                    "id": "senyales-bar-usr",
+                    "value": 94.27
+                },
+                {
+                    "id": "semaforos-bar-usr",
+                    "value": 91.6
+                },
+                {
+                    "id": "memoria-bar-usr",
+                    "value": 93.55
+                },
+                {
+                    "id": "colas-bar-usr",
+                    "value": 86.89
+                }
+            ],
+            "username": "pablo.ramis@estudiante.uam.es"
+        },
+        {
+            "progress": [
+                {
+                    "id": "hilos-bar-usr",
+                    "value": 74.18
+                },
+                {
+                    "id": "procesos-bar-usr",
+                    "value": 80.59
+                },
+                {
+                    "id": "ficheros-bar-usr",
+                    "value": 82.14
+                },
+                {
+                    "id": "senyales-bar-usr",
+                    "value": 76.34
+                },
+                {
+                    "id": "semaforos-bar-usr",
+                    "value": 93.0
+                },
+                {
+                    "id": "memoria-bar-usr",
+                    "value": 87.76
+                },
+                {
+                    "id": "colas-bar-usr",
+                    "value": 87.75
+                }
+            ],
+            "username": "fernando.revillas@estudiante.uam.es"
+        },
+        {
+            "progress": [
+                {
+                    "id": "hilos-bar-usr",
+                    "value": 77.68
+                },
+                {
+                    "id": "procesos-bar-usr",
+                    "value": 88.25
+                },
+                {
+                    "id": "ficheros-bar-usr",
+                    "value": 79.14
+                },
+                {
+                    "id": "senyales-bar-usr",
+                    "value": 89.4
+                },
+                {
+                    "id": "semaforos-bar-usr",
+                    "value": 89.4
+                },
+                {
+                    "id": "memoria-bar-usr",
+                    "value": 88.32
+                },
+                {
+                    "id": "colas-bar-usr",
+                    "value": 81.66
+                }
+            ],
+            "username": "john.rolingson@estudiante.uam.es"
+        },
+        {
+            "progress": [
+                {
+                    "id": "hilos-bar-usr",
+                    "value": 83.1
+                },
+                {
+                    "id": "procesos-bar-usr",
+                    "value": 72.43
+                },
+                {
+                    "id": "ficheros-bar-usr",
+                    "value": 72.03
+                },
+                {
+                    "id": "senyales-bar-usr",
+                    "value": 81.65
+                },
+                {
+                    "id": "semaforos-bar-usr",
+                    "value": 68.33
+                },
+                {
+                    "id": "memoria-bar-usr",
+                    "value": 76.02
+                },
+                {
+                    "id": "colas-bar-usr",
+                    "value": 69.36
+                }
+            ],
+            "username": "beatriz.sainz@estudiante.uam.es"
+        },
+        {
+            "progress": [
+                {
+                    "id": "hilos-bar-usr",
+                    "value": 94.6
+                },
+                {
+                    "id": "procesos-bar-usr",
+                    "value": 85.28
+                },
+                {
+                    "id": "ficheros-bar-usr",
+                    "value": 85.5
+                },
+                {
+                    "id": "senyales-bar-usr",
+                    "value": 84.84
+                },
+                {
+                    "id": "semaforos-bar-usr",
+                    "value": 91.5
+                },
+                {
+                    "id": "memoria-bar-usr",
+                    "value": 96.0
+                },
+                {
+                    "id": "colas-bar-usr",
+                    "value": 96.0
+                }
+            ],
+            "username": "angela.valderrama@estudiante.uam.es"
+        },
+        {
+            "progress": [
+                {
+                    "id": "hilos-bar-usr",
+                    "value": 62.1
+                },
+                {
+                    "id": "procesos-bar-usr",
+                    "value": 45.28
+                },
+                {
+                    "id": "ficheros-bar-usr",
+                    "value": 50.69
+                },
+                {
+                    "id": "senyales-bar-usr",
+                    "value": 73.47
+                },
+                {
+                    "id": "semaforos-bar-usr",
+                    "value": 72.13
+                },
+                {
+                    "id": "memoria-bar-usr",
+                    "value": 37.4
+                },
+                {
+                    "id": "colas-bar-usr",
+                    "value": 46.74
+                }
+            ],
+            "username": "marcos.vallea@estudiante.uam.es"
+        }
+    ]
+}

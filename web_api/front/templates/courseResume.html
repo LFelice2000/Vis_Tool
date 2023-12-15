@@ -1,0 +1,45 @@
+{% extends "confPage.html" %}
+
+{% block content%}
+<div class='container-fluid min-vh-100 d-flex justify-content-center align-items-center bg-ligth'>
+
+    <div class="d-flex flex-column" method='POST'>
+
+        <div class="d-flex flex-column">
+            <div class="d-flex gap-2">
+                <a href="#" class="btn btn-success">Actividades<a>
+                <a href="#" class="btn btn-success">Asistencia<a>
+                    <a href="#" class="btn btn-secondary">Resumen<a>
+            </div>
+            <div class=" my-3"><p class="">Por favor, inserte el peso de cada actividad: </p></div>
+        </div>  
+        
+
+        <form class="d-flex flex-column" method='POST'>
+
+            <div class='d-flex my-2 gap-3'>
+    
+                <div class="mx-2"><h5>Quiz:</h5></div>
+                <div class="mx-1 mt-0.5"><p class="">Quiz 1 test</p></div>
+                <select class="form-select mr-3" aria-label="Default select example" style="width: 300px;">
+                        <option>Procesos e Hilos</option>
+                        <option>Semaforos</option>
+                  </select>
+                <input class="mb-2 px-3" id="number_input" type="number" name="w{{activity.tmpId}}" style="width: 70px; heigth: 10px;" required/>
+                <div class=""><p class="">  %</p></div>
+                
+            </div>
+
+            
+            <button type='submit' class='btn btn-primary'>Log In</button>
+        </form>
+    </div>
+    
+    
+</div>
+
+<script>
+
+
+</script>
+{% endblock %}

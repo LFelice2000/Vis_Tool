@@ -1,0 +1,58 @@
+from django.db import models
+from django.core.exceptions import ValidationError
+import re
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+class Teacher(models.Model):
+    id = models.AutoField(primary_key=True, unique=True)
+    email = models.CharField(max_length=200, unique=True)
+
+class Student(models.Model):
+    name = models.CharField(max_length=200)
+    email = models.CharField(max_length=200, unique=True)
+
+class Course(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=200)
+    teacher = models.ManyToManyField(Teacher)
+    students = models.ManyToManyField(Student)
+
+class Grade(models.Model):
+    student = models.ManyToManyField(Student)
+    course = models.ManyToManyField(Course)
+    grade = models.DecimalField(max_digits=4, decimal_places=2, validators=[MaxValueValidator(10), MinValueValidator(0)], default=0)
+
+class Objective(models.Model):
+    name = models.CharField(max_length=200)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, default=None)
+
+class Quiz(models.Model):
+    id = models.AutoField(primary_key=True, unique=True)
+    name = models.CharField(max_length=200)
+    grade = models.ManyToManyField(Grade)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, default=None)
+    objective = models.ForeignKey(Objective, on_delete=models.CASCADE, default=None)
+    weight = models.DecimalField(max_digits=4, decimal_places=2, validators=[MaxValueValidator(100), MinValueValidator(0)], default=0)
+
+class Assignment(models.Model):
+    id = models.AutoField(primary_key=True, unique=True)
+    name = models.CharField(max_length=200)
+    grade = models.ManyToManyField(Grade)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, default=None)
+    objective = models.ForeignKey(Objective, on_delete=models.CASCADE, default=None)
+    weight = models.DecimalField(max_digits=4, decimal_places=2, validators=[MaxValueValidator(100), MinValueValidator(0)], default=0)
+
+class Sesion(models.Model):
+    name = models.CharField(max_length=100)
+    grade = models.ForeignKey(Grade, on_delete=models.CASCADE, default=None, null=True)
+
+class Attendance(models.Model):
+    id = models.AutoField(primary_key=True, unique=True)
+    name = models.CharField(max_length=200)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, default=None)
+    objective = models.ForeignKey(Objective, on_delete=models.CASCADE, default=None)
+    sesions = models.ManyToManyField(Sesion)
+    grade = models.ManyToManyField(Grade)
+    weight = models.DecimalField(max_digits=4, decimal_places=2, validators=[MaxValueValidator(100), MinValueValidator(0)], default=0)

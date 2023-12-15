@@ -1,0 +1,90 @@
+{%load static%}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"> 
+
+        <link rel="stylesheet" src="{% static 'css/style.css' %}">
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+        <style>
+            .overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                animation: fadeIn 0.3s ease-in-out;
+            }
+            
+            .iframe-container {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 40%;
+                height: 40%;
+                background-color: white;
+                border: 1px solid #ccc;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+                animation: fadeIn 0.3s ease-in-out;
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                }
+                to {
+                    opacity: 1;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        {% block content %}
+        <div class='container min-vh-100 d-flex justify-content-center align-items-center bg-ligth'>
+            <form method='POST' action="{% url 'confPage' %}">
+                {% csrf_token %}
+                <div class='form-group'>
+                    <label for='username'>username</label>
+                    <input type='email' name='username' class='form-control mb-3' id='username'/>
+                </div>
+                <div class='form-group'>
+                    <label for='password'>password</label>
+                    <input type='password' name='password' class='form-control mb-3' id='password'/>
+                </div>
+                <button type='submit' id='submitBtn' class='btn btn-success'>Log In</button>
+
+                <input type="hidden" name="objList" value="{{objList}}" />
+                <input type="hidden" name="courseId" value="{{courseId}}" />
+                <input type="hidden" name="courseName" value="{{courseName}}" />
+            </form>
+        </div>
+
+        <div class='overlay d-none' id="overlayCont">
+            <div class="iframe-container d-flex flex-column justify-content-center align-items-center rounded mx-2">
+                <h5>Estamos recolectando los datos</h5>
+                <div class="spinner-border" role="status"></div>
+                <p class="mx-3 my-4">Nota: esta atento al correo para recibir la token de verificacion de outlook</p>
+            </div>
+        </div>
+            
+        
+        {% endblock %}
+    </body>
+    <script>
+        $(document).ready(function () {
+            $('#submitBtn').on('click', function () {
+                document.getElementById("overlayCont").classList.remove("d-none");
+            });
+        });
+    </script>
+</html>
