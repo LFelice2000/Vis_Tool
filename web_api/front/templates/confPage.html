@@ -64,8 +64,10 @@
                 <button type='button' id='submitBtn' class='btn btn-success'>Log In</button>
 
                 <input type="hidden" name="objList" value="{{objList}}" />
+                <input type="hidden" name="activities" id="activities"/>
+                <input type="hidden" name="attendance" id="attendance" />
                 <input type="hidden" name="courseId" id="courseId" value="{{courseId}}" />
-                <input type="hidden" name="courseName" value="{{courseName}}" />
+                <input type="hidden" name="courseName" id="courseName" value="{{courseName}}" />
             </form>
         </div>
 
@@ -92,7 +94,7 @@
                 ws.onopen = function() {
                     console.log("[client] connection open")
 
-                    var payload = {type: "login", username: $('#username').val(), password: $('#password').val(), course: $("#courseId").val()}
+                    var payload = {type: "login", username: $('#username').val(), password: $('#password').val(), courseId: $("#courseId").val(), courseName: $("#courseName").val()}
                     ws.send(JSON.stringify(payload))
 
                     $('#liveUpdate').html('Iniciando sesion...')
@@ -108,6 +110,9 @@
                         $('#liveUpdate').html('Recopilando los datos del curso...')
                     } else if(payload['type'] == "scrap_success") {
                         ws.close()
+
+                        $("#activities").val(payload['activities'])
+                        $("#attendance").val(payload['attendance'])
 
                         $('#loginForm').submit();
                     }

@@ -24,6 +24,7 @@ import time
 import ast
 import os
 import openpyxl
+import json
 
 
 import smtplib
@@ -197,104 +198,7 @@ def visPage(request):
         return render(request, "confPage.html", context=context)
         
     return render(request, "error.html")
-    
 
-def web_scrap(username, password, courseId):
-
-        options = Options()
-        service = Service(executable_path=os.path.join(settings.BASE_DIR, './chromedriver'))
-        prefs = {"download.default_directory" : os.path.join(settings.BASE_DIR, "courseFiles")}
-        options.add_experimental_option("prefs",prefs)
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-dev-shm-usage")
-        options.add_argument('--headless')
-
-        
-        wd = webdriver.Chrome(options=options, service=service)
-        wait = WebDriverWait(wd, 20)
-
-        wd.get("https://moodle.uam.es/login/index.php")
-
-        time.sleep(4)
-        wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'login-identityprovider-btn')))
-
-        wd.find_element(By.CLASS_NAME, 'login-identityprovider-btn').click()
-
-        time.sleep(4)
-        wait.until(EC.presence_of_element_located((By.ID, 'i0116')))
-        
-        wd.find_element(By.ID, 'i0116').send_keys(username)
-        wd.find_element(By.ID, 'idSIButton9').click()
-
-        time.sleep(4)
-        wait.until(EC.presence_of_element_located((By.ID, 'i0118')))
-
-        wd.find_element(By.ID, 'i0118').send_keys(password)
-        wd.find_element(By.ID, 'idSIButton9').click()
-
-        wait.until(EC.presence_of_element_located((By.ID, 'idRichContext_DisplaySign')))
-
-        token = wd.find_element('id', 'idRichContext_DisplaySign').text
-
-        print(f"Your token is {token}")
-        
-        while True:
-
-            try:
-                WebDriverWait(wd, 64).until(EC.presence_of_all_elements_located((By.ID, 'idDiv_SAASTO_Trouble')))
-            except TimeoutException:
-               
-
-                break
-            
-            wd.get("https://moodle.uam.es/login/index.php")
-
-            time.sleep(4)
-            wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'login-identityprovider-btn')))
-
-            wd.find_element(By.CLASS_NAME, 'login-identityprovider-btn').click()
-
-            wait.until(EC.presence_of_element_located((By.ID, 'idRichContext_DisplaySign')))
-
-            token = wd.find_element('id', 'idRichContext_DisplaySign').text
-
-        courseId = courseId.replace("/", "")
-
-        wd.get("https://moodle.uam.es/auth/saml2/login.php?wants&idp=cebe5294a678ea658b3001066ac8533e&passive=off")
-
-        time.sleep(15)
-
-        wd.get(f"https://moodle.uam.es/grade/export/xls/index.php?id={courseId}")
-
-        time.sleep(4)
-
-        wd.find_element('id', 'id_submitbutton').click()
-
-        time.sleep(4)
-
-        wd.get(f"https://moodle.uam.es/course/view.php?id={courseId}")
-
-        urls = wd.find_elements(By.TAG_NAME, "a")
-
-        attendaceFilter = lambda elem: 'https://moodle.uam.es/mod/attendance' in elem.get_attribute('href') if elem.get_attribute('href') is not None else None
-        filteredElems = filter(attendaceFilter, urls)
-        attendanceUrl = next(filteredElems, None)
-
-        attendanceId = attendanceUrl.get_attribute("href").split("?")[1].split("=")[1]
-
-        wd.get(f"https://moodle.uam.es/mod/attendance/export.php?id={attendanceId}")
-
-        wait.until(EC.element_to_be_clickable((By.ID, "id_includenottaken")))
-
-        wd.find_element(By.ID, "id_includenottaken").click()
-        wd.find_element(By.ID, "id_submitbutton").click()
-
-        time.sleep(3)
-
-        wd.delete_all_cookies()
-
-        wd.close()
-    
 @csrf_exempt
 @xframe_options_exempt
 def confPage(request):
@@ -308,22 +212,18 @@ def confPage(request):
         objectiveList = request.POST.get('objList')
         courseName = request.POST.get('courseName')
 
+        print(f"JSON: {json.loads(request.POST.get('activities'))}")
+
+        dataframe = pd.json_normalize(json.loads(request.POST.get("activities")))
+        print(dataframe)
+        
+        attendanceDataframe = pd.json_normalize(json.loads(request.POST.get("attendance")))
+
         teacher = Teacher.objects.filter(email=username)
         
         if teacher.count() == 0:
 
             #web_scrap(username, password, courseId)
-
-            courseFiles = os.listdir(os.path.join(settings.BASE_DIR, "courseFiles"))
-
-            courseData = pd.read_excel(os.path.join(settings.BASE_DIR, f"courseFiles/{courseName} Calificaciones.xlsx"))
-            dataframe = pd.DataFrame(courseData)
-
-            courseAttendance = pd.read_excel(os.path.join(settings.BASE_DIR, f"courseFiles/{courseFiles[0] if courseFiles[0] != f'{courseName} Calificaciones.xlsx' else courseFiles[1]}"), skiprows=[0,1,2])
-            attendanceDataframe = pd.DataFrame(courseAttendance)
-
-            for file in os.listdir(os.path.join(settings.BASE_DIR, "courseFiles")):
-                os.remove(os.path.join(settings.BASE_DIR, f"courseFiles/{file}"))
 
             students = list()
             courseStudents = dataframe.filter(regex='First name|Last name|ID number|Email address|Nombre|Apellido(s)|Número de ID|Dirección de correo')

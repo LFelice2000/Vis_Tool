@@ -470,9 +470,6 @@
                 var realWeight = (totalWeigth/numObjectives);
                 var rowString = "";
                 var objectivesWeightCorrect = true;
-                
-                alert(JSON.stringify(objectiveActivities));
-                alert(JSON.stringify(objectivesWeigth));
 
                 for(i = 0; i < Object.keys(objectivesWeigth).length; i++) {
                     
@@ -482,17 +479,6 @@
                         rowInfo = "<tr><td>" + objectiveActivities[Object.keys(objectivesWeigth)[i]][j]["type"] + ": " + objectiveActivities[Object.keys(objectivesWeigth)[i]][j]["name"] + "</td><td>" + objectiveActivities[Object.keys(objectivesWeigth)[i]][j]["weigth"] + " %</td></tr>"
                         rowString += rowInfo;
                     } 
-                    
-                    //var objectiveColor = "green";
-                    //if (objectivesWeigth[Object.keys(objectivesWeigth)[i]] != 100) {
-                    //    objectiveColor = "red";
-                     //   objectivesWeightCorrect = false;
-                    //}
-
-                    
-                    //rowInfo = "</select></td><td style='color: " + objectiveColor +"'>" + objectivesWeigth[Object.keys(objectivesWeigth)[i]] + "%</td></tr>"
-
-                    //rowString += rowInfo;
                     
                     $('#resumeList tbody').append(rowString);
                 }

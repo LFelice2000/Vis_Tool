@@ -15,6 +15,7 @@ from pathlib import Path
 import json
 import time
 import os
+import pandas as pd
 
 class EchoConsumer(SyncConsumer):
     
@@ -23,11 +24,11 @@ class EchoConsumer(SyncConsumer):
 
     wd_options = Options()
     wd_service = Service(executable_path=os.path.join(BASE_DIR, './chromedriver'))
-    wd_prefs = {"download.default_directory" : os.path.join(WEB_API_PATH, "courseFiles")}
+    wd_prefs = {"download.default_directory" : os.path.join(BASE_DIR, "courseFiles")}
     wd_options.add_experimental_option("prefs",wd_prefs)
     wd_options.add_argument("--no-sandbox")
     wd_options.add_argument("--disable-dev-shm-usage")
-    #wd_options.add_argument('--headless')
+    wd_options.add_argument('--headless')
     
     
     def websocket_connect(self, event):
@@ -104,7 +105,7 @@ class EchoConsumer(SyncConsumer):
         'text': json.dumps(send_payload)
         })
         
-        courseId = receive_payload['course'].replace("/", "")
+        courseId = receive_payload['courseId'].replace("/", "")
 
         self.wd.get("https://moodle.uam.es/auth/saml2/login.php?wants&idp=cebe5294a678ea658b3001066ac8533e&passive=off")
 
@@ -141,7 +142,20 @@ class EchoConsumer(SyncConsumer):
 
         self.wd.close()
 
-        send_payload = {"type": "scrap_success"}
+        courseFiles = os.listdir(os.path.join(BASE_DIR, "courseFiles"))
+        
+        courseName = receive_payload['courseName']
+
+        courseData = pd.read_excel(os.path.join(BASE_DIR, f"courseFiles/{courseName} Calificaciones.xlsx"))
+        activitiesDataframe = pd.DataFrame(courseData)
+
+        courseAttendance = pd.read_excel(os.path.join(BASE_DIR, f"courseFiles/{courseFiles[0] if courseFiles[0] != f'{courseName} Calificaciones.xlsx' else courseFiles[1]}"), skiprows=[0,1,2])
+        attendanceDataframe = pd.DataFrame(courseAttendance)
+
+        for file in os.listdir(os.path.join(BASE_DIR, "courseFiles")):
+            os.remove(os.path.join(BASE_DIR, f"courseFiles/{file}"))
+
+        send_payload = {"type": "scrap_success", "activities": activitiesDataframe.to_json(orient='records', force_ascii=False, default_handler=str), "attendance": attendanceDataframe.to_json(orient='records', force_ascii=False, default_handler=str)}
         self.send({
         'type': 'websocket.send',
         'text': json.dumps(send_payload)

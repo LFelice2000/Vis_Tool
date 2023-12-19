@@ -11,10 +11,22 @@ services:
       - "5432:5432"
     networks:
       - "tfg-network"
+
+  web_scrapper:
+    container_name: "tfgscrapper"
+    build: "./web_scrapper"
+    command: bash -c "python3 manage.py runserver 0.0.0.0:8000"
+    restart: "always"
+    ports:
+      - "8000:8000"
+    networks:
+      - "tfg-network"
+    expose: 
+      - "8000"
   
   web_service:
     container_name: "tfgservice"
-    build: .
+    build: "./web_api"
     command: bash -c "python3 manage.py migrate && python3 manage.py runserver 0.0.0.0:8080"
     restart: "always"
     ports:
