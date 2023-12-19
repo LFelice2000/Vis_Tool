@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    </head>
+    <body>
+        <button class="btn btn-primary m-2" id="testbtn">test connection</button>
+    </body>
+    <script>
+
+        $("#testbtn").on('click', function () {
+
+            const url = 'ws:/localhost:8000/ws/test_connection'
+            const ws = new WebSocket(url)
+
+            ws.onopen = function() {
+                console.log("connection open")
+            }
+
+            ws.onmessage = function(e) {
+                console.log(e)
+                console.log("mesage received")
+            }
+
+            ws.onclose = function(e) {
+                console.log(e)
+                console.log("Connection closed")
+            }
+
+            ws.onerror = function(e) {
+                console.log(e)
+                console.log("something went wrong")
+            }
+
+        });
+
+    </script>
+</html>

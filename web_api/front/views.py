@@ -6,23 +6,17 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.clickjacking import xframe_options_exempt
 from core.models import *
 from core.views import *
-import json
 from urllib.parse import urlencode, quote_plus
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-from selenium.common.exceptions import TimeoutException
-from django.http import HttpResponseNotFound
-from decimal import Decimal
-
 
 from bs4 import BeautifulSoup as bs
+
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.common.action_chains import ActionChains
+from selenium.common.exceptions import TimeoutException
 
 import pandas as pd
 
@@ -203,23 +197,6 @@ def visPage(request):
         return render(request, "confPage.html", context=context)
         
     return render(request, "error.html")
-
-def send_email_token(recipient, token):
-
-    email_body = """\
-    <html>
-      <head></head>
-      <body>
-        
-        <p>Porfavor introduce el token antes de que caduque: %s</p>
-
-      </body>
-    </html>
-    """ % (token)
-    
-    email = EmailMultiAlternatives('A new mail!', email_body, settings.EMAIL_HOST_USER, [recipient])
-    email.content_subtype = "html" # this is the crucial part 
-    email.send()
     
 
 def web_scrap(username, password, courseId):
@@ -262,8 +239,6 @@ def web_scrap(username, password, courseId):
         print(f"Your token is {token}")
         
         while True:
-
-            #send_email_token(username, token)
 
             try:
                 WebDriverWait(wd, 64).until(EC.presence_of_all_elements_located((By.ID, 'idDiv_SAASTO_Trouble')))
@@ -337,7 +312,7 @@ def confPage(request):
         
         if teacher.count() == 0:
 
-            web_scrap(username, password, courseId)
+            #web_scrap(username, password, courseId)
 
             courseFiles = os.listdir(os.path.join(settings.BASE_DIR, "courseFiles"))
 

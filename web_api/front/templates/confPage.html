@@ -51,7 +51,7 @@
     <body>
         {% block content %}
         <div class='container min-vh-100 d-flex justify-content-center align-items-center bg-ligth'>
-            <form method='POST' action="{% url 'confPage' %}">
+            <form method='POST' action="{% url 'confPage' %}" id="loginForm">
                 {% csrf_token %}
                 <div class='form-group'>
                     <label for='username'>username</label>
@@ -61,10 +61,10 @@
                     <label for='password'>password</label>
                     <input type='password' name='password' class='form-control mb-3' id='password'/>
                 </div>
-                <button type='submit' id='submitBtn' class='btn btn-success'>Log In</button>
+                <button type='button' id='submitBtn' class='btn btn-success'>Log In</button>
 
                 <input type="hidden" name="objList" value="{{objList}}" />
-                <input type="hidden" name="courseId" value="{{courseId}}" />
+                <input type="hidden" name="courseId" id="courseId" value="{{courseId}}" />
                 <input type="hidden" name="courseName" value="{{courseName}}" />
             </form>
         </div>
@@ -73,6 +73,7 @@
             <div class="iframe-container d-flex flex-column justify-content-center align-items-center rounded mx-2">
                 <h5>Estamos recolectando los datos</h5>
                 <div class="spinner-border" role="status"></div>
+                <p class="mx-3 my-3" id="liveUpdate"></p>
                 <p class="mx-3 my-4">Nota: esta atento al correo para recibir la token de verificacion de outlook</p>
             </div>
         </div>
@@ -82,8 +83,46 @@
     </body>
     <script>
         $(document).ready(function () {
-            $('#submitBtn').on('click', function () {
+            $('#submitBtn').on('click', function (e) {
                 document.getElementById("overlayCont").classList.remove("d-none");
+
+                const url = 'ws:/localhost:8000/selenium_bot'
+                const ws = new WebSocket(url)
+    
+                ws.onopen = function() {
+                    console.log("[client] connection open")
+
+                    var payload = {type: "login", username: $('#username').val(), password: $('#password').val(), course: $("#courseId").val()}
+                    ws.send(JSON.stringify(payload))
+
+                    $('#liveUpdate').html('Iniciando sesion...')
+                }
+    
+                ws.onmessage = function(e) {
+
+                    var payload = JSON.parse(e.data)
+
+                    if(payload['type'] == "token") {
+                        $('#liveUpdate').html(`Tu token de microsoft es: ${payload['token']} (la aprobación puede tardar unos minutos)`)
+                    } else if(payload['type'] == "token_success") {
+                        $('#liveUpdate').html('Recopilando los datos del curso...')
+                    } else if(payload['type'] == "scrap_success") {
+                        ws.close()
+
+                        $('#loginForm').submit();
+                    }
+                }
+    
+                ws.onclose = function(e) {
+                    console.log(e)
+                    console.log("Connection closed")
+                }
+    
+                ws.onerror = function(e) {
+                    console.log(e)
+                    console.log("something went wrong")
+                }
+
             });
         });
     </script>
