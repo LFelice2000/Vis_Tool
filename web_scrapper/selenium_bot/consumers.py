@@ -30,12 +30,11 @@ class EchoConsumer(SyncConsumer):
     wd_options.add_argument("--disable-dev-shm-usage")
     wd_options.add_argument('--headless')
     
-    
     def websocket_connect(self, event):
       print("[socket] connect event called")
 
       self.wd = webdriver.Chrome(options=self.wd_options, service=self.wd_service)
-      self.wd_wait = WebDriverWait(self.wd, 20)
+      self.wd_wait = WebDriverWait(self.wd, 10)
 
       self.send({
          'type': 'websocket.accept'
@@ -64,30 +63,73 @@ class EchoConsumer(SyncConsumer):
         self.wd.find_element(By.ID, 'idSIButton9').click()
 
         time.sleep(4)
+       
         self.wd_wait.until(EC.presence_of_element_located((By.ID, 'i0118')))
 
-        self.wd.find_element(By.ID, 'i0118').send_keys(receive_payload['password'])
-        self.wd.find_element(By.ID, 'idSIButton9').click()
+        try:
+            self.wd_wait.until(EC.presence_of_element_located((By.ID, 'usernameError')))
 
-        self.wd_wait.until(EC.presence_of_element_located((By.ID, 'idRichContext_DisplaySign')))
-
-        token = self.wd.find_element('id', 'idRichContext_DisplaySign').text
-        
-        while True:
-            
-            print(f"Your token is {token}")
-
-            send_payload = {"type": "token", "token": token}
+            send_payload = {"type": "login_error", "data": "El nombre de usuario proporcionado no existe."}
             self.send({
             'type': 'websocket.send',
             'text': json.dumps(send_payload)
             })
 
+            self.wd.close()
+
+            return
+
+        except TimeoutException:
+          pass
+
+        self.wd.find_element(By.ID, 'i0118').send_keys(receive_payload['password'])
+        self.wd.find_element(By.ID, 'idSIButton9').click()
+
+        try:
+          self.wd_wait.until(EC.presence_of_element_located((By.ID, 'passwordError')))
+
+          send_payload = {"type": "login_error", "data": "La contraseña proporcionada no existe."}
+          self.send({
+          'type': 'websocket.send',
+          'text': json.dumps(send_payload)
+          })
+
+          self.wd.close()
+
+          return
+        except TimeoutException:
+          pass
+
+        self.wd_wait.until(EC.presence_of_element_located((By.ID, 'idRichContext_DisplaySign')))
+
+        token = self.wd.find_element('id', 'idRichContext_DisplaySign').text
+        
+        tryes = 0
+        while True:
+            
+            print(f"Your token is {token}")
+
+            if tryes < 3:
+              send_payload = {"type": "token", "token": token}
+              self.send({
+              'type': 'websocket.send',
+              'text': json.dumps(send_payload)
+              })
+            else:
+              send_payload = {"type": "token_failed"}
+              self.send({
+              'type': 'websocket.send',
+              'text': json.dumps(send_payload)
+              })
+              
+              self.wd.close()
             try:
                 WebDriverWait(self.wd, 64).until(EC.presence_of_all_elements_located((By.ID, 'idDiv_SAASTO_Trouble')))
             except TimeoutException:
                 break
             
+            tryes += 1
+
             self.wd.get("https://moodle.uam.es/login/index.php")
 
             time.sleep(4)
@@ -111,6 +153,12 @@ class EchoConsumer(SyncConsumer):
 
         time.sleep(15)
 
+        send_payload = {"type": "course_scrap", "data": "Descargando los datos de las actividades..."}
+        self.send({
+        'type': 'websocket.send',
+        'text': json.dumps(send_payload)
+        })
+
         self.wd.get(f"https://moodle.uam.es/grade/export/xls/index.php?id={courseId}")
 
         time.sleep(4)
@@ -128,6 +176,12 @@ class EchoConsumer(SyncConsumer):
         attendanceUrl = next(filteredElems, None)
 
         attendanceId = attendanceUrl.get_attribute("href").split("?")[1].split("=")[1]
+
+        send_payload = {"type": "course_scrap", "data": "Descargando los datos de las asistencias..."}
+        self.send({
+        'type': 'websocket.send',
+        'text': json.dumps(send_payload)
+        })
 
         self.wd.get(f"https://moodle.uam.es/mod/attendance/export.php?id={attendanceId}")
 

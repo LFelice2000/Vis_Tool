@@ -34,6 +34,7 @@ ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = [
     'daphne',
     'selenium_bot',
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -72,7 +73,7 @@ TEMPLATES = [
 ]
 
 ASGI_APPLICATION = 'web_scrapper.routing.application'
-WSGI_APPLICATION = 'web_scrapper.wsgi.application'
+#WSGI_APPLICATION = 'web_scrapper.wsgi.application'
 
 
 # Database

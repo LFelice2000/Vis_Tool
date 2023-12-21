@@ -79,6 +79,34 @@
                 <p class="mx-3 my-4">Nota: esta atento al correo para recibir la token de verificacion de outlook</p>
             </div>
         </div>
+
+        <div class='overlay d-none' id="tokenError">
+            <div class="iframe-container d-flex flex-column justify-content-center align-items-center rounded mx-2">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path fill="#953737" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"/></svg>
+                <p class="mx-3 my-4">Error iniciando sesion (token no validado).</p>
+            </div>
+        </div>
+
+        <div class='overlay d-none' id="scrapperError">
+            <div class="iframe-container d-flex flex-column justify-content-center align-items-center rounded mx-2">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path fill="#953737" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"/></svg>
+                <p class="mx-3 my-4" id="wsError">Error desconocido</p>
+            </div>
+        </div>
+
+        <div class='overlay d-none' id="loginError">
+            <div class="iframe-container d-flex flex-column justify-content-center align-items-center rounded mx-2">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path fill="#953737" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"/></svg>
+                <p class="mx-3 my-4" id="loginErr"></p>
+            </div>
+        </div>
+
+        <div class='overlay d-none' id="conectionError">
+            <div class="iframe-container d-flex flex-column justify-content-center align-items-center rounded mx-2">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path fill="#953737" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"/></svg>
+                <p class="mx-3 my-4">Error de conexion</p>
+            </div>
+        </div>
             
         
         {% endblock %}
@@ -106,28 +134,73 @@
 
                     if(payload['type'] == "token") {
                         $('#liveUpdate').html(`Tu token de microsoft es: ${payload['token']} (la aprobación puede tardar unos minutos)`)
+
+                    } else if (payload['type'] == 'token_failed') {
+                        ws.close()
+                        
+                        document.getElementById("overlayCont").classList.add("d-none");
+                        document.getElementById("tokenError").classList.remove("d-none");
+
+                        $('#tokenError').on('click', function () {
+                            document.getElementById("tokenError").classList.add("d-none");
+                            $('#liveUpdate').html()
+                        }) 
+
                     } else if(payload['type'] == "token_success") {
                         $('#liveUpdate').html('Recopilando los datos del curso...')
+
                     } else if(payload['type'] == "scrap_success") {
                         ws.close()
 
                         $("#activities").val(payload['activities'])
                         $("#attendance").val(payload['attendance'])
+                        
+                        $('#loginForm').submit()
 
-                        $('#loginForm').submit();
+                    } else if(payload['type'] == "scrap_success") {
+                        $('#liveUpdate').html(payload['course_scrap'])
+
+                    } else if (payload['type'] == 'login_error') {
+                        ws.close()
+                        
+                        $('#loginErr').html(payload['data'])
+
+                        document.getElementById("overlayCont").classList.add("d-none");
+                        document.getElementById("loginError").classList.remove("d-none");
+
+                        $('#loginError').on('click', function () {
+                            document.getElementById("loginError").classList.add("d-none");
+                            $('#liveUpdate').html()
+                        })
                     }
                 }
-    
+
                 ws.onclose = function(e) {
                     console.log(e)
-                    console.log("Connection closed")
+
+                    if (!document.getElementById("overlayCont").classList.contains("d-none")) {
+
+                        document.getElementById("overlayCont").classList.add("d-none");
+                        document.getElementById("conectionError").classList.remove("d-none");
+
+                        $('#conectionError').on('click', function () {
+                            document.getElementById("conectionError").classList.add("d-none");
+                            $('#liveUpdate').html()
+                        })
+                    }
                 }
     
                 ws.onerror = function(e) {
                     console.log(e)
-                    console.log("something went wrong")
-                }
 
+                    document.getElementById("overlayCont").classList.add("d-none");
+                    document.getElementById("scrapperError").classList.remove("d-none");
+
+                    $('#scrapperError').on('click', function () {
+                        document.getElementById("scrapperError").classList.add("d-none");
+                        $('#liveUpdate').html()
+                    }) 
+                }
             });
         });
     </script>
