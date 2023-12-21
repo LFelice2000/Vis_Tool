@@ -1,13 +1,12 @@
 from channels.routing import ProtocolTypeRouter, URLRouter
-from django.urls import re_path
+from channels.auth import AuthMiddlewareStack
+from django.urls import path
 from selenium_bot.consumers import *
 
 application = ProtocolTypeRouter({
-    'http': URLRouter([
-        re_path(r"selenium_bot", EchoConsumer.as_asgi())
-    ]),
-
-    'websocket': URLRouter([
-        re_path(r"selenium_bot", EchoConsumer.as_asgi())
-    ])
+    "websocket": AuthMiddlewareStack(
+        URLRouter([
+            path("selenium_bot", EchoConsumer.as_asgi()),
+        ])
+    )
 })
