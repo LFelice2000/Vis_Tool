@@ -90,8 +90,9 @@
 
                 const url = 'ws:/localhost:8000/selenium_bot'
                 const ws = new WebSocket(url)
-    
-                ws.onopen = function() {
+
+                ws.onopen = function(e) {
+
                     console.log("[client] connection open")
 
                     var payload = {type: "login", username: $('#username').val(), password: $('#password').val(), courseId: $("#courseId").val(), courseName: $("#courseName").val()}
