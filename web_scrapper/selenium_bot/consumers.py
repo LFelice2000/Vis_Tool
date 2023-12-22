@@ -211,10 +211,11 @@ class EchoConsumer(AsyncWebsocketConsumer):
     wd_options.add_argument('--headless')
     
     async def websocket_connect(self, event):
+
       print("[socket] connect event called")
 
       self.wd = webdriver.Chrome(options=self.wd_options, service=self.wd_service)
-      self.wd_wait = WebDriverWait(self.wd, 20)
+      self.wd_wait = WebDriverWait(self.wd, 10)
 
       await self.accept()
 

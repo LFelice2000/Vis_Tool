@@ -1,5 +1,10 @@
 version: '3.1'
 
+  
+networks:
+  tfg-network1:
+      driver: "bridge"
+
 services:
   db:
     container_name: "tfgdb"
@@ -10,17 +15,17 @@ services:
     ports:
       - "5432:5432"
     networks:
-      - "tfg-network"
+      - "tfg-network1"
 
   web_scrapper:
     container_name: "tfgscrapper"
     build: "./web_scrapper"
-    command: bash -c "python3 manage.py runserver 0.0.0.0:8000"
+    command: bash -c "daphne -p 8000 -b 0.0.0.0 web_scrapper.asgi:application"
     restart: "always"
     ports:
       - "8000:8000"
     networks:
-      - "tfg-network"
+      - "tfg-network1"
     expose: 
       - "8000"
   
@@ -32,19 +37,13 @@ services:
     ports:
       - "8080:8080"
     networks:
-      - "tfg-network"
+      - "tfg-network1"
     depends_on:
       - "db"
       - "web_scrapper"
     expose: 
       - "8080"
       - "4000"
-  
-networks:
-  tfg-network:
-      external: true
-      driver: "bridge"
-      name: "tfg-network"
 
 
     

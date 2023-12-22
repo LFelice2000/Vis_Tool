@@ -1,33 +1,15 @@
 from django.shortcuts import render, redirect
-from django.core.mail import send_mail, EmailMessage, EmailMultiAlternatives
 from django.urls import reverse
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.clickjacking import xframe_options_exempt
 from core.models import *
 from core.views import *
-from urllib.parse import urlencode, quote_plus
-
-from bs4 import BeautifulSoup as bs
-
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
-from selenium.common.exceptions import TimeoutException
 
 import pandas as pd
 
-import time
 import ast
-import os
-import openpyxl
 import json
-
-
-import smtplib
 
 notificationServiceThread = None
 
@@ -65,10 +47,6 @@ def teacherPage(request):
 @csrf_exempt
 @xframe_options_exempt
 def visPage(request):
-    global notificationServiceThread
-
-    if not notificationServiceThread:
-        pass
 
     if request.method == 'GET':
 
@@ -212,18 +190,13 @@ def confPage(request):
         objectiveList = request.POST.get('objList')
         courseName = request.POST.get('courseName')
 
-        print(f"JSON: {json.loads(request.POST.get('activities'))}")
-
         dataframe = pd.json_normalize(json.loads(request.POST.get("activities")))
-        print(dataframe)
         
         attendanceDataframe = pd.json_normalize(json.loads(request.POST.get("attendance")))
 
         teacher = Teacher.objects.filter(email=username)
         
         if teacher.count() == 0:
-
-            #web_scrap(username, password, courseId)
 
             students = list()
             courseStudents = dataframe.filter(regex='First name|Last name|ID number|Email address|Nombre|Apellido(s)|Número de ID|Dirección de correo')
