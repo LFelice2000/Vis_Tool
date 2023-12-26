@@ -57,6 +57,8 @@ def visPage(request):
         courseName = urlParams.get('courseName')
         courseId = urlParams.get('CourseId')
         language = urlParams.get('lan')
+
+        print(language)
         
         #or userMail == 'luis.felice@estudiante.uam.es'
         if is_teacher(userMail) or userMail == 'luis.felice@estudiante.uam.es':
@@ -160,6 +162,7 @@ def visPage(request):
             }
 
             return render(request, "visPage.html", context=context)
+        return render(request, "error.html")
         
     elif request.method == 'POST':
 
@@ -208,12 +211,11 @@ def confPage(request):
                 students.append({"firstName": data.get('Nombre'), "lastName": data.get('Apellido(s)'), "email": data.get('Dirección de correo')})
 
             attendanceSesions = list()
-            attendanceInfo = attendanceDataframe.filter(regex="\d{2} [a-zA-Z]{3} \d{4} \d{1,2}\.\d{2}[amAMpmPM]{2} Todos los estudiantes|Dirección de correo")
+            attendanceInfo = attendanceDataframe[attendanceDataframe.columns.difference(['Apellido(s)', 'Nombre', 'ID de estudiante', 'P', 'L', 'E', 'A', 'R','J','I', 'Sesiones tomadas', 'Puntuación', 'Porcentaje'])]
+
             for col in attendanceInfo:
                 if col != 'Dirección de correo':
                     attendanceSesions.append(col.replace(" Todos los estudiantes", ""))
-                
-
 
             courseContent = dataframe.filter(regex='Quiz|Assignment|Attendance|Cuestionario|Tarea|Asistencia')
             
@@ -244,7 +246,8 @@ def confPage(request):
             studentGradeList = list(dict())
             for student in students:
                 studentActivities = dataframe.loc[dataframe['Dirección de correo'] == student['email']].filter(regex='Email address|Quiz|Assignment|Attendance|Dirección de correo|Cuestionario|Tarea|Asistencia')
-                studentSessions = attendanceInfo.loc[attendanceInfo['Dirección de correo'] == student['email']].filter(regex="\d{2} [a-zA-Z]{3} \d{4} \d{1,2}\.\d{2}[amAMpmPM]{2} Todos los estudiantes|Dirección de correo")
+                studentSessions = attendanceInfo.loc[attendanceInfo['Dirección de correo'] == student['email']]
+                studentSessions = studentSessions[studentSessions.columns.difference(['Apellido(s)', 'Nombre', 'ID de estudiante', 'P', 'L', 'E', 'A', 'R','J','I', 'Sesiones tomadas', 'Puntuación', 'Porcentaje'])]
                 
                 activityList = list(dict())
                 for quiz in quizes:
@@ -259,9 +262,10 @@ def confPage(request):
                         activityList.append({'type': quiz['type'], 'name': quiz['name'], 'grade': studentGrade[i]})
 
                 for attend in attendance:
+
                     studentGrade = studentSessions[f"{attend['sesion']} Todos los estudiantes"][i].split(" ")[0]
 
-                    if studentGrade == 'P' or studentGrade == 'L':
+                    if studentGrade == 'P' or studentGrade == 'L' or studentGrade == 'R':
 
                         activityList.append({'type': attend['type'], 'name': attend['name'], 'sesion': attend['sesion'], 'grade': 10})
                     

@@ -138,6 +138,8 @@ def web_token_confirm(wd, wd_wait):
 
 def web_scrap(receive_payload, wd, wd_wait):
 
+  filesSem.acquire()
+
   courseId = receive_payload['courseId'].replace("/", "")
 
   wd.get("https://moodle.uam.es/auth/saml2/login.php?wants&idp=cebe5294a678ea658b3001066ac8533e&passive=off")
@@ -187,6 +189,8 @@ def web_scrap(receive_payload, wd, wd_wait):
 
   for file in os.listdir(os.path.join(BASE_DIR, "courseFiles")):
       os.remove(os.path.join(BASE_DIR, f"courseFiles/{file}"))
+  
+  filesSem.release()
 
   return {"activitiesDataframe": activitiesDataframe, "attendanceDataframe": attendanceDataframe}
 
@@ -201,7 +205,7 @@ class EchoConsumer(AsyncWebsocketConsumer):
     wd_options.add_experimental_option("prefs",wd_prefs)
     wd_options.add_argument("--no-sandbox")
     wd_options.add_argument("--disable-dev-shm-usage")
-    #wd_options.add_argument('--headless')
+    wd_options.add_argument('--headless')
     
     async def websocket_connect(self, event):
 
@@ -221,7 +225,6 @@ class EchoConsumer(AsyncWebsocketConsumer):
 
       if(receive_payload['type'] == 'login'):
         """
-
         # Web scrap for testing
 
         await loop.run_in_executor(None, functools.partial(web_login_local, receive_payload, self.wd, self.wd_wait))
