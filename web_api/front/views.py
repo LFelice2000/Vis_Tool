@@ -61,7 +61,7 @@ def visPage(request):
         #or userMail == 'luis.felice@estudiante.uam.es'
         if is_teacher(userMail) or userMail == 'luis.felice@estudiante.uam.es':
 
-            if not getTeacher(userMail) or (getTeacher(userMail) and not courseExists(courseName)):
+            if not courseExists(courseName):
             
                 context = {
                     'teacherMail': userMail,
@@ -71,7 +71,11 @@ def visPage(request):
 
                 return render(request, 'confObjectives.html', context=context)
             
-            return redirect(reverse('teacherAdmin'))
+            elif userMail in getTeachersInCourse(courseName):
+
+                return redirect(reverse('teacherAdmin'))
+            
+            return render(request, "error.html")
 
         currCourse = getCurrCourse(courseName)
 
@@ -309,3 +313,6 @@ def confWeigth(request):
 
     return redirect(reverse("createCourse", kwargs={'activities': activitiesInfo, 'studentList': students, "courseName": courseName, 'teacher': teacher, 'studentGrades': studentGrades, 'objectiveList': objectiveList}))
 
+@xframe_options_exempt
+def error(request):
+    return render(request, "error.html")

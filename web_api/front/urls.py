@@ -9,6 +9,7 @@ urlpatterns = [
     path("confWeigth/", views.confWeigth, name="confWeigth"),
     path("teacherAdmin/", views.teacherPage, name="teacherAdmin"),
     path("update/", views.update, name="update"),
+    path("error/", views.error, name='error'),
     path("core/", include("core.urls")),
 ]
 

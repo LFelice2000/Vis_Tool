@@ -5,6 +5,7 @@ from django.http import HttpResponseNotFound
 from core.models import Course, Sesion, Student, Quiz, Teacher, Grade, Objective, Assignment, Attendance
 import os
 
+from django.db import transaction
 
 def createCourse(request, activities, studentList, courseName, teacher, studentGrades, objectiveList):
     
@@ -13,16 +14,40 @@ def createCourse(request, activities, studentList, courseName, teacher, studentG
     studentGradesObj = ast.literal_eval(studentGrades)
     objectiveListObj = ast.literal_eval(objectiveList)
 
-    teacher = Teacher(email=teacher)
-    teacher.save()
+    savepoint = transaction.savepoint()
+    
+    course = None
+    try:
+        with transaction.atomic():
+            course = Course(name=courseName)
+            course.save()
+    except:
+        transaction.rollback()
 
-    course = Course(name=courseName)
-    course.save()
+        return redirect(reverse("error"))
+        
+    teacher = None
+    try:
+        teacher = Teacher.objects.filter(email=teacher, course=course)[0]
+    except:
+
+        try:
+            teacher = Teacher(email=teacher, course=course)
+            teacher.save()
+        except:
+            transaction.rollback()
+
+            return redirect(reverse("error"))
 
     for objective in objectiveListObj:
 
-        obj = Objective(name=objective['name'], course=course)
-        obj.save()
+        try:
+            obj = Objective(name=objective['name'])
+            obj.save()
+        except:
+            transaction.rollback()
+
+            return
 
     for student in studentsObj:
 
@@ -212,3 +237,16 @@ def getStudentEmails(courseName):
 def courseExists(courseName):
 
     return Course.objects.filter(name=courseName).exists()
+
+def getTeachersInCourse(courseName):
+
+    if courseExists(courseName):
+
+        courseTeachers = []
+        for teacher in Teacher.objects.filter(course=courseName):
+
+            courseTeachers.append(teacher.email)
+        
+        return courseTeachers
+    
+    return None

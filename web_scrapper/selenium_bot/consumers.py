@@ -17,37 +17,28 @@ import os
 import pandas as pd
 import asyncio
 import functools
+from threading import Semaphore as sem
+
+filesSem = sem()
 
 def web_login_local(receive_payload, wd, wd_wait):
    
   wd.get("http://localhost:8080/login/index.php")
 
   time.sleep(4)
-  wd_wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'login-identityprovider-btn')))
-
-  wd.find_element(By.CLASS_NAME, 'login-identityprovider-btn').click()
-
-  time.sleep(4)
-  wd_wait.until(EC.presence_of_element_located((By.ID, 'i0116')))
+  wd_wait.until(EC.presence_of_element_located((By.ID, 'username')))
   
-  wd.find_element(By.ID, 'i0116').send_keys(receive_payload['username'])
-  wd.find_element(By.ID, 'idSIButton9').click()
-
-  time.sleep(4)
-  wd_wait.until(EC.presence_of_element_located((By.ID, 'i0118')))
-
-  wd.find_element(By.ID, 'i0118').send_keys(receive_payload['password'])
-  wd.find_element(By.ID, 'idSIButton9').click()
-
-  wd_wait.until(EC.presence_of_element_located((By.ID, 'idRichContext_DisplaySign')))
-
-  token = wd.find_element('id', 'idRichContext_DisplaySign').text
-  
-  return token
+  wd.find_element(By.ID, 'username').send_keys(receive_payload['username'])
+  wd.find_element(By.ID, 'password').send_keys(receive_payload['password'])
+  wd.find_element(By.ID, 'loginbtn').click()
 
 def web_scrap_local(receive_payload, wd, wd_wait):
 
   courseId = receive_payload['courseId'].replace("/", "")
+
+  filesSem.acquire()
+
+  print("[socket] Descargando datos...")
 
   wd.get(f"http://localhost:8080/grade/export/xls/index.php?id={courseId}")
 
@@ -92,6 +83,8 @@ def web_scrap_local(receive_payload, wd, wd_wait):
 
   for file in os.listdir(os.path.join(BASE_DIR, "courseFiles")):
       os.remove(os.path.join(BASE_DIR, f"courseFiles/{file}"))
+  
+  filesSem.release()
 
   return {"activitiesDataframe": activitiesDataframe, "attendanceDataframe": attendanceDataframe}
 
@@ -208,7 +201,7 @@ class EchoConsumer(AsyncWebsocketConsumer):
     wd_options.add_experimental_option("prefs",wd_prefs)
     wd_options.add_argument("--no-sandbox")
     wd_options.add_argument("--disable-dev-shm-usage")
-    wd_options.add_argument('--headless')
+    #wd_options.add_argument('--headless')
     
     async def websocket_connect(self, event):
 
@@ -227,7 +220,22 @@ class EchoConsumer(AsyncWebsocketConsumer):
       receive_payload = json.loads(event.get('text'))
 
       if(receive_payload['type'] == 'login'):
-        
+        """
+
+        # Web scrap for testing
+
+        await loop.run_in_executor(None, functools.partial(web_login_local, receive_payload, self.wd, self.wd_wait))
+
+        send_payload = {"type": "token_success"}
+        await self.send(json.dumps(send_payload))
+
+        courseInfo =  await loop.run_in_executor(None, functools.partial(web_scrap_local, receive_payload, self.wd, self.wd_wait))
+
+        """
+
+        # Web scrap in final moodle page
+
+
         token = await loop.run_in_executor(None, functools.partial(web_login, receive_payload, self.wd, self.wd_wait))
 
         while token != None:
@@ -241,6 +249,8 @@ class EchoConsumer(AsyncWebsocketConsumer):
         await self.send(json.dumps(send_payload))
         
         courseInfo =  await loop.run_in_executor(None, functools.partial(web_scrap, receive_payload, self.wd, self.wd_wait))
+        
+        
 
         send_payload = {"type": "scrap_success", "activities": courseInfo["activitiesDataframe"].to_json(orient='records', force_ascii=False, default_handler=str), "attendance": courseInfo["attendanceDataframe"].to_json(orient='records', force_ascii=False, default_handler=str)}
         await self.send(json.dumps(send_payload))

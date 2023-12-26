@@ -5,19 +5,19 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+class Course(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=200)
+
 class Teacher(models.Model):
     id = models.AutoField(primary_key=True, unique=True)
     email = models.CharField(max_length=200, unique=True)
+    course = models.ManyToManyField(Course)
 
 class Student(models.Model):
     name = models.CharField(max_length=200)
     email = models.CharField(max_length=200, unique=True)
-
-class Course(models.Model):
-    id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=200)
-    teacher = models.ManyToManyField(Teacher)
-    students = models.ManyToManyField(Student)
+    course = models.ManyToManyField(Course)
 
 class Grade(models.Model):
     student = models.ManyToManyField(Student)
