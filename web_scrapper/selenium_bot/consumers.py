@@ -89,29 +89,32 @@ def web_scrap_local(receive_payload, wd, wd_wait):
   return {"activitiesDataframe": activitiesDataframe, "attendanceDataframe": attendanceDataframe}
 
 def web_login(receive_payload, wd, wd_wait):
-   
-  wd.get("https://moodle.uam.es/login/index.php")
-
-  time.sleep(4)
-  wd_wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'login-identityprovider-btn')))
-
-  wd.find_element(By.CLASS_NAME, 'login-identityprovider-btn').click()
-
-  time.sleep(4)
-  wd_wait.until(EC.presence_of_element_located((By.ID, 'i0116')))
   
-  wd.find_element(By.ID, 'i0116').send_keys(receive_payload['username'])
-  wd.find_element(By.ID, 'idSIButton9').click()
+  try:
+    wd.get("https://moodle.uam.es/login/index.php")
 
-  time.sleep(4)
-  wd_wait.until(EC.presence_of_element_located((By.ID, 'i0118')))
+    time.sleep(4)
+    wd_wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'login-identityprovider-btn')))
 
-  wd.find_element(By.ID, 'i0118').send_keys(receive_payload['password'])
-  wd.find_element(By.ID, 'idSIButton9').click()
+    wd.find_element(By.CLASS_NAME, 'login-identityprovider-btn').click()
 
-  wd_wait.until(EC.presence_of_element_located((By.ID, 'idRichContext_DisplaySign')))
+    time.sleep(4)
+    wd_wait.until(EC.presence_of_element_located((By.ID, 'i0116')))
+    
+    wd.find_element(By.ID, 'i0116').send_keys(receive_payload['username'])
+    wd.find_element(By.ID, 'idSIButton9').click()
 
-  token = wd.find_element('id', 'idRichContext_DisplaySign').text
+    time.sleep(4)
+    wd_wait.until(EC.presence_of_element_located((By.ID, 'i0118')))
+
+    wd.find_element(By.ID, 'i0118').send_keys(receive_payload['password'])
+    wd.find_element(By.ID, 'idSIButton9').click()
+
+    wd_wait.until(EC.presence_of_element_located((By.ID, 'idRichContext_DisplaySign')))
+
+    token = wd.find_element('id', 'idRichContext_DisplaySign').text
+  except:
+    return None
   
   return token
 
@@ -142,53 +145,60 @@ def web_scrap(receive_payload, wd, wd_wait):
 
   courseId = receive_payload['courseId'].replace("/", "")
 
-  wd.get("https://moodle.uam.es/auth/saml2/login.php?wants&idp=cebe5294a678ea658b3001066ac8533e&passive=off")
+  try:
 
-  time.sleep(15)
+    wd.get("https://moodle.uam.es/auth/saml2/login.php?wants&idp=cebe5294a678ea658b3001066ac8533e&passive=off")
 
-  wd.get(f"https://moodle.uam.es/grade/export/xls/index.php?id={courseId}")
+    time.sleep(15)
 
-  time.sleep(4)
+    wd.get(f"https://moodle.uam.es/grade/export/xls/index.php?id={courseId}")
 
-  wd.find_element('id', 'id_submitbutton').click()
+    time.sleep(4)
 
-  time.sleep(4)
+    wd.find_element('id', 'id_submitbutton').click()
 
-  wd.get(f"https://moodle.uam.es/course/view.php?id={courseId}")
+    time.sleep(4)
 
-  urls = wd.find_elements(By.TAG_NAME, "a")
+    wd.get(f"https://moodle.uam.es/course/view.php?id={courseId}")
 
-  attendaceFilter = lambda elem: 'https://moodle.uam.es/mod/attendance' in elem.get_attribute('href') if elem.get_attribute('href') is not None else None
-  filteredElems = filter(attendaceFilter, urls)
-  attendanceUrl = next(filteredElems, None)
+    urls = wd.find_elements(By.TAG_NAME, "a")
 
-  attendanceId = attendanceUrl.get_attribute("href").split("?")[1].split("=")[1]
+    attendaceFilter = lambda elem: 'https://moodle.uam.es/mod/attendance' in elem.get_attribute('href') if elem.get_attribute('href') is not None else None
+    filteredElems = filter(attendaceFilter, urls)
+    attendanceUrl = next(filteredElems, None)
 
-  wd.get(f"https://moodle.uam.es/mod/attendance/export.php?id={attendanceId}")
+    attendanceId = attendanceUrl.get_attribute("href").split("?")[1].split("=")[1]
 
-  wd_wait.until(EC.element_to_be_clickable((By.ID, "id_includenottaken")))
+    wd.get(f"https://moodle.uam.es/mod/attendance/export.php?id={attendanceId}")
 
-  wd.find_element(By.ID, "id_includenottaken").click()
-  wd.find_element(By.ID, "id_submitbutton").click()
+    wd_wait.until(EC.element_to_be_clickable((By.ID, "id_includenottaken")))
 
-  time.sleep(3)
+    wd.find_element(By.ID, "id_includenottaken").click()
+    wd.find_element(By.ID, "id_submitbutton").click()
 
-  wd.delete_all_cookies()
+    time.sleep(3)
 
-  wd.close()
+    wd.delete_all_cookies()
 
-  courseFiles = os.listdir(os.path.join(BASE_DIR, "courseFiles"))
-  
-  courseName = receive_payload['courseName']
+    wd.close()
 
-  courseData = pd.read_excel(os.path.join(BASE_DIR, f"courseFiles/{courseName} Calificaciones.xlsx"))
-  activitiesDataframe = pd.DataFrame(courseData)
+    courseFiles = os.listdir(os.path.join(BASE_DIR, "courseFiles"))
+    
+    courseName = receive_payload['courseName']
 
-  courseAttendance = pd.read_excel(os.path.join(BASE_DIR, f"courseFiles/{courseFiles[0] if courseFiles[0] != f'{courseName} Calificaciones.xlsx' else courseFiles[1]}"), skiprows=[0,1,2])
-  attendanceDataframe = pd.DataFrame(courseAttendance)
+    courseData = pd.read_excel(os.path.join(BASE_DIR, f"courseFiles/{courseName} Calificaciones.xlsx"))
+    activitiesDataframe = pd.DataFrame(courseData)
 
-  for file in os.listdir(os.path.join(BASE_DIR, "courseFiles")):
-      os.remove(os.path.join(BASE_DIR, f"courseFiles/{file}"))
+    courseAttendance = pd.read_excel(os.path.join(BASE_DIR, f"courseFiles/{courseFiles[0] if courseFiles[0] != f'{courseName} Calificaciones.xlsx' else courseFiles[1]}"), skiprows=[0,1,2])
+    attendanceDataframe = pd.DataFrame(courseAttendance)
+
+    for file in os.listdir(os.path.join(BASE_DIR, "courseFiles")):
+        os.remove(os.path.join(BASE_DIR, f"courseFiles/{file}"))
+  except:
+
+    filesSem.release()
+
+    return None
   
   filesSem.release()
 
@@ -238,8 +248,13 @@ class EchoConsumer(AsyncWebsocketConsumer):
 
         # Web scrap in final moodle page
 
-
         token = await loop.run_in_executor(None, functools.partial(web_login, receive_payload, self.wd, self.wd_wait))
+
+        if token is None:
+          send_payload = {"type": "login_error", "data": "Error login in, please check your credentials"}
+          await self.send(json.dumps(send_payload))
+
+          return
 
         while token != None:
 
@@ -253,7 +268,9 @@ class EchoConsumer(AsyncWebsocketConsumer):
         
         courseInfo =  await loop.run_in_executor(None, functools.partial(web_scrap, receive_payload, self.wd, self.wd_wait))
         
-        
+        if courseInfo is None:
+          send_payload = {"type": "scrap_success", "activities": courseInfo["activitiesDataframe"].to_json(orient='records', force_ascii=False, default_handler=str), "attendance": courseInfo["attendanceDataframe"].to_json(orient='records', force_ascii=False, default_handler=str)}
+          await self.send(json.dumps(send_payload))
 
         send_payload = {"type": "scrap_success", "activities": courseInfo["activitiesDataframe"].to_json(orient='records', force_ascii=False, default_handler=str), "attendance": courseInfo["attendanceDataframe"].to_json(orient='records', force_ascii=False, default_handler=str)}
         await self.send(json.dumps(send_payload))

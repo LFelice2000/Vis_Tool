@@ -1,10 +1,9 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
 import ast
-from django.http import HttpResponseNotFound
 from core.models import Course, Sesion, Student, Quiz, Teacher, Grade, Objective, Assignment, Attendance
-import os
 
+from django.db import IntegrityError
 from django.db import transaction
 
 def createCourse(request, activities, studentList, courseName, teacher, studentGrades, objectiveList):
@@ -29,13 +28,20 @@ def createCourse(request, activities, studentList, courseName, teacher, studentG
 
             for objective in objectiveListObj:
 
+                if  Objective.objects.filter(name=objective['name'], course=course).count() > 0:
+                    raise IntegrityError
+                
                 obj = Objective(name=objective['name'], course=course)
                 obj.save()
 
             for student in studentsObj:
-
-                stndt = Student(email=student['email'], name=f"{student['firstName']} {student['lastName']}")
-                stndt.save()
+                tmp = getRegisteredStudents()
+                stndt = None
+                if student['email'] not in getRegisteredStudents():
+                    stndt = Student(email=student['email'], name=f"{student['firstName']} {student['lastName']}")
+                    stndt.save()
+                else:
+                    stndt = Student.objects.filter(email=student['email']).first()
 
                 stndt.course.add(course)
 
@@ -238,3 +244,7 @@ def getTeachersInCourse(courseName):
         return courseTeachers
     
     return None
+
+def getRegisteredStudents():
+
+    return [s.email for s in Student.objects.all()]

@@ -206,7 +206,7 @@ def confPage(request):
         if teacher.count() == 0:
 
             students = list()
-            courseStudents = dataframe.filter(regex='First name|Last name|ID number|Email address|Nombre|Apellido(s)|Número de ID|Dirección de correo')
+            courseStudents = dataframe.filter(regex='First name|Last name|ID number|Email address|Nombre|Apellido\(s\)|Número de ID|Dirección de correo')
             for (col, data) in courseStudents.iterrows():
                 students.append({"firstName": data.get('Nombre'), "lastName": data.get('Apellido(s)'), "email": data.get('Dirección de correo')})
 
