@@ -28,6 +28,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+SECURE_SSL_REDIRECT = True
+
+HTTPS_PROTOCOL = 'https'
+
+HTTPS_PORT = 443
+
 # Application definition
 
 INSTALLED_APPS = [
