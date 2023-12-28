@@ -32,7 +32,7 @@ services:
   web_service:
     container_name: "tfgservice"
     build: "./web_api"
-    command: bash -c "python3 manage.py migrate && gunicorn -b 150.244.58.52:8080 web_api.wsgi:application"
+    command: bash -c "python3 manage.py migrate && gunicorn -b 0.0.0.0:8080 web_api.wsgi:application"
     restart: "always"
     ports:
       - "8080:8080"
