@@ -34,6 +34,8 @@ HTTPS_PROTOCOL = 'https'
 
 HTTPS_PORT = 443
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # Application definition
 
 INSTALLED_APPS = [
