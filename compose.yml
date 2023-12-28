@@ -35,7 +35,7 @@ services:
     command: bash -c "python3 manage.py migrate && python3 manage.py runserver 0.0.0.0:4000"
     restart: "always"
     ports:
-      - "8080:8080"
+      - "4000:4000"
     networks:
       - "tfg-network1"
     depends_on:
