@@ -32,16 +32,17 @@ services:
   web_service:
     container_name: "tfgservice"
     build: "./web_api"
-    command: bash -c "python3 manage.py migrate && python3 manage.py runserver 0.0.0.0:4000"
+    command: bash -c "python3 manage.py migrate && python3 manage.py runserver 0.0.0.0:8080"
     restart: "always"
     ports:
-      - "0.0.0.0:4000:4000"
+      - "8080:8080"
     networks:
       - "tfg-network1"
     depends_on:
       - "db"
       - "web_scrapper"
-    expose:
+    expose: 
+      - "8080"
       - "4000"
 
     
