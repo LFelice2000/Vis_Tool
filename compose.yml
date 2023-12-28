@@ -20,7 +20,7 @@ services:
   web_scrapper:
     container_name: "tfgscrapper"
     build: "./web_scrapper"
-    command: bash -c "daphne -p 8000 -b 0.0.0.0 web_api.asgi:application"
+    command: bash -c "daphne -p 8000 -b 0.0.0.0 web_scrapper.asgi:application"
     restart: "always"
     ports:
       - "8000:8000"
@@ -32,7 +32,7 @@ services:
   web_service:
     container_name: "tfgservice"
     build: "./web_api"
-    command: bash -c "python3 manage.py migrate && gunicorn web_api.wsgi:application"
+    command: bash -c "python3 manage.py migrate && gunicorn -b :8080 web_api.wsgi:application"
     restart: "always"
     ports:
       - "8080:8080"
