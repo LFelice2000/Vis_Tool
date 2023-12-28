@@ -42,7 +42,6 @@ services:
       - "db"
       - "web_scrapper"
     expose: 
-      - "8080"
       - "4000"
 
     
