@@ -35,7 +35,7 @@ def createCourse(request, activities, studentList, courseName, teacher, studentG
                 obj.save()
 
             for student in studentsObj:
-                tmp = getRegisteredStudents()
+
                 stndt = None
                 if student['email'] not in getRegisteredStudents():
                     stndt = Student(email=student['email'], name=f"{student['firstName']} {student['lastName']}")
