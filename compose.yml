@@ -25,7 +25,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./etc/letsencrypt/live/nabu.ii.uam.es:/etc/letsencrypt/live/nabu.ii.uam.es/
+      - /etc/letsencrypt/live/nabu.ii.uam.es:/etc/letsencrypt/live/nabu.ii.uam.es/
     networks:
       - "tfg-network1"
     expose: 
