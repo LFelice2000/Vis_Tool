@@ -40,7 +40,8 @@ services:
       - "tfg-network1"
     depends_on:
       - "db"
-      - "we
+      - "web_scrapper"
+    expose:
       - "4000"
 
     
