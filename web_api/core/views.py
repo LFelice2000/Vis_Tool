@@ -367,3 +367,25 @@ def getAttendaceSessions(courseName):
                 return [s.name for s in ses]
 
     return None
+
+def getObjectiveActivities(objectiveName, Coursename):
+
+    objectivesACtivities = []
+    course = Course.objects.filter(name=Coursename).first()
+
+    if course:
+
+        obj = Objective.objects.filter(course=course, name=objectiveName).first()
+        quizes = Quiz.objects.filter(objective=obj, course=course)
+
+        objectivesACtivities += [q for q in quizes]
+
+        assignment = Assignment.objects.filter(objective=obj, course=course)
+        objectivesACtivities += [q for q in assignment]
+
+        attendance = Attendance.objects.filter(objective=obj, course=course)
+        objectivesACtivities += [q for q in attendance]
+
+        return objectivesACtivities
+    
+    return None

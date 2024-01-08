@@ -128,6 +128,10 @@ def visPage(request):
             percentageObjectives = list(dict())
             for objective in getCourseObjectives(courseName):
 
+                #for activity in getObjectiveActivities(objective.name, currCourse.name):
+
+
+
                 #Variables para el progreso personal
                 gradeAcumulator = 0
                 weigthAcumulator = 0
