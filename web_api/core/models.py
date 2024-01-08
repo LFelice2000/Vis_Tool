@@ -46,7 +46,7 @@ class Assignment(models.Model):
 
 class Sesion(models.Model):
     name = models.CharField(max_length=100)
-    grade = models.ForeignKey(Grade, on_delete=models.CASCADE, default=None, null=True)
+    grade = models.ManyToManyField(Grade)
 
 class Attendance(models.Model):
     id = models.AutoField(primary_key=True, unique=True)
@@ -54,5 +54,4 @@ class Attendance(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, default=None)
     objective = models.ForeignKey(Objective, on_delete=models.CASCADE, default=None)
     sesions = models.ManyToManyField(Sesion)
-    grade = models.ManyToManyField(Grade)
     weight = models.DecimalField(max_digits=4, decimal_places=2, validators=[MaxValueValidator(100), MinValueValidator(0)], default=0)

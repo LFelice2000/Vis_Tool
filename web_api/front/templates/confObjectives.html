@@ -1,131 +1,131 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="es">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Progreso laboratorio SOPER</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-        <link rel="stylesheet" type='text/css' href="{% static 'css/style.css' %}">
-    </head>
-    <body>
-        <div class="container-fluid d-flex flex-column py-3">
-            <h1>Añadir Objetivos</h1>
-            <div class="form-group d-flex flex-row py-3 gap-3">
-                <label for="objectiveName">Nombre Del Objetivo</label>
-                <input class="form-control" type="text" id="objectiveName" style="width: 300px;"/>
-                <button type="button" class="btn btn-success" id="addObjt">añadir</button>
-            </div>
-            <h4 class="my-3">Resumen Objetivos</h4>
-            <form method="post">
-                {% csrf_token %}
-                <ul class="list-group" id="objList">
-                </ul>
-                <button type='submit' class='btn btn-success my-3' id='submBtn'>Confirmar</button>
+{% extends "base.html" %}
 
-                <input type="hidden" name="teacherMail" value="{{teacherMail}}" />
-                <input type="hidden" name="courseId" value="{{courseId}}" />
-                <input type="hidden" name="courseName" value="{{courseName}}" />
-            </form>
-        </div>
+{% block content %}
 
-        <div class='overlay d-none' id="errorCont">
-            <div class="iframe-container d-flex flex-column rounded mx-2">
-                <div class="sticky-top d-flex justify-content-end mb-5">
-                    <button class="btn btn btn-outline" id="ErrClose"><svg xmlns="http://www.w3.org/2000/svg" height="16" width="12" viewBox="0 0 384 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path fill="#575757" d="M376.6 84.5c11.3-13.6 9.5-33.8-4.1-45.1s-33.8-9.5-45.1 4.1L192 206 56.6 43.5C45.3 29.9 25.1 28.1 11.5 39.4S-3.9 70.9 7.4 84.5L150.3 256 7.4 427.5c-11.3 13.6-9.5 33.8 4.1 45.1s33.8 9.5 45.1-4.1L192 306 327.4 468.5c11.3 13.6 31.5 15.4 45.1 4.1s15.4-31.5 4.1-45.1L233.7 256 376.6 84.5z"/></svg></button>
-                </div>
-                <div class="d-flex flex-column justify-content-center align-items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path fill="#953737" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"/></svg>
-                    <p class="mx-3 my-4" id="errorInfo"></p>
-                </div>
-            </div>
-        </div>
+<div class="mt-5 d-flex flex-column justify-content-center align-items-center">
+    <h1>Añadir Objetivos</h1>
+    
+    <div class="form-group d-flex flex-row py-3 gap-3">
+        <label for="objectiveName">Nombre Del Objetivo:</label>
+        <input class="form-control" type="text" id="objectiveName" style="width: 300px;"/>
+        <button type="button" class="btn btn-success" id="addObjt">añadir</button>
+    </div> 
+</div>
 
-    </body>
-    <script>
 
-        $(document).ready(function() {
+<h4>Resumen Objetivos</h4>
+<form method="post">
+    {% csrf_token %}
+    <ul class="list-group" id="objList">
+    </ul>
+    <button type='submit' class='btn btn-success my-3' id='submBtn'>Confirmar</button>
 
-            $(document).on('keypress', function (e){
-                
-                if (e.which == 13 ) {
+    <input type="hidden" name="teacherMail" value="{{teacherMail}}" />
+    <input type="hidden" name="courseId" value="{{courseId}}" />
+    <input type="hidden" name="courseName" value="{{courseName}}" />
+    <input type="hidden" name="courseShortName" value="{{courseShortName}}" />
+    <input type="hidden" name="update" id="updateFlag" value="0" />
+</form>
+{% endblock%}
 
-                    $('#addObjt').trigger('click')
-                }
+
+{% block overlays %}
+<div class='overlay d-none' id="errorCont">
+<div class="iframe-container d-flex flex-column rounded mx-2">
+    <div class="sticky-top d-flex justify-content-end mb-5">
+        <button class="btn btn btn-outline" id="ErrClose"><svg xmlns="http://www.w3.org/2000/svg" height="16" width="12" viewBox="0 0 384 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path fill="#575757" d="M376.6 84.5c11.3-13.6 9.5-33.8-4.1-45.1s-33.8-9.5-45.1 4.1L192 206 56.6 43.5C45.3 29.9 25.1 28.1 11.5 39.4S-3.9 70.9 7.4 84.5L150.3 256 7.4 427.5c-11.3 13.6-9.5 33.8 4.1 45.1s33.8 9.5 45.1-4.1L192 306 327.4 468.5c11.3 13.6 31.5 15.4 45.1 4.1s15.4-31.5 4.1-45.1L233.7 256 376.6 84.5z"/></svg></button>
+    </div>
+    <div class="d-flex flex-column justify-content-center align-items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path fill="#953737" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"/></svg>
+        <p class="mx-3 my-4" id="errorInfo"></p>
+    </div>
+</div>
+</div>
+{% endblock %}
+
+
+{% block scripts%}
+<script>
+
+$(document).ready(function() {
+
+$(document).on('keypress', function (e){
+    
+    if (e.which == 13 ) {
+
+        $('#addObjt').trigger('click')
+    }
+})
+
+$('#objectiveName').on('keydown', function (e) {
+    var codigoTecla = event.which || event.keyCode;
+
+    if (codigoTecla === 190 || codigoTecla === 188) {
+    // Evitamos la acción por defecto (añadir el punto o la coma)
+    event.preventDefault();
+    }
+});
+
+$('#submBtn').hide();
+
+$('#addObjt').on('click', function () {
+    var objName = document.getElementById("objectiveName");
+    var appendObj = "<li class='list-group-item d-flex flex-row justify-content-between'><span class='py-2'>"+String(objName.value).trim()+" </span><button type='button' class='btn btn-primary-outline' id='deleteObj'><i class='bi bi-trash'></i></button></li>"
+    var uls = document.getElementsByTagName('li');
+    
+    for(var i=0;i<uls.length;i++){
+        if(String(uls[i].children[0].innerHTML).trim() == String(objName.value).trim()) {
+
+            document.getElementById('errorCont').classList.remove('d-none');
+            
+            $('#errorInfo').html("Ya existe un objetivo con el nombre " + String(objName.value))
+            $('#ErrClose').on('click', function () {
+                document.getElementById('errorCont').classList.add('d-none');
             })
 
-            $('#objectiveName').on('keydown', function (e) {
-                var codigoTecla = event.which || event.keyCode;
-
-                if (codigoTecla === 190 || codigoTecla === 188) {
-                // Evitamos la acción por defecto (añadir el punto o la coma)
-                event.preventDefault();
-                }
-            });
-
-            $('#submBtn').hide();
-
-            $('#addObjt').on('click', function () {
-                var objName = document.getElementById("objectiveName");
-                var appendObj = "<li class='list-group-item d-flex flex-row justify-content-between'><span class='py-2'>"+String(objName.value).trim()+" </span><button type='button' class='btn btn-primary-outline' id='deleteObj'><i class='bi bi-trash'></i></button></li>"
-                var uls = document.getElementsByTagName('li');
-                
-                for(var i=0;i<uls.length;i++){
-                    if(String(uls[i].children[0].innerHTML).trim() == String(objName.value).trim()) {
-
-                        document.getElementById('errorCont').classList.remove('d-none');
-                        
-                        $('#errorInfo').html("Ya existe un objetivo con el nombre " + String(objName.value))
-                        $('#ErrClose').on('click', function () {
-                            document.getElementById('errorCont').classList.add('d-none');
-                        })
-
-                        return;
-                    }
-                    
-                }
-                
-
-                if(String(objName.value).length == 0) {
-                    
-                    document.getElementById('errorCont').classList.remove('d-none');
-                        
-                    $('#errorInfo').html("Objective name can not be empty.")
-                    $('#ErrClose').on('click', function () {
-                        document.getElementById('errorCont').classList.add('d-none');
-                    })
-
-                    return;
-                }
-
-                $('ul').append(appendObj);
-                $('ul').append("<input type='hidden' name='objectives[]' value='"+String(objName.value).trim()+"' id='"+String(objName.value).trim()+"'/>");
-                
-                if($("ul li").length >= 1) {
-                    $('#submBtn').show();
-                }
-
-                $("#objectiveName").val('');
-            });
-    
-            $(document).on('click', '#deleteObj', function () {
-                
-                var objId = "#" + String($(this).parent().children().html()).trim();
-                $(objId).remove();
-                
-                $(this).parent().remove();
-
-                if($("ul li").length == 0) {
-                    $('#submBtn').hide();
-                }
-
-
-            });
-
-        });
+            return;
+        }
+        
+    }
     
 
-    </script>
-</html>
+    if(String(objName.value).length == 0) {
+        
+        document.getElementById('errorCont').classList.remove('d-none');
+            
+        $('#errorInfo').html("Objective name can not be empty.")
+        $('#ErrClose').on('click', function () {
+            document.getElementById('errorCont').classList.add('d-none');
+        })
+
+        return;
+    }
+
+    $('ul').append(appendObj);
+    $('ul').append("<input type='hidden' name='objectives[]' value='"+String(objName.value).trim()+"' id='"+String(objName.value).trim()+"'/>");
+    
+    if($("ul li").length >= 1) {
+        $('#submBtn').show();
+    }
+
+    $("#objectiveName").val('');
+});
+
+$(document).on('click', '#deleteObj', function () {
+    
+    var objId = "#" + String($(this).parent().children().html()).trim();
+    $(objId).remove();
+    
+    $(this).parent().remove();
+
+    if($("ul li").length == 0) {
+        $('#submBtn').hide();
+    }
+
+
+});
+
+});
+
+</script>
+{% endblock%}

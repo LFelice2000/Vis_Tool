@@ -7,7 +7,7 @@ urlpatterns = [
     path("", views.visPage, name="index"),
     path("confPage/", views.confPage, name="confPage"),
     path("confWeigth/", views.confWeigth, name="confWeigth"),
-    path("teacherAdmin/", views.teacherPage, name="teacherAdmin"),
+    path("teacherAdmin/<str:courseName>/<str:courseShortName>/<str:teacherMail>/<str:courseId>", views.teacherPage, name="teacherAdmin"),
     path("update/", views.update, name="update"),
     path("error/", views.error, name='error'),
     path("core/", include("core.urls")),

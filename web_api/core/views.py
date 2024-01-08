@@ -6,7 +6,7 @@ from core.models import Course, Sesion, Student, Quiz, Teacher, Grade, Objective
 from django.db import IntegrityError
 from django.db import transaction
 
-def createCourse(request, activities, studentList, courseName, teacher, studentGrades, objectiveList):
+def createCourse(request, activities, studentList, courseName, courseShortName, teacher, studentGrades, objectiveList, courseId):
     
     activitiesObj = ast.literal_eval(activities)
     studentsObj = ast.literal_eval(studentList)
@@ -62,15 +62,10 @@ def createCourse(request, activities, studentList, courseName, teacher, studentG
 
             for activity in activitiesObj['asistance']:
 
-                ses = Sesion(name=activity['sesion'])
-                ses.save()
-
                 obj = Objective.objects.filter(name=activity['objective'], course=course)
 
                 act = Attendance(name=activity['activityName'], course=course, objective=obj[0], weight=float(activity['weigth']))
                 act.save()
-
-                act.sesions.add(ses)
                 
             for student in studentGradesObj:
 
@@ -98,8 +93,7 @@ def createCourse(request, activities, studentList, courseName, teacher, studentG
                             act = Assignment.objects.filter(name=activity['name'], course=course).first()
                             
                             if act:
-
-                                grade = grade = Grade(grade=activity['grade'])
+                                grade = Grade(grade=activity['grade'])
                                 grade.save()
 
                                 grade.student.add(stu)
@@ -111,7 +105,7 @@ def createCourse(request, activities, studentList, courseName, teacher, studentG
                         elif activity['type'] == 'Asistencia':
                             
                             act = Attendance.objects.filter(name=activity['name'], course=course).first()
-                            
+
                             attendanceAssigned = False
                             for attendanceAct in activitiesObj['asistance']:
                                 if attendanceAct['sesion'] == activity['sesion']:
@@ -125,13 +119,116 @@ def createCourse(request, activities, studentList, courseName, teacher, studentG
                                 grade.student.add(stu)
                                 grade.course.add(course)
 
-                                act.grade.add(grade)
+                                ses = Sesion(name=activity['sesion'])
+                                ses.save()
+
+                                ses.grade.add(grade)
+
+                                act.sesions.add(ses)
                                 act.save()
+    except Exception as e:
+        print(e)
+        print("Error creating course")
+        return redirect(reverse("error"))
+
+    return redirect(reverse("teacherAdmin", kwargs={"courseName":courseName, 'courseShortName':courseShortName, "teacherMail":teacher, 'courseId': courseId}))
+
+def updateCourse(request, activities, courseName, courseShortName, studentGrades, teacher, courseId):
+    
+    activitiesObj = ast.literal_eval(activities)
+    studentGradesObj = ast.literal_eval(studentGrades)
+    
+    try:
+        with transaction.atomic():
+            
+            course = Course.objects.filter(name=courseName).first()
+            dbteacher = Teacher.objects.filter(email=teacher, course=course)
+                
+            for student in studentGradesObj:
+
+                stu = Student.objects.filter(email=student['student'], course=course).first()
+
+                if stu:
+                    for activity in student['activities']:
+
+                        if activity['type'] == 'Cuestionario':
+
+                            act = Quiz.objects.filter(name=activity['name'], course=course).first()
+                            
+                            if act:
+                                
+                                grade = Grade.objects.filter(quiz__id=act.id, student__id=stu.id).first()
+
+                                if grade and grade.grade != activity['grade']:
+                                    print(Grade.objects.filter(id=grade.id).update(grade=float(activity['grade'])))
+
+                        elif activity['type'] == 'Tarea':
+
+                            act = Assignment.objects.filter(name=activity['name'], course=course).first()
+                            
+                            if act:
+                                
+                                grade = Grade.objects.filter(assignment__id=act.id, student__id=stu.id).first()
+
+                                if grade and grade.grade != activity['grade']:
+                                    print(Grade.objects.filter(id=grade.id).update(grade=float(activity['grade'])))
+                        
+                        elif activity['type'] == 'Asistencia':
+                            
+                            act = Attendance.objects.filter(name=activity['name'], course=course).first()
+                            
+                            for attendanceAct in activitiesObj['asistance']:
+                                attendanceAssigned = False
+                                
+                                if attendanceAct['sesion'] in getAttendaceSessions(courseName):
+                                    attendanceAssigned = True
+
+                                if act and attendanceAssigned:
+                                    
+                                    for sesion in act.sesions.all():
+
+                                        if sesion.name == activity['sesion']:
+                                            
+                                            grade = Grade.objects.filter(sesion__id=sesion.id, student__id=stu.id).first()
+
+                                            if grade and grade.grade != activity['grade']:
+                                                print(Grade.objects.filter(id=grade.id).update(grade=float(activity['grade'])))
+                        """
+                         elif activity['type'] == 'Tarea':
+
+                            act = Assignment.objects.filter(name=activity['name'], course=course).first()
+                            
+                            if act:
+                                
+                                grade = Grade.objects.filter(assignment__id=act.id).first()
+
+                                if grade and grade.grade != activity['grade']:
+                                    grade.grade = float(activity['grade'])
+                                    grade.save()
+
+                        elif activity['type'] == 'Asistencia':
+                            
+                            act = Attendance.objects.filter(name=activity['name'], course=course).first()
+                            
+                            attendanceAssigned = False
+                            for attendanceAct in activitiesObj['asistance']:
+                                if attendanceAct['sesion'] in getAttendaceSessions(courseName):
+                                    attendanceAssigned = True
+
+                                if act and attendanceAssigned:
+
+                                    grade = Grade.objects.filter(attendance__id=act.id).first()
+
+                                    if grade and grade.grade != activity['grade']:
+                                        grade.grade = float(activity['grade'])
+                                        grade.save()
+                        """
+                       
     except Exception as e:
         print(e)
         return redirect(reverse("error"))
 
-    return redirect(reverse("teacherAdmin"))
+    return redirect(reverse("teacherAdmin", kwargs={"courseName":courseName, "courseShortName": courseShortName, "teacherMail":teacher, 'courseId': courseId}))
 
 def getCourseObjectives(courseName):
 
@@ -154,8 +251,11 @@ def getCourseStudents(courseName):
     course = Course.objects.filter(name=courseName).first()
 
     if course:
+        students = Student.objects.filter(course=course).all()
 
-        return course.students.all()
+        if students:
+
+            return students
     
     return None
 
@@ -202,14 +302,20 @@ def getStudentAttendanceGrades(courseName, studentMail):
     if course:
 
         student = Student.objects.get(email=studentMail)
-        studentQuizes = Attendance.objects.filter(grade__student=student, course=course)
+        attendance = Attendance.objects.filter(course=course).first()
 
-        grades = []
-        for quiz in studentQuizes:
+        if attendance:
+            grades = []
             
-            grades.append((quiz.grade.first(), quiz.weight))
+            for ses in attendance.sesions.all():
 
-        return grades
+                ses_grade = Grade.objects.filter(sesion__id=ses.id, student__id=student.id).first()
+
+                if ses_grade:
+            
+                    grades.append((ses_grade, attendance.weight))
+
+            return grades
 
     return None
 
@@ -218,10 +324,7 @@ def getStudentEmails(courseName):
     students = getCourseStudents(courseName)
 
     if students:
-        emails = []
-        for student in students:
-            emails.append(student.email)
-        
+        emails = [s.email for s in students]
         return emails
     
     return None
@@ -248,3 +351,19 @@ def getTeachersInCourse(courseName):
 def getRegisteredStudents():
 
     return [s.email for s in Student.objects.all()]
+
+def getAttendaceSessions(courseName):
+
+    cour = Course.objects.filter(name=courseName).first()
+
+    if cour:
+        at = Attendance.objects.filter(course=cour).first()
+
+        if at:
+            ses = at.sesions.all()
+
+            if ses:
+
+                return [s.name for s in ses]
+
+    return None

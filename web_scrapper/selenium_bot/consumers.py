@@ -233,6 +233,8 @@ class EchoConsumer(AsyncWebsocketConsumer):
 
       receive_payload = json.loads(event.get('text'))
 
+      print(receive_payload)
+
       if(receive_payload['type'] == 'login'):
         """
         # Web scrap for testing
@@ -269,8 +271,10 @@ class EchoConsumer(AsyncWebsocketConsumer):
         courseInfo =  await loop.run_in_executor(None, functools.partial(web_scrap, receive_payload, self.wd, self.wd_wait))
         
         if courseInfo is None:
-          send_payload = {"type": "scrap_success", "activities": courseInfo["activitiesDataframe"].to_json(orient='records', force_ascii=False, default_handler=str), "attendance": courseInfo["attendanceDataframe"].to_json(orient='records', force_ascii=False, default_handler=str)}
+          send_payload = {"type": "scrap_error","data": "Scrapper error"}
           await self.send(json.dumps(send_payload))
+
+          return
 
         send_payload = {"type": "scrap_success", "activities": courseInfo["activitiesDataframe"].to_json(orient='records', force_ascii=False, default_handler=str), "attendance": courseInfo["attendanceDataframe"].to_json(orient='records', force_ascii=False, default_handler=str)}
         await self.send(json.dumps(send_payload))

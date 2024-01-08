@@ -7,8 +7,8 @@
         <title>Progreso laboratorio SOPER</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
-        <link rel="stylesheet" href="{% static '/css/style.css' %}">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <link rel="stylesheet" type='text/css' href="{% static 'css/style.css' %}">
     </head>
     <body>
         <div class='container-fluid d-flex bg-ligth'>
@@ -19,14 +19,19 @@
                     <a class="nav-item nav-link disabled" href="#">option 2</a>
                     <a class="nav-item nav-link disabled" href="#">option 3</a>
                 </div>
-                <div class="d-flex align-self-end mr-3">
-                    <a class="nav-item nav-link" href="#"><i class="bi bi-cloud-upload"></i></a>
-                </div>
+               
+                <img class="img-fluid" src="{% static "images/VisUAM_logo_header.png" %}"/>
+
+                <form class="d-flex align-self-end mr-3" method="GET" action="{% url 'confPage' %}">
+                    <button type="submit" class="btn btn-primary-outline nav-item nav-link" id='updateBtn'><i class="bi bi-cloud-upload"></i></button>
+
+                    <input type="hidden" name="courseName" id="courseName" value="{{courseName}}" />
+                    <input type="hidden" name="courseShortName" value="{{courseShortName}}"/>
+                    <input type="hidden" name="teacherMail" id="courseName" value="{{teacherMail}}" />
+                    <input type="hidden" name="courseId" id='courseId' value="{{courseId}}"/>
+                    <input type="hidden" name="updateFlag" id="updateFlag" value="1" />
+                </form>
             </nav>
-
         </div>
-    </body>
-    <script>
-
-    </script>
+        <p>Course: {{courseName}}</p>
 </html>
