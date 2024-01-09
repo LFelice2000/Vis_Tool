@@ -125,75 +125,65 @@ def visPage(request):
             if userMail not in getStudentEmails(courseName):
                 return render(request, "error.html")
 
-            percentageObjectives = list(dict())
+            personalTotal = []
+            globalTotal = []
             for objective in getCourseObjectives(courseName):
-
-                #for activity in getObjectiveActivities(objective.name, currCourse.name):
-
-
-
-                #Variables para el progreso personal
-                gradeAcumulator = 0
-                weigthAcumulator = 0
-                personalPercentage = 0
                 
-                #Variables para el progreso global
-                globalGrade = 0
-                globalWeigth = 0
-                globalPercentage = 0
-
-                for student in students:
+                
+                globalGradeAcum = 0
+                objectivesLoops = 0
+                for stu in students:
                     
-                    for (grade, weigth) in getStudentQuizGrades(courseName, student.email):
+                    personalGradeAcum = 0
+                    for activity in getObjectiveActivities(objective.name, currCourse.name):
                         
-                        if grade:
-                            if student.email == userMail:
-                                
-                                gradeAcumulator += (float(grade.grade) * (float(weigth)/100))
-                                weigthAcumulator += float(weigth)/100
+                        if type(activity) == type(Quiz()):
 
-                                personalPercentage = (gradeAcumulator / (10*weigthAcumulator))*100
+                            grade = Grade.objects.filter(quiz__id=activity.id, student=stu, course=currCourse).first()
 
-                            globalGrade += (float(grade.grade) * (float(weigth)/100))
-                            globalWeigth += float(weigth)/100
+                            if stu.email == userMail:
+                                personalGradeAcum += grade.grade * (activity.weight/100)
 
-                            globalPercentage = (globalGrade / (10*globalWeigth))*100
+                            globalGradeAcum += grade.grade * (activity.weight/100)
+
+                        elif type(activity) == type(Assignment()):
+
+                            grade = Grade.objects.filter(assignment__id=activity.id, student=stu, course=currCourse).first()
+
+                            if stu.email == userMail:
+                                personalGradeAcum += grade.grade * (activity.weight/100)
+
+                            globalGradeAcum += grade.grade * (activity.weight/100)
+                        
+                        elif type(activity) == type(Sesion()):
+                            
+                            
+                            at = Attendance.objects.filter(sesions=activity).first()
+                            grade = Grade.objects.filter(sesion__id=activity.id, student=stu, course=currCourse).first()
+                            
+                            if grade and at:
+                                if stu.email == userMail:
+                                    personalGradeAcum += grade.grade * (at.weight/100)
+
+                                globalGradeAcum += grade.grade * (at.weight/100)
+
+                    if stu.email == userMail:
+                        personalResults = {'name': objective.name, 'personalScore': round((personalGradeAcum*10), 2)}
                     
-                    for (grade, weigth) in getStudentAssignmentGrades(courseName, student.email):
-
-                        if grade:
-                            if student.email == userMail:
-                                
-                                gradeAcumulator += (float(grade.grade) * (float(weigth)/100))
-                                weigthAcumulator += float(weigth)/100
-
-                                personalPercentage = (gradeAcumulator / (10*weigthAcumulator))*100
-
-                            globalGrade += (float(grade.grade) * (float(weigth)/100))
-                            globalWeigth += float(weigth)/100
-
-                            globalPercentage = (globalGrade / (10*globalWeigth))*100
+                        personalTotal.append(personalResults)
                     
-                    for (grade, weigth) in getStudentAttendanceGrades(courseName, student.email):
+                globalTotal.append({'objective': objective.name, 'globalScore': (globalGradeAcum/students.count())*10})
 
-                        if grade:
-                            if student.email == userMail:
-                                
-                                gradeAcumulator += (float(grade.grade) * (float(weigth)/100))
-                                weigthAcumulator += float(weigth)/100
+            
+            for result in personalTotal:
+                for globalResult in globalTotal:
 
-                                personalPercentage = (gradeAcumulator / (10*weigthAcumulator))*100
+                    if result['name'] == globalResult['objective']:
 
-                            globalGrade += (float(grade.grade) * (float(weigth)/100))
-                            globalWeigth += float(weigth)/100
-
-                            globalPercentage = (globalGrade / (10*globalWeigth))*100
-
-
-                percentageObjectives.append({"objective": objective.name, "percentage": round(personalPercentage, 2), "global": round(globalPercentage, 2)})
+                        result['global'] = globalResult['globalScore']
 
             context = {
-                'activities': percentageObjectives,
+                'objectives': personalTotal,
                 'student': userMail
             }
 

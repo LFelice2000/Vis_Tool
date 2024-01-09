@@ -62,9 +62,7 @@ def createCourse(request, activities, studentList, courseName, courseShortName, 
 
             for activity in activitiesObj['asistance']:
 
-                obj = Objective.objects.filter(name=activity['objective'], course=course)
-
-                act = Attendance(name=activity['activityName'], course=course, objective=obj[0], weight=float(activity['weigth']))
+                act = Attendance(name=activity['activityName'], course=course, weight=float(activity['weigth']))
                 act.save()
                 
             for student in studentGradesObj:
@@ -106,26 +104,36 @@ def createCourse(request, activities, studentList, courseName, courseShortName, 
                             
                             act = Attendance.objects.filter(name=activity['name'], course=course).first()
 
-                            attendanceAssigned = False
                             for attendanceAct in activitiesObj['asistance']:
+
+                                attendanceAssigned = False
+                                
+                                objectiveName = ""
                                 if attendanceAct['sesion'] == activity['sesion']:
                                     attendanceAssigned = True
+                                    objectiveName = attendanceAct['objective']
 
-                            if act and attendanceAssigned:
-                                
-                                grade = Grade(grade=activity['grade'])
-                                grade.save()
+                                if act and attendanceAssigned:
+                                    
+                                    grade = Grade(grade=activity['grade'])
+                                    grade.save()
 
-                                grade.student.add(stu)
-                                grade.course.add(course)
+                                    grade.student.add(stu)
+                                    grade.course.add(course)
 
-                                ses = Sesion(name=activity['sesion'])
-                                ses.save()
+                                    obj = Objective.objects.filter(name=objectiveName, course=course).first()
 
-                                ses.grade.add(grade)
+                                    ses = Sesion.objects.filter(name=activity['sesion'], objective=obj).first()
+                                    if not ses:
 
-                                act.sesions.add(ses)
-                                act.save()
+                                        ses = Sesion(name=activity['sesion'], objective=obj)
+                                        ses.save()
+
+
+                                    ses.grade.add(grade)
+
+                                    act.sesions.add(ses)
+                                    act.save()
     except Exception as e:
         print(e)
         print("Error creating course")
@@ -160,7 +168,7 @@ def updateCourse(request, activities, courseName, courseShortName, studentGrades
                                 grade = Grade.objects.filter(quiz__id=act.id, student__id=stu.id).first()
 
                                 if grade and grade.grade != activity['grade']:
-                                    print(Grade.objects.filter(id=grade.id).update(grade=float(activity['grade'])))
+                                    Grade.objects.filter(id=grade.id).update(grade=float(activity['grade']))
 
                         elif activity['type'] == 'Tarea':
 
@@ -171,7 +179,7 @@ def updateCourse(request, activities, courseName, courseShortName, studentGrades
                                 grade = Grade.objects.filter(assignment__id=act.id, student__id=stu.id).first()
 
                                 if grade and grade.grade != activity['grade']:
-                                    print(Grade.objects.filter(id=grade.id).update(grade=float(activity['grade'])))
+                                    Grade.objects.filter(id=grade.id).update(grade=float(activity['grade']))
                         
                         elif activity['type'] == 'Asistencia':
                             
@@ -192,7 +200,7 @@ def updateCourse(request, activities, courseName, courseShortName, studentGrades
                                             grade = Grade.objects.filter(sesion__id=sesion.id, student__id=stu.id).first()
 
                                             if grade and grade.grade != activity['grade']:
-                                                print(Grade.objects.filter(id=grade.id).update(grade=float(activity['grade'])))
+                                                Grade.objects.filter(id=grade.id).update(grade=float(activity['grade']))
                         """
                          elif activity['type'] == 'Tarea':
 
@@ -382,9 +390,12 @@ def getObjectiveActivities(objectiveName, Coursename):
 
         assignment = Assignment.objects.filter(objective=obj, course=course)
         objectivesACtivities += [q for q in assignment]
+        
+        attendance = Attendance.objects.filter(course=course).first()
 
-        attendance = Attendance.objects.filter(objective=obj, course=course)
-        objectivesACtivities += [q for q in attendance]
+        if attendance:
+            sesions = Sesion.objects.filter(objective=obj, attendance=attendance)
+            objectivesACtivities += [q for q in sesions]
 
         return objectivesACtivities
     
