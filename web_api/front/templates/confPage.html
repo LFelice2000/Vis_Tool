@@ -40,12 +40,12 @@
             {% csrf_token %}
             <div class='form-group'>
                 <label for='username' class="mb-2">username</label>
-                <input type='email' name='username' class='form-control mb-3 h-50' id='username'/>
+                <input type='email' name='username' class='form-control mb-3 h-50' id='username' required/>
             </div>
             <div class='form-group'>
                 <label for='password'>password</label>
                 <div class="d-flex flex-lg-row mb-2 gap-3 align-items-center">
-                    <input type='password' name='password' class='form-control h-50 password' id='password'/>
+                    <input type='password' name='password' class='form-control h-50 password' id='password' required/>
                     <button type="button" class="btn btn-primary-outline" id="showPswd"><h4 class="bi bi-eye-slash"></h4></button>
                     <button type="button" class="btn btn-primary-outline d-none" id="hidePswd"><h4 class="bi bi-eye"></h4></button>
                 </div>
@@ -113,6 +113,7 @@
 
 
         $('#hidePswd').on('click', function () {
+            
             if (!document.getElementById("hidePswd").classList.contains("d-none")) {
                 document.getElementById("hidePswd").classList.add("d-none");
                 document.getElementById("showPswd").classList.remove("d-none");
@@ -122,10 +123,43 @@
         });
 
         $('#submitBtn').on('click', function (e) {
+            const checkEmailRegex = /^[a-zA-Z.]+@uam\.es$/
+            
             document.getElementById("overlayCont").classList.remove("d-none");
+
+            if ($('#username').val().length == 0 || $('#password').val().length == 0) {
+                
+                $('#loginErr').html("No puede haber ningun campo vacio")
+
+                document.getElementById("overlayCont").classList.add("d-none");
+                document.getElementById("loginError").classList.remove("d-none");
+
+                $('#loginErrClose').on('click', function () {
+                    document.getElementById("loginError").classList.add("d-none");
+                    $('#liveUpdate').html()
+                })
+
+                return
+            }
+            
+            if (!$('#username').val().match(checkEmailRegex)) {
+                
+                $('#loginErr').html("La aplicacion solo puede ser configurada por un profesor con identificador valida (@uam.es)")
+
+                document.getElementById("overlayCont").classList.add("d-none");
+                document.getElementById("loginError").classList.remove("d-none");
+
+                $('#loginErrClose').on('click', function () {
+                    document.getElementById("loginError").classList.add("d-none");
+                    $('#liveUpdate').html()
+                })
+
+                return
+            }
 
             const url = 'ws://localhost:8000/selenium_bot'
             const ws = new WebSocket(url)
+            
 
             ws.onopen = function(e) {
 
