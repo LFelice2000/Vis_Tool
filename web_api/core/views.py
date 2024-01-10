@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
 import ast
-from core.models import Course, Sesion, Student, Quiz, Teacher, Grade, Objective, Assignment, Attendance
+from core.models import Course, Sesion, Student, Quiz, Teacher, Grade, Objective, Assignment, Attendance, Update
 
 from django.db import IntegrityError
 from django.db import transaction
@@ -150,7 +150,6 @@ def updateCourse(request, activities, courseName, courseShortName, studentGrades
         with transaction.atomic():
             
             course = Course.objects.filter(name=courseName).first()
-            dbteacher = Teacher.objects.filter(email=teacher, course=course)
                 
             for student in studentGradesObj:
 
@@ -201,41 +200,21 @@ def updateCourse(request, activities, courseName, courseShortName, studentGrades
 
                                             if grade and grade.grade != activity['grade']:
                                                 Grade.objects.filter(id=grade.id).update(grade=float(activity['grade']))
-                        """
-                         elif activity['type'] == 'Tarea':
 
-                            act = Assignment.objects.filter(name=activity['name'], course=course).first()
-                            
-                            if act:
-                                
-                                grade = Grade.objects.filter(assignment__id=act.id).first()
+            oldUpdate = Update.objects.filter(course=course).first()
+            if oldUpdate:
 
-                                if grade and grade.grade != activity['grade']:
-                                    grade.grade = float(activity['grade'])
-                                    grade.save()
+                oldUpdate.delete()
 
-                        elif activity['type'] == 'Asistencia':
-                            
-                            act = Attendance.objects.filter(name=activity['name'], course=course).first()
-                            
-                            attendanceAssigned = False
-                            for attendanceAct in activitiesObj['asistance']:
-                                if attendanceAct['sesion'] in getAttendaceSessions(courseName):
-                                    attendanceAssigned = True
-
-                                if act and attendanceAssigned:
-
-                                    grade = Grade.objects.filter(attendance__id=act.id).first()
-
-                                    if grade and grade.grade != activity['grade']:
-                                        grade.grade = float(activity['grade'])
-                                        grade.save()
-                        """
-                       
+            t = Teacher.objects.filter(email=teacher).first()
+            newUpdate = Update(course=course, teacher=t)
+            newUpdate.save()
+             
     except Exception as e:
         print(e)
         return redirect(reverse("error"))
 
+    
     return redirect(reverse("teacherAdmin", kwargs={"courseName":courseName, "courseShortName": courseShortName, "teacherMail":teacher, 'courseId': courseId}))
 
 def getCourseObjectives(courseName):

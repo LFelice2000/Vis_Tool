@@ -29,11 +29,14 @@
         </div>
     </div>
     {% endfor %}
+
+    {% if update %}
     <div class="row">
         <div class="col-md-14">
-            <p class="text-end" id="actualizacion">Actualizado:</p>
+            <p class="text-end" id="actualizacion">Actualizado: {{update.date}} por {{updateBy.email}}</p>
         </div>
     </div>
+    {% endif %}
 </div>
 {% endblock %}
 

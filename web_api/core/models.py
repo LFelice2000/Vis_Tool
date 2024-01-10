@@ -5,6 +5,8 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+from django.utils.timezone import now
+
 class Course(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=200)
@@ -55,3 +57,8 @@ class Attendance(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, default=None)
     sesions = models.ManyToManyField(Sesion)
     weight = models.DecimalField(max_digits=4, decimal_places=2, validators=[MaxValueValidator(100), MinValueValidator(0)], default=0)
+
+class Update(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, default=None)
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, default=None)
+    date = models.DateTimeField(default=now, editable=False)

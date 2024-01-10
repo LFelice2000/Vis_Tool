@@ -47,8 +47,6 @@ def update(request):
         dataframe = pd.json_normalize(json.loads(request.POST.get("activities")))
         
         attendanceDataframe = pd.json_normalize(json.loads(request.POST.get("attendance")))
-
-        teacher = Teacher.objects.filter(email=teacher)
         
         courseStudents = dataframe.filter(regex='First name|Last name|ID number|Email address|Nombre|Apellido\(s\)|Número de ID|Dirección de correo')
         students = getStudentDataframe(courseStudents)
@@ -93,10 +91,9 @@ def visPage(request):
         courseName = urlParams.get('courseFullName')
         courseShortName = urlParams.get('courseName')
         courseId = urlParams.get('CourseId')
-        language = urlParams.get('lan')
 
         #or userMail == 'luis.felice@estudiante.uam.es'
-        if is_teacher(userMail) :
+        if is_teacher(userMail):
 
             if not courseExists(courseName):
             
@@ -172,7 +169,7 @@ def visPage(request):
                     
                         personalTotal.append(personalResults)
                     
-                globalTotal.append({'objective': objective.name, 'globalScore': (globalGradeAcum/students.count())*10})
+                globalTotal.append({'objective': objective.name, 'globalScore': round(((globalGradeAcum/students.count())*10), 2)})
 
             
             for result in personalTotal:
@@ -181,11 +178,24 @@ def visPage(request):
                     if result['name'] == globalResult['objective']:
 
                         result['global'] = globalResult['globalScore']
+            
 
-            context = {
-                'objectives': personalTotal,
-                'student': userMail
-            }
+            update = Update.objects.filter(course=currCourse).first()
+
+            context = None
+
+            if update:
+                context = {
+                    'objectives': personalTotal,
+                    'student': userMail,
+                    'update': update,
+                    'updateBy': update.teacher
+                }
+            else:
+                context = {
+                    'objectives': personalTotal,
+                    'student': userMail,
+                }
 
             return render(request, "visPage.html", context=context)
         return render(request, "error.html")
