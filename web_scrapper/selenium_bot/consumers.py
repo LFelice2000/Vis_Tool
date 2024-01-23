@@ -71,6 +71,9 @@ def web_scrap_local(receive_payload, wd, wd_wait):
 
   wd.close()
 
+  for file in os.listdir(os.path.join(BASE_DIR, "courseFiles")):
+      os.remove(os.path.join(BASE_DIR, f"courseFiles/{file}"))
+
   courseFiles = os.listdir(os.path.join(BASE_DIR, "courseFiles"))
   
   courseName = receive_payload['courseName']
@@ -118,7 +121,7 @@ def web_login(receive_payload, wd, wd_wait):
   
   return token
 
-def web_token_confirm(wd, wd_wait):
+def web_token_confirm_app(wd, wd_wait):
     
     try:
       WebDriverWait(wd, 64).until(EC.presence_of_all_elements_located((By.ID, 'idDiv_SAASTO_Trouble')))
@@ -253,17 +256,27 @@ class EchoConsumer(AsyncWebsocketConsumer):
         token = await loop.run_in_executor(None, functools.partial(web_login, receive_payload, self.wd, self.wd_wait))
 
         if token is None:
-          send_payload = {"type": "login_error", "data": "Error login in, please check your credentials"}
+          send_payload = {"type": "login_error", "data": "Error iniciando sesion, porfavor verificar las credenciales."}
           await self.send(json.dumps(send_payload))
 
           return
 
+        token_attemp = 0
         while token != None:
 
+          if token_attemp == 3:
+            
+            send_payload = {"type": "token_failed"}
+            await self.send(json.dumps(send_payload))
+            
+            return
+          
           send_payload = {"type": "token", "token": token}
           await self.send(json.dumps(send_payload))
 
-          token = await loop.run_in_executor(None, functools.partial(web_token_confirm, self.wd, self.wd_wait))
+          token = await loop.run_in_executor(None, functools.partial(web_token_confirm_app, self.wd, self.wd_wait))
+
+          token_attemp += 1
 
         send_payload = {"type": "token_success"}
         await self.send(json.dumps(send_payload))
@@ -271,7 +284,7 @@ class EchoConsumer(AsyncWebsocketConsumer):
         courseInfo =  await loop.run_in_executor(None, functools.partial(web_scrap, receive_payload, self.wd, self.wd_wait))
         
         if courseInfo is None:
-          send_payload = {"type": "scrap_error","data": "Scrapper error"}
+          send_payload = {"type": "scrap_error","data": "Error en la recopilacion de datos."}
           await self.send(json.dumps(send_payload))
 
           return
