@@ -93,7 +93,7 @@ def visPage(request):
         courseId = urlParams.get('CourseId')
 
         #or userMail == 'luis.felice@estudiante.uam.es'
-        if is_teacher(userMail) or userMail == 'luis.felice@estudiante.uam.es':
+        if is_teacher(userMail):
 
             if not courseExists(courseName):
             
@@ -109,8 +109,10 @@ def visPage(request):
 
                 return redirect(reverse('teacherAdmin', kwargs={"courseName":courseName, 'courseShortName': courseShortName, 'teacherMail': userMail, 'courseId': courseId}))
             
-            
-            return render(request, "error.html")
+            context = {
+                "error": "Error desconocido."
+            }
+            return render(request, "error.html", context=context)
 
         currCourse = getCurrCourse(courseName)
 
@@ -120,7 +122,12 @@ def visPage(request):
             students = getCourseStudents(courseName)
 
             if userMail not in getStudentEmails(courseName):
-                return render(request, "error.html")
+
+                context = {
+                    "error": "El estudiante no esta registrado en la herramienta."
+                }
+
+                return render(request, "error.html", context=context)
 
             personalTotal = []
             globalTotal = []
@@ -128,7 +135,6 @@ def visPage(request):
                 
                 
                 globalGradeAcum = 0
-                objectivesLoops = 0
                 for stu in students:
                     
                     personalGradeAcum = 0
@@ -198,7 +204,12 @@ def visPage(request):
                 }
 
             return render(request, "visPage.html", context=context)
-        return render(request, "error.html")
+        
+        context = {
+            "error": "La herramienta no esta configurada para este curso"
+        }
+            
+        return render(request, "error.html", context=context)
         
     elif request.method == 'POST':
 
@@ -219,7 +230,11 @@ def visPage(request):
         }
         
         return render(request, "confPage.html", context=context)
-        
+    
+    context = {
+        "error": "Error desconocido."
+    }
+
     return render(request, "error.html")
 
 def getStudentDataframe(courseStudents):
@@ -385,8 +400,10 @@ def confPage(request):
         
         return render(request, "confActivities.html", context=context)
 
-
-    return render(request, "error.html")
+    context = {
+        "error": "Error desconocido."
+    }
+    return render(request, "error.html", context=context)
 
 @csrf_exempt
 @xframe_options_exempt
@@ -405,5 +422,10 @@ def confWeigth(request):
     return redirect(reverse("createCourse", kwargs={'activities': activitiesInfo, 'studentList': students, "courseName": courseName, 'courseShortName': courseShortName, 'teacher': teacher, 'studentGrades': studentGrades, 'objectiveList': objectiveList, 'courseId': courseId}))
 
 @xframe_options_exempt
-def error(request):
-    return render(request, "error.html")
+def error(request, error):
+
+    context = {
+        "error": error
+    }
+
+    return render(request, "error.html", context=context)

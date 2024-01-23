@@ -137,7 +137,7 @@ def createCourse(request, activities, studentList, courseName, courseShortName, 
     except Exception as e:
         print(e)
         print("Error creating course")
-        return redirect(reverse("error"))
+        return redirect(reverse("error", kwargs={"error": f"Error creating the course ({e})"}))
 
     return redirect(reverse("teacherAdmin", kwargs={"courseName":courseName, 'courseShortName':courseShortName, "teacherMail":teacher, 'courseId': courseId}))
 
@@ -212,7 +212,7 @@ def updateCourse(request, activities, courseName, courseShortName, studentGrades
              
     except Exception as e:
         print(e)
-        return redirect(reverse("error"))
+        return redirect(reverse("error", kwargs={"error": f"Error updating the course ({e})"}))
 
     
     return redirect(reverse("teacherAdmin", kwargs={"courseName":courseName, "courseShortName": courseShortName, "teacherMail":teacher, 'courseId': courseId}))

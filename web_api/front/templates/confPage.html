@@ -9,7 +9,7 @@
 {%endblock%}
 
 {% block content %}
-<div class="mt-5 d-flex flex-column justify-content-center align-items-center">
+<div class="container-fluid mt-5 d-flex flex-column justify-content-center align-items-center">
 
     {% if updateFlag %}
         <form method='POST' action="{% url 'update' %}" id="loginForm">
@@ -24,6 +24,14 @@
                     <input type='password' name='password' class='form-control h-50 password' id='password'/>
                     <button type="button" class="btn btn-primary-outline" id="showPswd"><h4 class="bi bi-eye-slash"></h4></button>
                     <button type="button" class="btn btn-primary-outline d-none" id="hidePswd"><h4 class="bi bi-eye"></h4></button>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="txt2FA" id="txt2FA" disabled>
+                    <label class="form-check-label" for="flexCheckDefault">2FA por mensaje</label>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" name="app2FA" type="checkbox" id="app2FA">
+                    <label class="form-check-label" for="flexCheckDefault">2FA por aplicacion</label>
                 </div>
             </div>
             <button type='button' id='submitBtn' class='btn btn-success'>Log In</button>
@@ -49,6 +57,14 @@
                     <button type="button" class="btn btn-primary-outline" id="showPswd"><h4 class="bi bi-eye-slash"></h4></button>
                     <button type="button" class="btn btn-primary-outline d-none" id="hidePswd"><h4 class="bi bi-eye"></h4></button>
                 </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="txt2FA" id="txt2FA" disabled>
+                    <label class="form-check-label" for="flexCheckDefault">2FA por mensaje</label>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" name="app2FA" type="checkbox" id="app2FA">
+                    <label class="form-check-label" for="flexCheckDefault">2FA por aplicacion</label>
+                </div>
             </div>
             <button type='button' id='submitBtn' class='btn btn-success'>Log In</button>
         
@@ -67,12 +83,12 @@
 {% endblock %}
 
 {% block overlays %}
-<div class='overlay d-none' id="overlayCont">
-    <div class="iframe-container d-flex flex-column justify-content-center align-items-center rounded mx-2">
-        <h5>Estamos recolectando los datos</h5>
+<div class='container-fluid overlay d-none m-auto' id="overlayCont">
+    <div class="iframe-container d-flex flex-column justify-content-center align-items-center rounded mx-2" id='overlaynorm'>
+        <p class="h5">Estamos recolectando los datos</p>
         <div class="spinner-border" role="status"></div>
         <p class="mx-3 my-3" id="liveUpdate"></p>
-        <p class="mx-3 my-4">Nota: esta atento al correo para recibir la token de verificacion de outlook</p>
+        <p class="mx-3 my-4" id="note">Nota: esta atento al correo para recibir la token de verificacion de outlook</p>
     </div>
 </div>
 
@@ -127,9 +143,9 @@
             
             document.getElementById("overlayCont").classList.remove("d-none");
 
-            if ($('#username').val().length == 0 || $('#password').val().length == 0) {
+            if ($('#username').val().length == 0 || $('#password').val().length == 0 || (!$('#app2FA').is(':checked') && !$('#txt2FA').is(':checked'))) {
                 
-                $('#loginErr').html("No puede haber ningun campo vacio")
+                $('#loginErr').html("No puede haber ningun campo vacio y se debe seleccionar una opcion para el 2FA.")
 
                 document.getElementById("overlayCont").classList.add("d-none");
                 document.getElementById("loginError").classList.remove("d-none");
@@ -142,6 +158,7 @@
                 return
             }
             
+            /**
             if (!$('#username').val().match(checkEmailRegex)) {
                 
                 $('#loginErr').html("La aplicacion solo puede ser configurada por un profesor con identificador valida (@uam.es)")
@@ -156,6 +173,7 @@
 
                 return
             }
+            */
 
             const url = 'ws://localhost:8000/selenium_bot'
             const ws = new WebSocket(url)
@@ -165,8 +183,9 @@
 
                 console.log("[client] connection open")
 
-                var payload = {type: "login", username: $('#username').val(), password: $('#password').val(), courseId: $("#courseId").val(), courseName: $("#courseShortName").val()}
+                var payload = {type: "login", username: $('#username').val(), password: $('#password').val(), courseId: $("#courseId").val(), courseName: $("#courseShortName").val(), '2FA': $('#txt2FA').is(':checked') ? 'txt' : 'app'}
                 ws.send(JSON.stringify(payload))
+
 
                 $('#liveUpdate').html('Iniciando sesion...')
             }
@@ -179,7 +198,7 @@
                     $('#liveUpdate').html(`Tu token de microsoft es: ${payload['token']} (la aprobación puede tardar unos minutos)`)
 
                 } else if (payload['type'] == 'token_failed') {
-                    ws.close()
+                    ws.close(1000)
 
                     $('#loginErr').html("Error iniciando sesion (token no validado).")
 
@@ -235,6 +254,18 @@
 
             ws.onclose = function(e) {
                 console.log(e)
+
+                if(e.code == 1006) {
+                    $('#loginErr').html("Se perdio la conexion con el socket.")
+
+                    document.getElementById("overlayCont").classList.add("d-none");
+                    document.getElementById("loginError").classList.remove("d-none");
+
+                    $('#loginErrClose').on('click', function () {
+                        document.getElementById("loginError").classList.add("d-none");
+                        $('#liveUpdate').html()
+                    })
+                }
             }
 
             ws.onerror = function(e) {

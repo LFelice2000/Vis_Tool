@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<div class="mt-5 d-flex flex-column justify-content-center align-items-center">
+<div class="mx-auto mt-5 d-flex flex-column justify-content-center align-items-center wrapper">
     <h1>Añadir Objetivos</h1>
     
     <div class="form-group d-flex flex-row py-3 gap-3">
@@ -30,16 +30,16 @@
 
 
 {% block overlays %}
-<div class='overlay d-none' id="errorCont">
-<div class="iframe-container d-flex flex-column rounded mx-2">
-    <div class="sticky-top d-flex justify-content-end mb-5">
-        <button class="btn btn btn-outline" id="ErrClose"><svg xmlns="http://www.w3.org/2000/svg" height="16" width="12" viewBox="0 0 384 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path fill="#575757" d="M376.6 84.5c11.3-13.6 9.5-33.8-4.1-45.1s-33.8-9.5-45.1 4.1L192 206 56.6 43.5C45.3 29.9 25.1 28.1 11.5 39.4S-3.9 70.9 7.4 84.5L150.3 256 7.4 427.5c-11.3 13.6-9.5 33.8 4.1 45.1s33.8 9.5 45.1-4.1L192 306 327.4 468.5c11.3 13.6 31.5 15.4 45.1 4.1s15.4-31.5 4.1-45.1L233.7 256 376.6 84.5z"/></svg></button>
+<div class='container-fluid overlay d-none' id="errorCont">
+    <div class="iframe-container container-fluid d-flex flex-column rounded mx-2 wrapper">
+        <div class="sticky-top d-flex justify-content-end mb-5">
+            <button class="btn btn btn-outline" id="ErrClose"><svg xmlns="http://www.w3.org/2000/svg" height="16" width="12" viewBox="0 0 384 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path fill="#575757" d="M376.6 84.5c11.3-13.6 9.5-33.8-4.1-45.1s-33.8-9.5-45.1 4.1L192 206 56.6 43.5C45.3 29.9 25.1 28.1 11.5 39.4S-3.9 70.9 7.4 84.5L150.3 256 7.4 427.5c-11.3 13.6-9.5 33.8 4.1 45.1s33.8 9.5 45.1-4.1L192 306 327.4 468.5c11.3 13.6 31.5 15.4 45.1 4.1s15.4-31.5 4.1-45.1L233.7 256 376.6 84.5z"/></svg></button>
+        </div>
+        <div class="d-flex flex-column justify-content-center align-items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path fill="#953737" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"/></svg>
+            <p class="mx-3 my-4" id="errorInfo"></p>
+        </div>
     </div>
-    <div class="d-flex flex-column justify-content-center align-items-center">
-        <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path fill="#953737" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"/></svg>
-        <p class="mx-3 my-4" id="errorInfo"></p>
-    </div>
-</div>
 </div>
 {% endblock %}
 
@@ -70,6 +70,21 @@ $('#submBtn').hide();
 
 $('#addObjt').on('click', function () {
     var objName = document.getElementById("objectiveName");
+    var inputOnlyLettersRegex = /\s*\d+\s*/;
+    
+    if (inputOnlyLettersRegex.test(objName.value)) {
+        document.getElementById('errorCont').classList.remove('d-none');
+            
+        $('#errorInfo').html("Los objetivos no pueden contener un numero en el nombre.")
+        $('#ErrClose').on('click', function () {
+            document.getElementById('errorCont').classList.add('d-none');
+        });
+
+        return;
+    }
+
+    var idName = objName.value.replace(/\s/g, '')
+
     var appendObj = "<li class='list-group-item d-flex flex-row justify-content-between'><span class='py-2'>"+String(objName.value).trim()+" </span><button type='button' class='btn btn-primary-outline' id='deleteObj'><i class='bi bi-trash'></i></button></li>"
     var uls = document.getElementsByTagName('li');
     
@@ -102,7 +117,7 @@ $('#addObjt').on('click', function () {
     }
 
     $('ul').append(appendObj);
-    $('ul').append("<input type='hidden' name='objectives[]' value='"+String(objName.value).trim()+"' id='"+String(objName.value).trim()+"'/>");
+    $('ul').append("<input type='hidden' name='objectives[]' value='"+String(objName.value).trim()+"' id='"+String(idName).trim()+"'/>");
     
     if($("ul li").length >= 1) {
         $('#submBtn').show();
@@ -113,7 +128,9 @@ $('#addObjt').on('click', function () {
 
 $(document).on('click', '#deleteObj', function () {
     
-    var objId = "#" + String($(this).parent().children().html()).trim();
+    var objName = "#" + String($(this).parent().children().html()).trim();
+    var objId = objName.replace(/\s/g, '')
+
     $(objId).remove();
     
     $(this).parent().remove();
