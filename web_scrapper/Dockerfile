@@ -26,7 +26,7 @@ RUN curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-ke
 
 COPY ./ ./
 
-RUN sudo mkdir /etc/letsencrypt/live/nabu.ii.uam.es
+RUN mkdir /etc/letsencrypt/live/nabu.ii.uam.es/
 
 ENV DISPLAY=:99
 
