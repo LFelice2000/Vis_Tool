@@ -210,8 +210,7 @@ def web_scrap(receive_payload, wd, wd_wait):
 class EchoConsumer(AsyncWebsocketConsumer):
     
     WEB_API_PATH = f"{Path(__file__).resolve().parent.parent.parent.absolute()}/web_api/"
-    print(os.path.join(WEB_API_PATH, "courseFiles"))
-
+    
     wd_options = Options()
     wd_service = Service(executable_path=os.path.join(BASE_DIR, './chromedriver'))
     wd_prefs = {"download.default_directory" : os.path.join(BASE_DIR, "courseFiles")}
