@@ -28,9 +28,6 @@ COPY ./ ./
 
 RUN mkdir -p certs/
 
-RUN ln -s /etc/letsencrypt/live/nabu.ii.uam.es/privkey.pem certs/
-RUN ln -s /etc/letsencrypt/live/nabu.ii.uam.es/fullchain.pem certs/
-
 ENV DISPLAY=:99
 
 EXPOSE 8000
