@@ -28,6 +28,10 @@ COPY ./ ./
 
 RUN mkdir -p /etc/letsencrypt/live/nabu.ii.uam.es/
 
+COPY /etc/letsencrypt/live/nabu.ii.uam.es/privkey.pem /etc/letsencrypt/live/nabu.ii.uam.es/
+
+COPY /etc/letsencrypt/live/nabu.ii.uam.es/fullchain.pem /etc/letsencrypt/live/nabu.ii.uam.es/
+
 ENV DISPLAY=:99
 
 EXPOSE 8000
