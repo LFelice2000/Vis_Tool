@@ -28,8 +28,6 @@ COPY ./ ./
 
 RUN mkdir -p /etc/letsencrypt/live/nabu.ii.uam.es/
 
-COPY /etc/letsencrypt/live/nabu.ii.uam.es/ /etc/letsencrypt/live/nabu.ii.uam.es/
-
 ENV DISPLAY=:99
 
 EXPOSE 8000
