@@ -19,6 +19,7 @@ services:
 
   web_scrapper:
     container_name: "tfgscrapper"
+    user: "root"
     build: "./web_scrapper"
     command: bash -c "daphne -e ssl:8443:privateKey=/etc/letsencrypt/live/nabu.ii.uam.es/privkey.pem:certKey=/etc/letsencrypt/live/nabu.ii.uam.es/fullchain.pem web_scrapper.asgi:application -p 8000 -b 0.0.0.0"
     volumes:
@@ -47,10 +48,3 @@ services:
     expose: 
       - "8080"
       - "4000"
-
-    
-#-e ssl:8443:privateKey=/etc/letsencrypt/live/nabu.ii.uam.es/privkey.pem:certKey=/etc/letsencrypt/live/nabu.ii.uam.es/fullchain.pem
-#volumes:
-#      - /etc/letsencrypt/live/nabu.ii.uam.es:/etc/letsencrypt/live/nabu.ii.uam.es/
-
-#web_service -> gunicorn -b 0.0.0.0:8080 web_api.wsgi:application
