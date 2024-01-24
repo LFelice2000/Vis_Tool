@@ -18,12 +18,12 @@ services:
       - "tfg-network1"
 
   web_scrapper:
+    user: "root"
     container_name: "tfgscrapper"
     build: "./web_scrapper"
     command: bash -c "daphne -e ssl:8443:privateKey=/etc/letsencrypt/live/nabu.ii.uam.es/privkey.pem:certKey=/etc/letsencrypt/live/nabu.ii.uam.es/fullchain.pem web_scrapper.asgi:application -p 8000 -b 0.0.0.0"
     volumes:
-      - /etc/letsencrypt/live/nabu.ii.uam.es/privkey.pem:/etc/letsencrypt/live/nabu.ii.uam.es/,
-      - /etc/letsencrypt/live/nabu.ii.uam.es/fullchain.pem:/etc/letsencrypt/live/nabu.ii.uam.es/
+      - /etc/letsencrypt/live/nabu.ii.uam.es:/etc/letsencrypt/live/nabu.ii.uam.es/
     restart: "always"
     ports:
       - "8000:8000"
