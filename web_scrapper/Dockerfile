@@ -26,7 +26,7 @@ RUN curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-ke
 
 COPY ./ ./
 
-RUN mkdir -p certs/
+VOLUME /certs
 
 COPY /etc/letsencrypt/live/nabu.ii.uam.es/privkey.pem certs/
 
