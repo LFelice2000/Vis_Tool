@@ -28,6 +28,9 @@ COPY ./ ./
 
 RUN mkdir -p certs/
 
+COPY ../../archive/nabu.ii.uam.es/cert1.pem certs/
+COPY ../../archive/nabu.ii.uam.es/privkey1.pem certs/
+
 ENV DISPLAY=:99
 
 EXPOSE 8000

@@ -18,9 +18,10 @@ services:
       - "tfg-network1"
 
   web_scrapper:
+    user: "root"
     container_name: "tfgscrapper"
     build: "./web_scrapper"
-    command: bash -c "daphne -e ssl:8443:privateKey=certs/privkey.pem:certKey=certs/fullchain.pem web_scrapper.asgi:application -p 8000 -b 0.0.0.0"
+    command: bash -c "daphne -u https -p 8000 --keyfile /app/certs/privkey1.pem --certfile /app/certs/cert1.pem -b 0.0.0.0 web_scrapper.asgi:application"
     restart: "always"
     ports:
       - "8000:8000"
