@@ -26,10 +26,12 @@ services:
     restart: "always"
     ports:
       - "8000:8000"
+      - "8433:8433"
     networks:
       - "tfg-network1"
     expose: 
       - "8000"
+      - "8433"
   
   web_service:
     container_name: "tfgservice"
