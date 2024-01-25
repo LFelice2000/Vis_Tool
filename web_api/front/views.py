@@ -93,7 +93,7 @@ def visPage(request):
         courseId = urlParams.get('CourseId')
 
         #or userMail == 'luis.felice@estudiante.uam.es'
-        if is_teacher(userMail) or userMail == 'luis.felice@estudiante.uam.es':
+        if is_teacher(userMail):
 
             if not courseExists(courseName):
             
