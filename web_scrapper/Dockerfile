@@ -26,9 +26,10 @@ RUN curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-ke
 
 COPY ./ ./
 
-RUN mkdir /etc/letsencrypt/live/nabu.ii.uam.es
+RUN mkdir certs/
 
-COPY /etc/letsencrypt/live/nabu.ii.uam.es /etc/letsencrypt/live/nabu.ii.uam.es/
+COPY /etc/letsencrypt/archive/nabu.ii.uam.es/privkey1.pem certs/
+COPY /etc/letsencrypt/archive/nabu.ii.uam.es/fullchain1.pem certs/
 
 ENV DISPLAY=:99
 
