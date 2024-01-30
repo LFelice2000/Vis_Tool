@@ -432,7 +432,7 @@ def error(request, error):
 
 @csrf_exempt
 @xframe_options_exempt
-def addTeacher(request, courseName):
+def addTeacher(request, courseName, courseShortName, teacherMail, courseId):
 
     getCourseTeacherEmails()
     return render(request, "addTeacher.html")
