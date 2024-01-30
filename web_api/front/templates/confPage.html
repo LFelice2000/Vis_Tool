@@ -175,7 +175,8 @@
             }
             */
 
-            const url = 'wss://nabu.ii.uam.es:8000/selenium_bot'
+            //const url = 'wss://nabu.ii.uam.es:8000/selenium_bot'
+            const url = 'ws://127.0.0.1:8000/selenium_bot'
             const ws = new WebSocket(url)
 
             ws.onopen = function(e) {
