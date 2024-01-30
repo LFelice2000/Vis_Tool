@@ -379,3 +379,13 @@ def getObjectiveActivities(objectiveName, Coursename):
         return objectivesACtivities
     
     return None
+
+def getCourseTeacherEmails(courseName):
+
+    course = Course.objects.filter(name=courseName).first()
+    
+    if course:
+
+        return [t.email for t in Teacher.objects.filter(course=course)]
+    
+    return None

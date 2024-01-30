@@ -429,3 +429,10 @@ def error(request, error):
     }
 
     return render(request, "error.html", context=context)
+
+@csrf_exempt
+@xframe_options_exempt
+def addTeacher(request, courseName):
+
+    getCourseTeacherEmails()
+    return render(request, "addTeacher.html")
