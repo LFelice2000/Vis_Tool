@@ -28,8 +28,6 @@ COPY ./ ./
 
 RUN mkdir certs/
 
-COPY /etc/letsencrypt/live/nabu.ii.uam.es certs/
-
 ENV DISPLAY=:99
 
 EXPOSE 8000
