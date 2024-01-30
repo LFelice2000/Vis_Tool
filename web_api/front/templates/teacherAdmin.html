@@ -15,7 +15,7 @@
 
             <nav class="container-fluid navbar d-flex mt-3">
                 <div class="d-flex gap-3">
-                    <button class="btn btn-success nav-item nav-link"><a href="{% url 'addTeacher' courseName=courseName courseShortName=courseShortName teacherMail=teacherMail courseId=courseId %}">Añadir Profesor</a></button>
+                    <button class="btn btn-success nav-item nav-link"><a href="{% url 'addTeacher' %}">Añadir Profesor</a></button>
                     <a class="nav-item nav-link disabled" href="#">option 2</a>
                     <a class="nav-item nav-link disabled" href="#">option 3</a>
                 </div>
@@ -34,5 +34,7 @@
             </nav>
         </div>
         
+        {% block content %}
         <p>Course: {{courseName}}</p>
+        {%endblock%}
 </html>
