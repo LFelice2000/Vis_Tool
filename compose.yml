@@ -20,9 +20,10 @@ services:
   web_scrapper:
     container_name: "tfgscrapper"
     build: "./web_scrapper"
-    command: bash -c "daphne -e ssl:8443:privateKey=certs/privkey.pem:certKey=certs/fullchain.pem web_scrapper.asgi:application -b 0.0.0.0 -p 8000"
+    command: bash -c "daphne -e ssl:8443:privateKey=/etc/nginx/ssl/privkey.pem:certKey=/etc/nginx/ssl/fullchain.pem web_scrapper.asgi:application -b 0.0.0.0 -p 8000"
     volumes:
-      - /etc/letsencrypt/live/nabu.ii.uam.es:/certs/
+      - /etc/letsencrypt/ssl/fullchain.pem:/etc/nginx/ssl/fullchain.pem
+      - /etc/letsencrypt/ssl/privkey.pem:/etc/nginx/ssl/privkey.pem
     restart: "always"
     ports:
       - "8000:8000"
