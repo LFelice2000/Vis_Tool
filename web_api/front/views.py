@@ -434,5 +434,4 @@ def error(request, error):
 @xframe_options_exempt
 def addTeacher(request, courseName, courseShortName, teacherMail, courseId):
 
-    getCourseTeacherEmails()
     return render(request, "addTeacher.html")
