@@ -438,9 +438,15 @@ def addTeacher(request, courseName, courseShortName, teacherMail,courseId):
 
         teachers = request.POST.getlist("objectives[]")
 
-        print(teachers)
+        for teacher in teachers:
 
-    
+            if not teacherExists(teacher):
+
+                createTeacher(teacher, courseName)
+            else:
+
+                
+
         return redirect(reverse("teacherAdmin", kwargs={'courseName': courseName, 'courseShortName': courseShortName, 'teacherMail': teacherMail, 'courseId': courseId}))
     
     context = {
