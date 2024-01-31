@@ -418,7 +418,7 @@ def confWeigth(request):
     activitiesInfo = request.POST.get("activitiesInfo")
     courseId = request.POST.get('courseId')
 
-
+    print('going to create course')
     return redirect(reverse("createCourse", kwargs={'activities': activitiesInfo, 'studentList': students, "courseName": courseName, 'courseShortName': courseShortName, 'teacher': teacher, 'studentGrades': studentGrades, 'objectiveList': objectiveList, 'courseId': courseId}))
 
 @xframe_options_exempt

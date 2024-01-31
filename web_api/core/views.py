@@ -13,6 +13,7 @@ def createCourse(request, activities, studentList, courseName, courseShortName, 
     studentGradesObj = ast.literal_eval(studentGrades)
     objectiveListObj = ast.literal_eval(objectiveList)
     
+    print('creating course')
     try:
         with transaction.atomic():
             course = Course(name=courseName)
