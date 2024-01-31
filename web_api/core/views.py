@@ -406,7 +406,8 @@ def createTeacher(email, courseName):
         except Exception as e:
             print(e)
             print("Error creating course")
-        return redirect(reverse("error", kwargs={"error": f"Error creating the course ({e})"}))
+            
+            return redirect(reverse("error", kwargs={"error": f"Error creating the course ({e})"}))
     
     return None
 
@@ -429,6 +430,7 @@ def addTeacherToCourse(courseName, email):
         except Exception as e:
             print(e)
             print("Error creating course")
-        return redirect(reverse("error", kwargs={"error": f"Error creating the course ({e})"}))
+            
+            return redirect(reverse("error", kwargs={"error": f"Error creating the course ({e})"}))
     
     return None
