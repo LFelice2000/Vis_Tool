@@ -445,7 +445,7 @@ def addTeacher(request, courseName, courseShortName, teacherMail,courseId):
                 createTeacher(teacher, courseName)
             else:
 
-                
+                addTeacherToCourse(teacher, teacher)
 
         return redirect(reverse("teacherAdmin", kwargs={'courseName': courseName, 'courseShortName': courseShortName, 'teacherMail': teacherMail, 'courseId': courseId}))
     
