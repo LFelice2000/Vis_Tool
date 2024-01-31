@@ -70,7 +70,7 @@ def update(request):
 def teacherPage(request, courseName, courseShortName, teacherMail, courseId):
 
     context = {
-        "courseName": courseName,
+        "courseName": str(courseName),
         "teacherMail": teacherMail,
         "courseId": courseId,
         'courseShortName':courseShortName
