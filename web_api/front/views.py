@@ -4,7 +4,7 @@ from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.clickjacking import xframe_options_exempt
 from core.models import *
-from core.views import *
+from core.utils import *
 from urllib.parse import unquote, urlparse, parse_qs
 
 import pandas as pd
@@ -61,8 +61,13 @@ def update(request):
         activities = json.dumps({"quiz": quizes,"assignment": assignments, "asistance": attendance})
 
         studentGradeList = getStudentGradeListFromDataframe(students, dataframe, attendanceInfo, quizes, attendance, assignments)
-     
-        return redirect(reverse("updateCourse", kwargs={"activities": activities, "courseName": courseName, "courseShortName": courseShortName, "studentGrades": studentGradeList, "teacher": teacher, "courseId": courseId}))
+
+        res = updateCourse(activities, courseName, courseShortName, studentGradeList, teacher, courseId)
+        if res['status'] == "error":
+            return redirect(reverse("error", kwargs={"error": res['error']}))
+        
+        return redirect(reverse("teacherAdmin", kwargs={"courseName":courseName, "courseShortName": courseShortName, "teacherMail":teacher, 'courseId': courseId}))
+
 
     
 @csrf_exempt
@@ -418,8 +423,12 @@ def confWeigth(request):
     activitiesInfo = request.POST.get("activitiesInfo")
     courseId = request.POST.get('courseId')
 
-    print('going to create course')
-    return redirect(reverse("createCourse", kwargs={'activities': activitiesInfo, 'studentList': students, "courseName": courseName, 'courseShortName': courseShortName, 'teacher': teacher, 'studentGrades': studentGrades, 'objectiveList': objectiveList, 'courseId': courseId}))
+    res = createCourse(activitiesInfo, students, courseName, courseShortName, teacher, studentGrades, objectiveList, courseId)
+
+    if res['status'] == "error":
+        return redirect(reverse("error", kwargs={"error": res['error']}))
+
+    return redirect(reverse("teacherAdmin", kwargs={"courseName":courseName, 'courseShortName':courseShortName, "teacherMail":teacher, 'courseId': courseId}))
 
 @xframe_options_exempt
 def error(request, error):

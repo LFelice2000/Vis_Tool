@@ -13,7 +13,6 @@ def createCourse(request, activities, studentList, courseName, courseShortName, 
     studentGradesObj = ast.literal_eval(studentGrades)
     objectiveListObj = ast.literal_eval(objectiveList)
     
-    
     try:
         with transaction.atomic():
             course = Course(name=courseName)
@@ -391,3 +390,47 @@ def getCourseTeacherEmails(courseName):
     
     return None
 
+def createTeacher(email, courseName):
+
+    course = Course.objects.filter(name=courseName).first()
+
+    if course:
+        try:
+            with transaction.atomic():
+                
+                teacher = Teacher(email=email)
+                teacher.save()
+
+                teacher.course.add(course)
+
+        except Exception as e:
+            print(e)
+            print("Error creating course")
+            
+            return redirect(reverse("error", kwargs={"error": f"Error creating the course ({e})"}))
+    
+    return None
+
+def teacherExists(email):
+
+    return Teacher.objects.filter(email=email).first()
+
+def addTeacherToCourse(courseName, email):
+
+    course = Course.objects.filter(name=courseName).first()
+
+    if course:
+        try:
+            with transaction.atomic():
+                
+                teacher = Teacher.objects.filter(email=email).first()
+
+                teacher.course.add(course)
+
+        except Exception as e:
+            print(e)
+            print("Error creating course")
+            
+            return redirect(reverse("error", kwargs={"error": f"Error creating the course ({e})"}))
+    
+    return None
