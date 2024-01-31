@@ -12,7 +12,7 @@
     </head>
     <body>
         <div class='container-fluid d-flex bg-ligth'>
-
+            {% block navbar %}
             <nav class="container-fluid navbar d-flex mt-3">
                 <div class="d-flex gap-3">
                     <a class="btn btn-success" href="{% url 'addTeacher' courseName=courseName courseShortName=courseShortName teacherMail=teacherMail courseId=courseId %}">Añadir Profesor</a>
@@ -32,10 +32,16 @@
                     <input type="hidden" name="updateFlag" id="updateFlag" value="1" />
                 </form>
             </nav>
+            {% endblock %}
         </div>
         
         {% block content %}
         <p>Course: {{courseName}}</p>
         {%endblock%}
+
+        {% block overlays %}
+        {% endblock %}
     </body>
+    {% block scripts%}
+    {% endblock %}
 </html>
