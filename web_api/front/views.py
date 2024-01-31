@@ -436,6 +436,11 @@ def addTeacher(request, courseName, courseShortName, teacherMail,courseId):
 
     if request.method == 'POST':
 
+        teachers = request.POST.getlist("objectives[]")
+
+        print(teachers)
+
+
         return redirect(reverse("teacherAdmin", kwargs={'courseName': courseName, 'courseShortName': courseShortName, 'teacherMail': teacherMail, 'courseId': courseId}))
     
     context = {
