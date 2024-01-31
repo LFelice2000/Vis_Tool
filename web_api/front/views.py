@@ -432,6 +432,13 @@ def error(request, error):
 
 @csrf_exempt
 @xframe_options_exempt
-def addTeacher(request, courseName):
+def addTeacher(request, courseName, courseShortName, teacherMail,courseId):
 
-    return render(request, "addTeacher.html")
+    context = {
+        'courseName': courseName,
+        'courseShortName': courseShortName,
+        'teacherMail': teacherMail,
+        'courseId': courseId
+    }
+
+    return render(request, "addTeacher.html", context=context)
