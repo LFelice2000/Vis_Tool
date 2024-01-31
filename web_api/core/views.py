@@ -389,3 +389,21 @@ def getCourseTeacherEmails(courseName):
         return [t.email for t in Teacher.objects.filter(course=course)]
     
     return None
+
+def createTeacher(email, courseName):
+
+    course = Course.objects.filter(name=courseName).first()
+
+    if course:
+        try:
+            with transaction.atomic():
+                
+                teacher = Teacher(email=email)
+                teacher.save()
+
+                teacher.course.add(course)
+
+        except Exception as e:
+            print(e)
+            print("Error creating course")
+        return redirect(reverse("error", kwargs={"error": f"Error creating the course ({e})"}))
