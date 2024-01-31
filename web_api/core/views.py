@@ -13,6 +13,7 @@ def createCourse(request, activities, studentList, courseName, courseShortName, 
     studentGradesObj = ast.literal_eval(studentGrades)
     objectiveListObj = ast.literal_eval(objectiveList)
     
+    
     try:
         with transaction.atomic():
             course = Course(name=courseName)
@@ -386,6 +387,7 @@ def getCourseTeacherEmails(courseName):
     
     if course:
 
-        [t.email for t in Teacher.objects.filter(course=course)]
+        return [t.email for t in Teacher.objects.filter(course=course)]
+    
+    return None
 
-        return

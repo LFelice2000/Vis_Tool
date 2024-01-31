@@ -418,7 +418,7 @@ def confWeigth(request):
     activitiesInfo = request.POST.get("activitiesInfo")
     courseId = request.POST.get('courseId')
 
-
+    print('going to create course')
     return redirect(reverse("createCourse", kwargs={'activities': activitiesInfo, 'studentList': students, "courseName": courseName, 'courseShortName': courseShortName, 'teacher': teacher, 'studentGrades': studentGrades, 'objectiveList': objectiveList, 'courseId': courseId}))
 
 @xframe_options_exempt
@@ -438,7 +438,14 @@ def addTeacher(request, courseName, courseShortName, teacherMail,courseId):
 
         teachers = request.POST.getlist("objectives[]")
 
-        
+        for teacher in teachers:
+
+            if not teacherExists(teacher):
+
+                createTeacher(teacher, courseName)
+            else:
+
+                addTeacherToCourse(teacher, teacher)
 
         return redirect(reverse("teacherAdmin", kwargs={'courseName': courseName, 'courseShortName': courseShortName, 'teacherMail': teacherMail, 'courseId': courseId}))
     
