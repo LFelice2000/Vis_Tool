@@ -63,98 +63,104 @@
 
     $(document).ready(function() {
     
-    $(document).on('keypress', function (e){
+        $(document).on('keypress', function (e){
+            
+            if (e.which == 13 ) {
         
-        if (e.which == 13 ) {
-    
-            $('#addTeacher').trigger('click')
-        }
-    })
-    
-    $('#mail').on('keydown', function (e) {
-        var codigoTecla = event.which || event.keyCode;
-    
-        if (codigoTecla === 190 || codigoTecla === 188) {
-        // Evitamos la acción por defecto (añadir el punto o la coma)
-        event.preventDefault();
-        }
-    });
-    
-    $('#submBtn').hide();
-    
-    $('#addTeacher').on('click', function () {
-        var objName = document.getElementById("mail");
-        var inputOnlyLettersRegex = /\s*\d+\s*/;
+                $('#addTeacher').trigger('click')
+            }
+        })
+
+        const checkEmailRegex = /^[a-zA-Z.]+@uam\.es$/
         
-        if (inputOnlyLettersRegex.test(objName.value)) {
+        if (!$('#mail').val().match(checkEmailRegex)) {
+            
+                    
             document.getElementById('errorCont').classList.remove('d-none');
-                
-            $('#errorInfo').html("Los objetivos no pueden contener un numero en el nombre.")
+                    
+            $('#errorInfo').html("Solo se pueden añadir direcciones de correos de profesores de la UAM");
             $('#ErrClose').on('click', function () {
                 document.getElementById('errorCont').classList.add('d-none');
             });
     
             return;
         }
-    
-        var idName = objName.value.replace(/\s/g, '')
-    
-        var appendObj = "<li class='list-group-item d-flex flex-row justify-content-between'><span class='py-2'>"+String(objName.value).trim()+" </span><button type='button' class='btn btn-primary-outline' id='deleteObj'><i class='bi bi-trash'></i></button></li>"
-        var uls = document.getElementsByTagName('li');
         
-        for(var i=0;i<uls.length;i++){
-            if(String(uls[i].children[0].innerHTML).trim() == String(objName.value).trim()) {
-    
+        $('#submBtn').hide();
+        
+        $('#addTeacher').on('click', function () {
+            var objName = document.getElementById("mail");
+            var inputOnlyLettersRegex = /\s*\d+\s*/;
+            
+            if (inputOnlyLettersRegex.test(objName.value)) {
                 document.getElementById('errorCont').classList.remove('d-none');
+                    
+                $('#errorInfo').html("Los objetivos no pueden contener un numero en el nombre.")
+                $('#ErrClose').on('click', function () {
+                    document.getElementById('errorCont').classList.add('d-none');
+                });
+        
+                return;
+            }
+        
+            var idName = objName.value.replace(/\s/g, '')
+        
+            var appendObj = "<li class='list-group-item d-flex flex-row justify-content-between'><span class='py-2'>"+String(objName.value).trim()+" </span><button type='button' class='btn btn-primary-outline' id='deleteObj'><i class='bi bi-trash'></i></button></li>"
+            var uls = document.getElementsByTagName('li');
+            
+            for(var i=0;i<uls.length;i++){
+                if(String(uls[i].children[0].innerHTML).trim() == String(objName.value).trim()) {
+        
+                    document.getElementById('errorCont').classList.remove('d-none');
+                    
+                    $('#errorInfo').html("Ya agregaste ese correo " + String(objName.value))
+                    $('#ErrClose').on('click', function () {
+                        document.getElementById('errorCont').classList.add('d-none');
+                    })
+        
+                    return;
+                }
                 
-                $('#errorInfo').html("Ya agregaste ese correo " + String(objName.value))
+            }
+            
+        
+            if(String(objName.value).length == 0) {
+                
+                document.getElementById('errorCont').classList.remove('d-none');
+                    
+                $('#errorInfo').html("El correo no puede estar vacio.")
                 $('#ErrClose').on('click', function () {
                     document.getElementById('errorCont').classList.add('d-none');
                 })
-    
+        
                 return;
             }
+        
+            $('ul').append(appendObj);
+            $('ul').append("<input type='hidden' name='objectives[]' value='"+String(objName.value).trim()+"' id='"+String(idName).trim()+"'/>");
             
-        }
+            if($("ul li").length >= 1) {
+                $('#submBtn').show();
+            }
         
-    
-        if(String(objName.value).length == 0) {
+            $("#mail").val('');
+        });
+        
+        $(document).on('click', '#deleteObj', function () {
             
-            document.getElementById('errorCont').classList.remove('d-none');
-                
-            $('#errorInfo').html("El correo no puede estar vacio.")
-            $('#ErrClose').on('click', function () {
-                document.getElementById('errorCont').classList.add('d-none');
-            })
-    
-            return;
-        }
-    
-        $('ul').append(appendObj);
-        $('ul').append("<input type='hidden' name='objectives[]' value='"+String(objName.value).trim()+"' id='"+String(idName).trim()+"'/>");
+            var objName = "#" + String($(this).parent().children().html()).trim();
+            var objId = objName.replace(/\s/g, '')
         
-        if($("ul li").length >= 1) {
-            $('#submBtn').show();
-        }
-    
-        $("#mail").val('');
-    });
-    
-    $(document).on('click', '#deleteObj', function () {
+            $(objId).remove();
+            
+            $(this).parent().remove();
         
-        var objName = "#" + String($(this).parent().children().html()).trim();
-        var objId = objName.replace(/\s/g, '')
-    
-        $(objId).remove();
+            if($("ul li").length == 0) {
+                $('#submBtn').hide();
+            }
         
-        $(this).parent().remove();
-    
-        if($("ul li").length == 0) {
-            $('#submBtn').hide();
-        }
-    
-    
-    });
+        
+        });
     
     });
     
