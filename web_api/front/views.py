@@ -436,7 +436,8 @@ def addTeacher(request, courseName, courseShortName, teacherMail,courseId):
 
     if request.method == 'POST':
 
-        
+        return redirect(reverse("teacherAdmin", kwargs={'courseName': courseName, 'courseShortName': courseShortName, 'teacherMail': teacherMail, 'courseId': courseId}))
+    
     context = {
         'courseName': courseName,
         'courseShortName': courseShortName,
