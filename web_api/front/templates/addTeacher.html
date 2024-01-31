@@ -70,32 +70,19 @@
                 $('#addTeacher').trigger('click')
             }
         })
-
-        const checkEmailRegex = /^[a-zA-Z.]+@uam\.es$/
-        
-        if (!$('#mail').val().match(checkEmailRegex)) {
-            
-                    
-            document.getElementById('errorCont').classList.remove('d-none');
-                    
-            $('#errorInfo').html("Solo se pueden añadir direcciones de correos de profesores de la UAM");
-            $('#ErrClose').on('click', function () {
-                document.getElementById('errorCont').classList.add('d-none');
-            });
-    
-            return;
-        }
         
         $('#submBtn').hide();
         
         $('#addTeacher').on('click', function () {
             var objName = document.getElementById("mail");
-            var inputOnlyLettersRegex = /\s*\d+\s*/;
-            
-            if (inputOnlyLettersRegex.test(objName.value)) {
+            const checkEmailRegex = /^[a-zA-Z.]+@uam\.es$/
+        
+            if (!$('#mail').val().match(checkEmailRegex)) {
+                
+                        
                 document.getElementById('errorCont').classList.remove('d-none');
-                    
-                $('#errorInfo').html("Los objetivos no pueden contener un numero en el nombre.")
+                        
+                $('#errorInfo').html("Solo se pueden añadir direcciones de correos de profesores de la UAM");
                 $('#ErrClose').on('click', function () {
                     document.getElementById('errorCont').classList.add('d-none');
                 });
