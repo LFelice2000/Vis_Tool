@@ -434,6 +434,9 @@ def error(request, error):
 @xframe_options_exempt
 def addTeacher(request, courseName, courseShortName, teacherMail,courseId):
 
+    if request.method == 'POST':
+
+        
     context = {
         'courseName': courseName,
         'courseShortName': courseShortName,

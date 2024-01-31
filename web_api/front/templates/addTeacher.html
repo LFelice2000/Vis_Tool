@@ -33,16 +33,11 @@
     </div> 
 </div>
 
-<form method="post">
+<form method="post" action="{% url 'addTeacher' courseName=courseName courseShortName=courseShortName teacherMail=teacherMail courseId=courseId %}">
     {% csrf_token %}
     <ul class="list-group" id="teacherList">
     </ul>
     <button type='submit' class='btn btn-success my-3' id='submBtn'>Confirmar</button>
-
-    <input type="hidden" name="teacherMail" value="{{teacherMail}}" />
-    <input type="hidden" name="courseId" value="{{courseId}}" />
-    <input type="hidden" name="courseName" value="{{courseName}}" />
-    <input type="hidden" name="courseShortName" value="{{courseShortName}}" />
 </form>
 
 {% endblock %}
