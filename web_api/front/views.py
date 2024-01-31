@@ -440,7 +440,7 @@ def addTeacher(request, courseName, courseShortName, teacherMail,courseId):
 
         print(teachers)
 
-
+    
         return redirect(reverse("teacherAdmin", kwargs={'courseName': courseName, 'courseShortName': courseShortName, 'teacherMail': teacherMail, 'courseId': courseId}))
     
     context = {

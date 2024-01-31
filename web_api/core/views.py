@@ -407,3 +407,9 @@ def createTeacher(email, courseName):
             print(e)
             print("Error creating course")
         return redirect(reverse("error", kwargs={"error": f"Error creating the course ({e})"}))
+    
+    return None
+
+def teacherExists(email):
+
+    return Teacher.objects.filter(email=email).first()
