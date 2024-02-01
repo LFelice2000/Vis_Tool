@@ -85,20 +85,23 @@ def teacherPage(request, courseName, courseShortName, teacherMail, courseId):
         globalGradeAcum = 0
         for stu in students:
             
-            personalGradeAcum = 0
             for activity in getObjectiveActivities(objective.name, currCourse.name):
                 
                 if type(activity) == type(Quiz()):
 
                     grade = Grade.objects.filter(quiz__id=activity.id, student=stu, course=currCourse).first()
 
-                    globalGradeAcum += grade.grade * (activity.weight/100)
+                    if grade:
+
+                        globalGradeAcum += grade.grade * (activity.weight/100)
 
                 elif type(activity) == type(Assignment()):
 
                     grade = Grade.objects.filter(assignment__id=activity.id, student=stu, course=currCourse).first()
 
-                    globalGradeAcum += grade.grade * (activity.weight/100)
+                    if grade:
+
+                        globalGradeAcum += grade.grade * (activity.weight/100)
                 
                 elif type(activity) == type(Sesion()):
                     
