@@ -11,6 +11,7 @@ urlpatterns = [
     path("update/", views.update, name="update"),
     path("error/<str:error>", views.error, name='error'),
     path("addTeacher/<str:courseName>/<str:courseShortName>/<str:teacherMail>/<str:courseId>", views.addTeacher, name="addTeacher"),
+    path("addStudent/<str:courseName>/<str:courseShortName>/<str:teacherMail>/<str:courseId>", views.addStudent, name="addStudent"),
     path("core/", include("core.urls")),
 ]
 

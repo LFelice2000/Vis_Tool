@@ -428,3 +428,25 @@ def addTeacherToCourse(courseName, email):
             return None
     
     return None
+
+def addStudentToCourse(email, courseName):
+
+    course = Course.objects.filter(name=courseName).first()
+
+    if course:
+
+        stu = Student.objects.filter(email=email).first()
+
+        if not stu:
+            try:
+                with transaction.atomic():
+                    stu = Student(email=email)
+                    stu.save()
+
+                    stu.course.add(stu)
+            except Exception as e:
+
+                return None
+    
+    return None
+

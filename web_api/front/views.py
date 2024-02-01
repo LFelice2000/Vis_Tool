@@ -468,3 +468,27 @@ def addTeacher(request, courseName, courseShortName, teacherMail,courseId):
     }
 
     return render(request, "addTeacher.html", context=context)
+
+@csrf_exempt
+@xframe_options_exempt
+def addStudent(request, courseName, courseShortName, teacherMail,courseId):
+
+
+    if request.method == 'POST':
+
+        students = request.POST.getlist("objectives[]")
+
+        for student in students:
+
+            addStudentToCourse(student, courseName)
+
+        return redirect(reverse("teacherAdmin", kwargs={'courseName': courseName, 'courseShortName': courseShortName, 'teacherMail': teacherMail, 'courseId': courseId}))
+    
+    context = {
+        'courseName': courseName,
+        'courseShortName': courseShortName,
+        'teacherMail': teacherMail,
+        'courseId': courseId
+    }
+
+    return render(request, "addStudent.html", context=context)
