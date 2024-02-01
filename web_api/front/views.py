@@ -76,7 +76,6 @@ def teacherPage(request, courseName, courseShortName, teacherMail, courseId):
 
     currCourse = getCurrCourse(courseName)
 
-    personalTotal = []
     globalTotal = []
     for objective in getCourseObjectives(courseName):
                 
