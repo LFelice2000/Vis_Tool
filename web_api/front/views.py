@@ -74,11 +74,51 @@ def update(request):
 @xframe_options_exempt
 def teacherPage(request, courseName, courseShortName, teacherMail, courseId):
 
+    currCourse = getCurrCourse(courseName)
+
+    personalTotal = []
+    globalTotal = []
+    for objective in getCourseObjectives(courseName):
+                
+        students = getCourseStudents(courseName)
+        
+        globalGradeAcum = 0
+        for stu in students:
+            
+            personalGradeAcum = 0
+            for activity in getObjectiveActivities(objective.name, currCourse.name):
+                
+                if type(activity) == type(Quiz()):
+
+                    grade = Grade.objects.filter(quiz__id=activity.id, student=stu, course=currCourse).first()
+
+                    globalGradeAcum += grade.grade * (activity.weight/100)
+
+                elif type(activity) == type(Assignment()):
+
+                    grade = Grade.objects.filter(assignment__id=activity.id, student=stu, course=currCourse).first()
+
+                    globalGradeAcum += grade.grade * (activity.weight/100)
+                
+                elif type(activity) == type(Sesion()):
+                    
+                    
+                    at = Attendance.objects.filter(sesions=activity).first()
+                    grade = Grade.objects.filter(sesion__id=activity.id, student=stu, course=currCourse).first()
+                    
+                    if grade and at:
+
+                        globalGradeAcum += grade.grade * (at.weight/100)
+
+        globalTotal.append({'name': objective.name, 'globalScore': round(((globalGradeAcum/students.count())*10), 2)})
+
+
     context = {
         "courseName": str(courseName),
         "teacherMail": teacherMail,
         "courseId": courseId,
-        'courseShortName':courseShortName
+        'courseShortName':courseShortName,
+        'globalObjectives': globalTotal
     }
 
     return render(request, "teacherAdmin.html", context=context)
