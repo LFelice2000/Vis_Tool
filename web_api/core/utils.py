@@ -142,7 +142,7 @@ def createCourse(activities, studentList, courseName, courseShortName, teacher, 
 
 def updateCourse(activities, courseName, courseShortName, studentGrades, teacher, courseId):
 
-    activitiesObj = activities
+    activitiesObj = ast.literal_eval(str(activities))
     studentGradesObj = ast.literal_eval(studentGrades)
     
     try:
