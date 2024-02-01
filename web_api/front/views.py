@@ -114,6 +114,7 @@ def teacherPage(request, courseName, courseShortName, teacherMail, courseId):
 
         globalTotal.append({'name': objective.name, 'globalScore': round(((globalGradeAcum/students.count())*10), 2)})
 
+    print(globalTotal)
 
     context = {
         "courseName": str(courseName),
