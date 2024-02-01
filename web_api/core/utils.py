@@ -443,7 +443,7 @@ def addStudentToCourse(email, courseName):
                     stu = Student(email=email)
                     stu.save()
 
-                    stu.course.add(stu)
+                    stu.course.add(course)
             except Exception as e:
                 print(e)
                 return None
