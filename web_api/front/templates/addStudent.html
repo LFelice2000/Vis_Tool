@@ -38,7 +38,7 @@
     </div> 
 </div>
 
-<form method="post" action="{% url 'addTeacher' courseName=courseName courseShortName=courseShortName teacherMail=teacherMail courseId=courseId %}">
+<form method="post" action="{% url 'addStudent' courseName=courseName courseShortName=courseShortName teacherMail=teacherMail courseId=courseId %}">
     {% csrf_token %}
     <ul class="list-group" id="teacherList">
     </ul>
