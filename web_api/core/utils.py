@@ -141,9 +141,9 @@ def createCourse(activities, studentList, courseName, courseShortName, teacher, 
     return {"status": "success"}
 
 def updateCourse(activities, courseName, courseShortName, studentGrades, teacher, courseId):
-    
-    activitiesObj = json.loads(activities)
-    studentGradesObj = json.loads(studentGrades)
+
+    activitiesObj = activities
+    studentGradesObj = ast.literal_eval(studentGrades)
     
     try:
         with transaction.atomic():
