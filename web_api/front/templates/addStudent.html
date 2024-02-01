@@ -96,7 +96,7 @@
             var stuInfo = {'name': document.getElementById("name").value, 'mail': document.getElementById("mail").value}
             var inputOnlyLettersRegex = /\s*\d+\s*/;
     
-            if (inputOnlyLettersRegex.test($('#name').val(()))) {
+            if (inputOnlyLettersRegex.test($('#name').val())) {
                 document.getElementById('errorCont').classList.remove('d-none');
                     
                 $('#errorInfo').html("Los nombres solo pueden contener letras y espacios.")
