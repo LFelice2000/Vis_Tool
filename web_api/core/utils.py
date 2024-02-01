@@ -1,4 +1,6 @@
 import ast
+import json
+
 from core.models import Course, Sesion, Student, Quiz, Teacher, Grade, Objective, Assignment, Attendance, Update
 
 from django.db import IntegrityError
@@ -140,8 +142,8 @@ def createCourse(activities, studentList, courseName, courseShortName, teacher, 
 
 def updateCourse(activities, courseName, courseShortName, studentGrades, teacher, courseId):
     
-    activitiesObj = ast.literal_eval(activities)
-    studentGradesObj = ast.literal_eval(studentGrades)
+    activitiesObj = json.loads(activities)
+    studentGradesObj = json.loads(studentGrades)
     
     try:
         with transaction.atomic():
