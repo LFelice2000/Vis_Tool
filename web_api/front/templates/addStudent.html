@@ -133,9 +133,8 @@
                 return;
             }
             
-            alert(JSON.stringify(stuInfo))
             $('ul').append(appendObj);
-            $('ul').append("<input type='hidden' name='objectives[]' value='"+String(stuInfo)+"' id='"+String(idName).trim()+"'/>");
+            $('ul').append("<input type='hidden' name='objectives[]' value='"+JSON.stringify(stuInfo)+"' id='"+String(idName).trim()+"'/>");
             
             if($("ul li").length >= 1) {
                 $('#submBtn').show();
