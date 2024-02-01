@@ -479,7 +479,7 @@ def addStudent(request, courseName, courseShortName, teacherMail,courseId):
 
         for student in students:
 
-            addStudentToCourse(student, courseName)
+            addStudentToCourse(json.loads(student), courseName)
 
         return redirect(reverse("teacherAdmin", kwargs={'courseName': courseName, 'courseShortName': courseShortName, 'teacherMail': teacherMail, 'courseId': courseId}))
     
