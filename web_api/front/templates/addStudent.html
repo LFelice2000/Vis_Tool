@@ -78,12 +78,34 @@
                 $('#addTeacher').trigger('click')
             }
         })
+
+        $('#name').on('keydown', function (e) {
+            var codigoTecla = event.which || event.keyCode;
+        
+            if (codigoTecla === 190 || codigoTecla === 188) {
+            // Evitamos la acción por defecto (añadir el punto o la coma)
+            event.preventDefault();
+            }
+        });
+        
         
         $('#submBtn').hide();
         
         $('#addTeacher').on('click', function () {
             var objName = document.getElementById("mail");
             var stuInfo = {'name': document.getElementById("name").value, 'mail': document.getElementById("mail").value}
+            var inputOnlyLettersRegex = /\s*\d+\s*/;
+    
+            if (inputOnlyLettersRegex.test($('#name').val(()))) {
+                document.getElementById('errorCont').classList.remove('d-none');
+                    
+                $('#errorInfo').html("Los nombres solo pueden contener letras y espacios.")
+                $('#ErrClose').on('click', function () {
+                    document.getElementById('errorCont').classList.add('d-none');
+                });
+        
+                return;
+            }
 
             const checkEmailRegex = /^[a-zA-Z.]+@estudiante.uam\.es$/
         
@@ -141,6 +163,7 @@
             }
         
             $("#mail").val('');
+            $('#name').val('');
         });
         
         $(document).on('click', '#deleteObj', function () {
