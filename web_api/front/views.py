@@ -479,7 +479,8 @@ def addStudent(request, courseName, courseShortName, teacherMail,courseId):
 
         for student in students:
 
-            addStudentToCourse(student, courseName)
+            print(student)
+            #addStudentToCourse(student, courseName)
 
         return redirect(reverse("teacherAdmin", kwargs={'courseName': courseName, 'courseShortName': courseShortName, 'teacherMail': teacherMail, 'courseId': courseId}))
     
