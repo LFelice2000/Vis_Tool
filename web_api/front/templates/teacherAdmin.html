@@ -61,5 +61,28 @@
         {% endblock %}
     </body>
     {% block scripts%}
+    <script>
+
+        $(document).ready(function (){
+    
+            $('.progress .progress-bar').each(function() {
+                var finalWidth = parseFloat($(this).text());
+                var barColor = "bg-success";
+    
+                if(finalWidth < 50) {
+                    barColor = "bg-danger"
+                } else if (finalWidth < 70) {
+                    barColor = "bg-warning"
+                }
+    
+                $(this).addClass(barColor);
+                $(this).css("width", "0px").animate({width: finalWidth+"%"}, 500);
+                $(this).removeClass("progress-bar-animated progress-bar-striped");
+            });
+    
+        });
+        
+    
+    </script>
     {% endblock %}
 </html>
