@@ -478,6 +478,8 @@ def addStudent(request, courseName, courseShortName, teacherMail,courseId):
 
         students = request.POST.getlist("objectives[]")
 
+        print(student)
+
         for student in students:
 
             addStudentToCourse(student, courseName)
