@@ -32,8 +32,13 @@
     <h1>Añadir Estudiantes</h1>
     
     <div class="form-group d-flex flex-row py-3 gap-3">
+
+        <label for="mail">Nombre:</label>
+        <input class="form-control" type="text" id="name" style="width: 300px;"/>
+        
         <label for="mail">Correo:</label>
         <input class="form-control" type="text" id="mail" style="width: 300px;"/>
+
         <button type="button" class="btn btn-success" id="addTeacher">añadir</button>
     </div> 
 </div>
@@ -78,6 +83,8 @@
         
         $('#addTeacher').on('click', function () {
             var objName = document.getElementById("mail");
+            var stuInfo = {'name': document.getElementById("mail").value, 'mail': document.getElementById("mail").value}
+
             const checkEmailRegex = /^[a-zA-Z.]+@estudiante.uam\.es$/
         
             if (!$('#mail').val().match(checkEmailRegex)) {
@@ -127,7 +134,7 @@
             }
         
             $('ul').append(appendObj);
-            $('ul').append("<input type='hidden' name='objectives[]' value='"+String(objName.value).trim()+"' id='"+String(idName).trim()+"'/>");
+            $('ul').append("<input type='hidden' name='objectives[]' value='"+String(stuInfo)+"' id='"+String(idName).trim()+"'/>");
             
             if($("ul li").length >= 1) {
                 $('#submBtn').show();
