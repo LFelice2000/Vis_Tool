@@ -445,7 +445,7 @@ def addStudentToCourse(email, courseName):
 
                     stu.course.add(stu)
             except Exception as e:
-
+                print(e)
                 return None
     
     return None
