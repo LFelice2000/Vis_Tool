@@ -5,8 +5,7 @@
 <nav class="container-fluid navbar d-flex mt-3">
     <div class="d-flex gap-3">
         <a class="btn btn-success" href="{% url 'addTeacher' courseName=courseName courseShortName=courseShortName teacherMail=teacherMail courseId=courseId %}">Añadir Profesor</a>
-        <a class="nav-item nav-link disabled" href="#">Add Student</a>
-        <a class="nav-item nav-link disabled" href="#">option 3</a>
+        <a class="btn btn-success" href="#">Añadir Estudiante</a>
     </div>
    
     <img class="img-fluid" src="{% static "images/VisUAM_logo_header.png" %}"/>
@@ -81,7 +80,7 @@
             var objName = document.getElementById("mail");
             const checkEmailRegex = /^[a-zA-Z.]+@estudiante.uam\.es$/
         
-            /**if (!$('#mail').val().match(checkEmailRegex)) {
+            if (!$('#mail').val().match(checkEmailRegex)) {
                 
                         
                 document.getElementById('errorCont').classList.remove('d-none');
@@ -92,9 +91,11 @@
                 });
         
                 return;
-            }*/
+            }
         
-            var idName = objName.value.replace(/\s/g, '')
+            var idName = objName.value.split('@')[0].replace('.', '')
+
+            alert(idName)
         
             var appendObj = "<li class='list-group-item d-flex flex-row justify-content-between'><span class='py-2'>"+String(objName.value).trim()+" </span><button type='button' class='btn btn-primary-outline' id='deleteObj'><i class='bi bi-trash'></i></button></li>"
             var uls = document.getElementsByTagName('li');
