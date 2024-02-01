@@ -16,7 +16,6 @@ notificationServiceThread = None
 
 def is_teacher(value):
 
-    print(value)
     domain = value.split("@")[1]
 
     if domain == "uam.es":
