@@ -440,7 +440,9 @@ def addStudentToCourse(student, courseName):
         if not stu:
             try:
                 with transaction.atomic():
-                    stu = Student(email=student['mail'], name=student['name'])
+
+                    formatedName = ' '.join(e.capitalize() for e in student['name'].split(' '))
+                    stu = Student(email=student['mail'], name=formatedName)
                     stu.save()
 
                     stu.course.add(course)
