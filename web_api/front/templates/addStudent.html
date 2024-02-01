@@ -94,8 +94,6 @@
             }
         
             var idName = objName.value.split('@')[0].replace('.', '')
-
-            alert(idName)
         
             var appendObj = "<li class='list-group-item d-flex flex-row justify-content-between'><span class='py-2'>"+String(objName.value).trim()+" </span><button type='button' class='btn btn-primary-outline' id='deleteObj'><i class='bi bi-trash'></i></button></li>"
             var uls = document.getElementsByTagName('li');
@@ -140,7 +138,7 @@
         
         $(document).on('click', '#deleteObj', function () {
             
-            var objName = "#" + String($(this).parent().children().html()).trim();
+            var objName = "#" + String($(this).parent().children().html()).trim().split('@')[0].replace('.', '');
             var objId = objName.replace(/\s/g, '')
         
             $(objId).remove();
