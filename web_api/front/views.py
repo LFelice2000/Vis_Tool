@@ -235,20 +235,21 @@ def visPage(request):
             
 
             update = Update.objects.filter(course=currCourse).first()
+            studentName = Student.objects.filter(email=userMail).first().name
 
             context = None
 
             if update:
                 context = {
                     'objectives': personalTotal,
-                    'student': userMail,
+                    'student': studentName,
                     'update': update,
                     'updateBy': update.teacher
                 }
             else:
                 context = {
                     'objectives': personalTotal,
-                    'student': userMail,
+                    'student': studentName,
                 }
 
             return render(request, "visPage.html", context=context)
