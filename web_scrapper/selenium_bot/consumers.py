@@ -6,6 +6,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
+from webdriver_manager.chrome import ChromeDriverManager
+
 
 from web_scrapper.settings import BASE_DIR
 
@@ -212,18 +214,21 @@ class EchoConsumer(AsyncWebsocketConsumer):
     WEB_API_PATH = f"{Path(__file__).resolve().parent.parent.parent.absolute()}/web_api/"
     
     wd_options = Options()
-    wd_service = Service(executable_path=os.path.join(BASE_DIR, './chromedriver'))
+    
     wd_prefs = {"download.default_directory" : os.path.join(BASE_DIR, "courseFiles")}
     wd_options.add_experimental_option("prefs",wd_prefs)
     wd_options.add_argument("--no-sandbox")
     wd_options.add_argument("--disable-dev-shm-usage")
     wd_options.add_argument('--headless')
     
+    latestchromedriver = ChromeDriverManager().install()
+    wd_service = Service(executable_path=latestchromedriver)
+
     async def websocket_connect(self, event):
 
       print("[socket] connect event called")
 
-      self.wd = webdriver.Chrome(options=self.wd_options, service=self.wd_service)
+      self.wd = webdriver.Chrome(service=self.wd_service, options=self.wd_options)
       self.wd_wait = WebDriverWait(self.wd, 10)
 
       await self.accept()

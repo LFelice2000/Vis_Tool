@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<input type="hidden" id="objectivesJson" value="{{objectivesJson}}" />
+
 <div class="d-flex flex-column mt-4">
     <div class=""><h3 class="text-center">Bienvenid@ {{student}}</h3></div>
 </div>
@@ -19,12 +21,12 @@
         </div>
         <div class="col-md-4">
             <div class="progress" role="progressbar">
-                <div id="hilos-bar-usr" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%">{{objective.global}}%</div>
+                <div id="{{objective.name|cut:" "}}-global" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%">{{objective.global}}%</div>
             </div>
         </div>
         <div class="col-md-4">
             <div class="progress" role="progressbar">
-                <div id="hilos-bar" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%">{{objective.personalScore}}%</div>
+                <div id="{{objective.name|cut:" "}}-personal" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%">{{objective.personalScore}}%</div>
             </div>
         </div>
     </div>
@@ -45,20 +47,48 @@
 
     $(document).ready(function (){
 
-        $('.progress .progress-bar').each(function() {
             var finalWidth = parseFloat($(this).text());
-            var barColor = "bg-success";
 
-            if(finalWidth < 50) {
-                barColor = "bg-danger"
-            } else if (finalWidth < 70) {
-                barColor = "bg-warning"
+            var objObject =  JSON.parse($('#objectivesJson').val())
+            for(var obj in objObject) {
+                var objName = objObject[obj].name
+                var personalId = `#${objName.replace(/\s/g, '')}-personal`
+                var globalId = `#${objName.replace(/\s/g, '')}-global`
+
+   
+                
+                var personalScore = parseFloat($(personalId).html().replace('%', ''))
+                var globalScore = parseFloat($(globalId).html().replace('%', ''))
+    
+                var scoreDifference = personalScore - globalScore
+
+                if (scoreDifference <= -20) {
+                    barColor = "bg-warning"
+                }
+                else if (scoreDifference >= -10 && scoreDifference <= 10) {
+                    barColor = "bg-primary"
+                }
+                else {
+                    barColor = "bg-success"
+                }
+
+                if(globalScore < 50) {
+                    globalBarColor = "bg-danger"
+                } else if (globalScore < 70) {
+                    globalBarColor = "bg-warning"
+                } else {
+                    globalBarColor = "bg-success"
+                }
+
+                $(personalId).addClass(barColor);
+                $(personalId).css("width", "0px").animate({width: personalScore+"%"}, 500);
+                $(personalId).removeClass("progress-bar-animated progress-bar-striped");
+
+                $(globalId).addClass(barColor);
+                $(globalId).css("width", "0px").animate({width: globalScore+"%"}, 500);
+                $(globalId).removeClass("progress-bar-animated progress-bar-striped");
             }
 
-            $(this).addClass(barColor);
-            $(this).css("width", "0px").animate({width: finalWidth+"%"}, 500);
-            $(this).removeClass("progress-bar-animated progress-bar-striped");
-        });
 
     });
     

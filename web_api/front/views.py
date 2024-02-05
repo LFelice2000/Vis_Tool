@@ -219,11 +219,11 @@ def visPage(request):
                                 globalGradeAcum += grade.grade * (at.weight/100)
 
                     if stu.email == userMail:
-                        personalResults = {'name': objective.name, 'personalScore': round((personalGradeAcum*10), 2)}
+                        personalResults = {'name': objective.name, 'personalScore': float(round((personalGradeAcum*10), 2))}
                     
                         personalTotal.append(personalResults)
                     
-                globalTotal.append({'objective': objective.name, 'globalScore': round(((globalGradeAcum/students.count())*10), 2)})
+                globalTotal.append({'objective': objective.name, 'globalScore': float(round(((globalGradeAcum/students.count())*10), 2))})
 
             
             for result in personalTotal:
@@ -242,12 +242,14 @@ def visPage(request):
             if update:
                 context = {
                     'objectives': personalTotal,
+                    'objectivesJson': json.dumps(personalTotal),
                     'student': studentName,
                     'update': update,
                     'updateBy': update.teacher
                 }
             else:
                 context = {
+                    'objectivesJson': json.dumps(personalTotal),
                     'objectives': personalTotal,
                     'student': studentName,
                 }
