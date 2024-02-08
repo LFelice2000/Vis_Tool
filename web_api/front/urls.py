@@ -10,8 +10,13 @@ urlpatterns = [
     path("teacherAdmin/<str:courseName>/<str:courseShortName>/<str:teacherMail>/<str:courseId>", views.teacherPage, name="teacherAdmin"),
     path("update/", views.update, name="update"),
     path("error/<str:error>", views.error, name='error'),
+    path("manageTeacher/<str:courseName>/<str:courseShortName>/<str:teacherMail>/<str:courseId>", views.manageTeacher, name="manageTeacher"),
+    path("manageStudents/<str:courseName>/<str:courseShortName>/<str:teacherMail>/<str:courseId>", views.manageStudent, name="manageStudent"),
     path("addTeacher/<str:courseName>/<str:courseShortName>/<str:teacherMail>/<str:courseId>", views.addTeacher, name="addTeacher"),
     path("addStudent/<str:courseName>/<str:courseShortName>/<str:teacherMail>/<str:courseId>", views.addStudent, name="addStudent"),
+    path("removeTeacher/<str:courseName>/<str:courseShortName>/<str:teacherMail>/<str:courseId>", views.removeTeacher, name="removeTeacher"),
+    path("removeStudent/<str:courseName>/<str:courseShortName>/<str:teacherMail>/<str:courseId>", views.removeStudent, name="removeStudent"),
+    path("studentInfo/<str:courseName>/<str:courseShortName>/<str:teacherMail>/<str:courseId>", views.studentInfo, name="studentInfo"),
     path("core/", include("core.urls")),
 ]
 

@@ -324,12 +324,9 @@ def getTeachersInCourse(courseName):
     if courseExists(courseName):
 
         course = Course.objects.filter(name=courseName).first()
-        courseTeachers = []
-        for teacher in Teacher.objects.filter(course=course):
-
-            courseTeachers.append(teacher.email)
         
-        return courseTeachers
+        if course:
+            return [t.email for t in Teacher.objects.filter(course=course)]
     
     return None
 
@@ -420,11 +417,12 @@ def addTeacherToCourse(courseName, email):
             with transaction.atomic():
                 
                 teacher = Teacher.objects.filter(email=email).first()
-
-                teacher.course.add(course)
+                
+                if teacher:
+                    teacher.course.add(course)
 
         except Exception as e:
-            
+            print(e)
             return None
     
     return None
@@ -449,6 +447,59 @@ def addStudentToCourse(student, courseName):
             except Exception as e:
                 print(e)
                 return None
+        else:
+            try:
+                with transaction.atomic():
+
+                    stu = Student.objects.filter(email=student['mail']).first()
+
+                    if stu:
+        
+                        stu.course.add(course)
+            except Exception as e:
+                print(e)
+                return None
     
     return None
 
+def deleteTeacher(teacher, courseName):
+
+    course = Course.objects.filter(name=courseName).first()
+
+    if course:
+
+        teacher = Teacher.objects.filter(email=teacher).first()
+
+        if teacher:
+
+            try:
+                with transaction.atomic():
+                    teacher.course.remove(course)
+            except Exception as e:
+                print(e)
+                return None
+            
+            return True
+    
+    return None
+
+def deleteStudent(student, courseName):
+
+    course = Course.objects.filter(name=courseName).first()
+
+    if course:
+
+        stu = Student.objects.filter(email=student).first()
+
+        if stu:
+
+            try:
+                with transaction.atomic():
+                    stu.course.remove(course)
+            except Exception as e:
+                print(e)
+                return None
+            
+            return True
+    
+    return None
