@@ -15,8 +15,8 @@
             {% block navbar %}
             <nav class="container-fluid navbar d-flex mt-3">
                 <div class="d-flex gap-3">
-                    <a class="btn btn-success" href="{% url 'addTeacher' courseName=courseName courseShortName=courseShortName teacherMail=teacherMail courseId=courseId %}">Añadir Profesor</a>
-                    <a class="btn btn-success" href="{% url 'addStudent' courseName=courseName courseShortName=courseShortName teacherMail=teacherMail courseId=courseId %}">Añadir Estudiante</a>
+                    <a class="btn btn-success" href="{% url 'manageTeacher' courseName=courseName courseShortName=courseShortName teacherMail=teacherMail courseId=courseId %}">Gestionar Profesores</a>
+                    <a class="btn btn-success" href="{% url 'manageStudent' courseName=courseName courseShortName=courseShortName teacherMail=teacherMail courseId=courseId %}">Gestionar Estudiantes</a>
                 </div>
                
                 <img class="img-fluid" src="{% static "images/VisUAM_logo_header.png" %}"/>
@@ -35,26 +35,30 @@
         </div>
         
         {% block content %}
-            <p class="mt-3">Curso: {{courseName}}</p>
 
-            <div class="container-fluid d-flex flex-column justify-content-center mt-4">
-                <div class="row mb-4">
-                    <div class="col-md-4"><h3 class="text-center"></div>
-                    
-                    <div class="col-md-4"><h3 class="text-center">Media del Grupo</h3></div>
-                </div>
-                {% for objective in globalObjectives %}
-                <div class="row">
-                    <div class="col-md-4">
-                        <p class="text-end"><strong>{{objective.name}}</strong></p>
+            <div class="container-fluid mt-3">
+                <p class="mt-5 h5">Curso: {{courseName}}</p>
+                <div class="container-fluid d-flex flex-column justify-content-center mt-4">
+                    <div class="row mb-4">
+                        <div class="col-md-4"><h3 class="text-center"></div>
+                        
+                        <div class="col-md-4"><h3 class="text-center">Media del Grupo</h3></div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="progress" role="progressbar">
-                            <div id="hilos-bar-usr" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%">{{objective.globalScore}}%</div>
+                    {% for objective in globalObjectives %}
+                    <div class="row">
+                        <div class="col-md-4">
+                            <p class="text-end"><strong>{{objective.name}}</strong></p>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="progress" role="progressbar">
+                                <div id="hilos-bar-usr" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%">{{objective.globalScore}}%</div>
+                            </div>
                         </div>
                     </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
+            </div>
+
         {%endblock%}
 
         {% block overlays %}

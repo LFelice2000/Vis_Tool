@@ -1,0 +1,46 @@
+{% extends "teacherAdmin.html" %}
+{% load static %}
+
+{% block navbar %}
+<nav class="container-fluid navbar d-flex mt-3">
+    <div class="d-flex gap-3">
+        <a class="btn btn-success" href="{% url 'manageTeacher' courseName=courseName courseShortName=courseShortName teacherMail=teacherMail courseId=courseId %}">Gestionar Profesores</a>
+        <a class="btn btn-success disabled" href="#">Gestionar Estudiantes</a>
+    </div>
+   
+    <img class="img-fluid" src="{% static "images/VisUAM_logo_header.png" %}"/>
+
+    <form class="d-flex align-self-end mr-3" method="GET" action="{% url 'confPage' %}">
+        <button type="submit" class="btn btn-primary-outline nav-item nav-link" id='updateBtn'><i class="bi bi-cloud-upload"></i></button>
+
+        <input type="hidden" name="courseName" id="courseName" value="{{courseName}}" />
+        <input type="hidden" name="courseShortName" value="{{courseShortName}}"/>
+        <input type="hidden" name="teacherMail" id="courseName" value="{{teacherMail}}" />
+        <input type="hidden" name="courseId" id='courseId' value="{{courseId}}"/>
+    </form>
+</nav>
+{% endblock %}
+
+{% block content %}
+
+    <a class="btn btn-primary-outline mt-4" href="{% url 'teacherAdmin' courseName=courseName courseShortName=courseShortName teacherMail=teacherMail courseId=courseId %}">
+        <svg xmlns="http://www.w3.org/2000/svg" height="16" width="18" viewBox="0 0 576 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M576 128c0-35.3-28.7-64-64-64H205.3c-17 0-33.3 6.7-45.3 18.7L9.4 233.4c-6 6-9.4 14.1-9.4 22.6s3.4 16.6 9.4 22.6L160 429.3c12 12 28.3 18.7 45.3 18.7H512c35.3 0 64-28.7 64-64V128zM271 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"/></svg>
+    </a>
+
+    <div class="container-fluid mt-2">
+        <p class="h4">Student Info: </p>
+       
+    </div>
+    
+{% endblock %}
+
+{% block overlays %}
+
+{% endblock %}
+
+{%block scripts %}
+<script>
+
+
+</script>
+{% endblock %}

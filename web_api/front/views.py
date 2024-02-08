@@ -6,6 +6,7 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from core.models import *
 from core.utils import *
 from urllib.parse import unquote, urlparse, parse_qs
+from django.http import JsonResponse
 
 import pandas as pd
 
@@ -487,6 +488,38 @@ def error(request, error):
 
 @csrf_exempt
 @xframe_options_exempt
+def manageStudent(request, courseName, courseShortName, teacherMail,courseId):
+
+    students = getStudentEmails(courseName)
+
+    context = {
+        'courseName': courseName,
+        'courseShortName': courseShortName,
+        'teacherMail': teacherMail,
+        'courseId': courseId,
+        'students': students
+    }
+
+    return render(request, "manageStudents.html", context=context)
+
+@csrf_exempt
+@xframe_options_exempt
+def manageTeacher(request, courseName, courseShortName, teacherMail,courseId):
+
+    teachers = getTeachersInCourse(courseName)
+
+    context = {
+        'courseName': courseName,
+        'courseShortName': courseShortName,
+        'teacherMail': teacherMail,
+        'courseId': courseId,
+        'teachers': teachers
+    }
+
+    return render(request, "manageTeachers.html", context=context)
+
+@csrf_exempt
+@xframe_options_exempt
 def addTeacher(request, courseName, courseShortName, teacherMail,courseId):
 
 
@@ -500,10 +533,9 @@ def addTeacher(request, courseName, courseShortName, teacherMail,courseId):
 
                 createTeacher(teacher, courseName)
             else:
+                addTeacherToCourse(courseName, teacher)
 
-                addTeacherToCourse(teacher, teacher)
-
-        return redirect(reverse("teacherAdmin", kwargs={'courseName': courseName, 'courseShortName': courseShortName, 'teacherMail': teacherMail, 'courseId': courseId}))
+        return redirect(reverse("manageTeacher", kwargs={'courseName': courseName, 'courseShortName': courseShortName, 'teacherMail': teacherMail, 'courseId': courseId}))
     
     context = {
         'courseName': courseName,
@@ -513,6 +545,33 @@ def addTeacher(request, courseName, courseShortName, teacherMail,courseId):
     }
 
     return render(request, "addTeacher.html", context=context)
+
+@csrf_exempt
+@xframe_options_exempt
+def removeTeacher(request, courseName, courseShortName, teacherMail,courseId):
+
+    if request.method == 'POST':
+
+        teacher = request.POST.get("teacherToDelete")
+
+        if not deleteTeacher(teacher, courseName):
+            print('error')
+
+        return redirect(reverse("manageTeacher", kwargs={'courseName': courseName, 'courseShortName': courseShortName, 'teacherMail': teacherMail, 'courseId': courseId}))
+    
+@csrf_exempt
+@xframe_options_exempt
+def removeStudent(request, courseName, courseShortName, teacherMail,courseId):
+
+    if request.method == 'POST':
+
+        student = request.POST.get("studentToDelete")
+
+        print(student)
+        if not deleteStudent(student, courseName):
+            print('error')
+
+        return redirect(reverse("manageTeacher", kwargs={'courseName': courseName, 'courseShortName': courseShortName, 'teacherMail': teacherMail, 'courseId': courseId}))
 
 @csrf_exempt
 @xframe_options_exempt
@@ -537,3 +596,60 @@ def addStudent(request, courseName, courseShortName, teacherMail,courseId):
     }
 
     return render(request, "addStudent.html", context=context)
+
+@csrf_exempt
+@xframe_options_exempt
+def studentInfo(request, courseName, courseShortName, teacherMail,courseId):
+
+    studentMail = request.POST.get('studentMail')
+
+    print(studentMail)
+
+    currCourse = getCurrCourse(courseName)
+    students = getCourseStudents(courseName)
+
+    if studentMail not in getStudentEmails(courseName):
+
+        JsonResponse({'state': 'error'})
+
+    personalTotal = []
+    for objective in getCourseObjectives(currCourse.name):
+        
+        for stu in students:
+            
+            personalGradeAcum = 0
+            for activity in getObjectiveActivities(objective.name, currCourse.name):
+                
+                if type(activity) == type(Quiz()):
+
+                    grade = Grade.objects.filter(quiz__id=activity.id, student=stu, course=currCourse).first()
+                    
+                    if grade:
+                        if stu.email == studentMail:
+                            personalGradeAcum += grade.grade * (activity.weight/100)
+
+                elif type(activity) == type(Assignment()):
+
+                    grade = Grade.objects.filter(assignment__id=activity.id, student=stu, course=currCourse).first()
+
+                    if grade:
+                        if stu.email == studentMail:
+                            personalGradeAcum += grade.grade * (activity.weight/100)
+                
+                elif type(activity) == type(Sesion()):
+                    
+                    
+                    at = Attendance.objects.filter(sesions=activity).first()
+                    grade = Grade.objects.filter(sesion__id=activity.id, student=stu, course=currCourse).first()
+                    
+                    if grade and at:
+                        if stu.email == studentMail:
+                            personalGradeAcum += grade.grade * (at.weight/100)
+
+
+            if stu.email == studentMail:
+                personalResults = {'name': objective.name, 'personalScore': float(round((personalGradeAcum*10), 2))}
+            
+                personalTotal.append(personalResults)
+
+    return JsonResponse({'state': 'succeess', 'objectives': json.dumps(personalTotal)})

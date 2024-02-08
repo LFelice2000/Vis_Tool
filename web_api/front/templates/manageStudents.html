@@ -1,0 +1,186 @@
+{% extends "teacherAdmin.html" %}
+{% load static %}
+
+{% block navbar %}
+<nav class="container-fluid navbar d-flex mt-3">
+    <div class="d-flex gap-3">
+        <a class="btn btn-success" href="{% url 'manageTeacher' courseName=courseName courseShortName=courseShortName teacherMail=teacherMail courseId=courseId %}">Gestionar Profesores</a>
+        <a class="btn btn-success disabled" href="#">Gestionar Estudiantes</a>
+    </div>
+   
+    <img class="img-fluid" src="{% static "images/VisUAM_logo_header.png" %}"/>
+
+    <form class="d-flex align-self-end mr-3" method="GET" action="{% url 'confPage' %}">
+        <button type="submit" class="btn btn-primary-outline nav-item nav-link" id='updateBtn'><i class="bi bi-cloud-upload"></i></button>
+
+        <input type="hidden" name="courseName" id="courseName" value="{{courseName}}" />
+        <input type="hidden" name="courseShortName" value="{{courseShortName}}"/>
+        <input type="hidden" name="teacherMail" id="courseName" value="{{teacherMail}}" />
+        <input type="hidden" name="courseId" id='courseId' value="{{courseId}}"/>
+    </form>
+</nav>
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid mt-2" id="studentListCont">
+        <a class="btn btn-primary-outline mt-4" href="{% url 'teacherAdmin' courseName=courseName courseShortName=courseShortName teacherMail=teacherMail courseId=courseId %}">
+            <svg xmlns="http://www.w3.org/2000/svg" height="16" width="18" viewBox="0 0 576 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M576 128c0-35.3-28.7-64-64-64H205.3c-17 0-33.3 6.7-45.3 18.7L9.4 233.4c-6 6-9.4 14.1-9.4 22.6s3.4 16.6 9.4 22.6L160 429.3c12 12 28.3 18.7 45.3 18.7H512c35.3 0 64-28.7 64-64V128zM271 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"/></svg>
+        </a>
+
+        <div class="container-fluid mt-2">
+            <p class="h4">Estudiantes: </p>
+            <ul class="list-group mt-3" id="objList">
+                {% for student in students %}
+                <li class='list-group-item d-flex flex-row justify-content-between'>
+                    <span class='py-2'>{{student}}</span>
+                    <button type='button' class='btn btn-primary-outline deleteObj'>
+                        <i class='bi bi-trash'></i>
+                    </button>
+                </li>
+                {% endfor %}
+            </ul>
+
+            <a class="btn btn-success mt-5" href="{% url 'addStudent' courseName=courseName courseShortName=courseShortName teacherMail=teacherMail courseId=courseId %}">Añadir Estudiantes</a>
+        </div>
+    </div>
+
+    <div class="container-fluid mt-2" id="studentPersonalCont">
+        <button class="btn btn-primary-outline mt-4" id="returnStudents">
+            <svg xmlns="http://www.w3.org/2000/svg" height="16" width="18" viewBox="0 0 576 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M576 128c0-35.3-28.7-64-64-64H205.3c-17 0-33.3 6.7-45.3 18.7L9.4 233.4c-6 6-9.4 14.1-9.4 22.6s3.4 16.6 9.4 22.6L160 429.3c12 12 28.3 18.7 45.3 18.7H512c35.3 0 64-28.7 64-64V128zM271 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"/></svg>
+        </button>
+
+        <div class="container-fluid d-flex flex-column justify-content-center mt-4" id="studentPersonalinfo">
+
+        </div>
+    </div>
+    
+{% endblock %}
+
+{% block overlays %}
+<div class='container-fluid overlay d-none' id="deleteOverlay">
+    <div class="iframe-container container-fluid d-flex flex-column rounded mx-2 wrapper">
+        <div class="sticky-top d-flex justify-content-end mb-2">
+            <button class="btn btn btn-outline" id="confirmClose"><svg xmlns="http://www.w3.org/2000/svg" height="16" width="12" viewBox="0 0 384 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path fill="#575757" d="M376.6 84.5c11.3-13.6 9.5-33.8-4.1-45.1s-33.8-9.5-45.1 4.1L192 206 56.6 43.5C45.3 29.9 25.1 28.1 11.5 39.4S-3.9 70.9 7.4 84.5L150.3 256 7.4 427.5c-11.3 13.6-9.5 33.8 4.1 45.1s33.8 9.5 45.1-4.1L192 306 327.4 468.5c11.3 13.6 31.5 15.4 45.1 4.1s15.4-31.5 4.1-45.1L233.7 256 376.6 84.5z"/></svg></button>
+        </div>
+        <form class="d-flex flex-column justify-content-center align-items-center" id="overlayForm" method='post' action="{% url 'removeStudent' courseName=courseName courseShortName=courseShortName teacherMail=teacherMail courseId=courseId %}">
+            <svg xmlns="http://www.w3.org/2000/svg" height="32" width="32" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path fill="#fbc113" d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480H40c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24V296c0 13.3 10.7 24 24 24s24-10.7 24-24V184c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/></svg>
+            <p class="mx-3 my-4" id="studentToDelete"></p>
+            
+            <button type="submit" class="btn btn-success" id='confirmDelete'>Confirmar</button>
+
+            <input type="hidden" name="courseName" id="courseName" value="{{courseName}}" />
+            <input type="hidden" name="courseShortName" value="{{courseShortName}}"/>
+            <input type="hidden" name="teacherMail" id="courseName" value="{{teacherMail}}" />
+            <input type="hidden" name="courseId" id='courseId' value="{{courseId}}"/>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{%block scripts %}
+<script>
+
+    $(document).ready(function() {
+        $('#studentPersonalCont').hide()
+
+        $('li').on('mouseover', function() {
+            $(this).css('background-color', 'rgba(0,0,0, .06)');
+            $(this).css('cursor', 'pointer');
+
+        });
+
+        $('li').on('mouseout', function() {
+            $(this).css('background-color', 'rgba(0,0,0, .0)');
+        });
+
+        $('li').on('click', function() {
+
+            var selectedStudent = String($(this).find('span').html());
+
+            $.ajax({
+                url: "{% url 'studentInfo' courseName=courseName courseShortName=courseShortName teacherMail=teacherMail courseId=courseId %}",
+                type: "POST",
+                data: {
+                    'studentMail': selectedStudent
+                },
+                success: function(response) {
+                    if(response.state == 'succeess') {
+                        $('#studentListCont').hide()
+                        
+                        var objectives = JSON.parse(response.objectives)
+                        var content = ""
+                        var rows = 0
+
+                        for(const objective in objectives) {
+
+                            var id = `bar${rows}`
+
+                            content += `
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <p class="text-end"><strong>${objectives[objective].name}</strong></p>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="progress" role="progressbar">
+                                        <div id="${id}" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%">${objectives[objective].personalScore}%</div>
+                                    </div>
+                                </div>
+                            </div>
+                            `
+                            
+                            rows += 1
+                        }
+
+                        $('#studentPersonalinfo').html(content)
+                        
+                        for (var count = 0; count < rows; count++) {
+                            var personalScore = parseFloat($(`#bar${count}`).html().replace('%', ''))
+
+                            if (personalScore < 50) {
+                                barColor = "bg-warning"
+                            }
+                            else if (personalScore >= 50 && personalScore <= 60) {
+                                barColor = "bg-primary"
+                            }
+                            else {
+                                barColor = "bg-success"
+                            }
+    
+                            $(`#bar${count}`).addClass(barColor);
+                            $(`#bar${count}`).css("width", "0px").animate({width: `${personalScore}%`}, 500);
+                            $(`#bar${count}`).removeClass("progress-bar-animated progress-bar-striped");
+                        }
+                        
+                        $('#studentPersonalCont').show()
+                    }
+                }
+            });
+        });
+
+        $('#returnStudents').on('click', function () {
+            $('#studentPersonalCont').hide()
+            $('#studentListCont').show()
+        })
+
+        $('.deleteObj').on('click', function () {
+            var studentToDelete = $(this).parent().children().html()
+            var studentToDeleteInput = `<input type="hidden" name="studentToDelete" id="${studentToDelete.split('@')[0].replace('.','')}" value="${studentToDelete}" />`
+
+            document.getElementById('deleteOverlay').classList.remove('d-none');
+
+            $('#studentToDelete').html(`Seguro que quieres eliminar al estudiante ${studentToDelete.bold()} del curso actual ?`);
+            $('#overlayForm').append(studentToDeleteInput);
+        });
+
+        $('#confirmClose').on('click', function() {
+            var studentToDelete = $('input[name="studentToDelete"]').attr('id')
+
+            $(`#${studentToDelete}`).remove()
+            document.getElementById('deleteOverlay').classList.add('d-none');
+        })
+
+    
+    });
+    
+    </script>
+{% endblock %}
