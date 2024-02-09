@@ -17,11 +17,13 @@ notificationServiceThread = None
 
 def is_teacher(value):
 
-    domain = value.split("@")[1]
 
-    if domain == "uam.es":
+    if value:
+        domain = value.split("@")[1]
 
-        return True
+        if domain == "uam.es":
+
+            return True
     
     return False
 
@@ -139,8 +141,9 @@ def visPage(request):
         courseShortName = urlParams.get('courseName')
         courseId = urlParams.get('CourseId')
 
+        print(userMail)
         #or userMail == 'luis.felice@estudiante.uam.es'
-        if is_teacher(userMail) or userMail == 'luis.felice@estudiante.uam.es':
+        if is_teacher(userMail):
 
             if not courseExists(courseName):
             
