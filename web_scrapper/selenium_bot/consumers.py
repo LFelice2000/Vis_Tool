@@ -7,6 +7,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.support.ui import Select
 
 
 from web_scrapper.settings import BASE_DIR
@@ -149,6 +150,7 @@ def web_scrap(receive_payload, wd, wd_wait):
   filesSem.acquire()
 
   courseId = receive_payload['courseId'].replace("/", "")
+  group = receive_payload['group'].replace("/", "")
 
   try:
 
@@ -158,7 +160,15 @@ def web_scrap(receive_payload, wd, wd_wait):
 
     wd.get(f"https://moodle.uam.es/grade/export/xls/index.php?id={courseId}")
 
-    time.sleep(4)
+    #wd_wait.until(EC.element_to_be_clickable((By.ID, "single_select65c77391cdf1428")))
+
+    #print('element ready')
+
+    #group_select = Select(wd.find_element('name', 'group'))
+
+    #print(group_select)
+    #for option in group_select.options:
+    #  print(option.text)
 
     wd.find_element('id', 'id_submitbutton').click()
 
@@ -181,7 +191,7 @@ def web_scrap(receive_payload, wd, wd_wait):
     wd.find_element(By.ID, "id_includenottaken").click()
     wd.find_element(By.ID, "id_submitbutton").click()
 
-    time.sleep(3)
+    time.sleep(15)
 
     wd.delete_all_cookies()
 
@@ -197,10 +207,13 @@ def web_scrap(receive_payload, wd, wd_wait):
     courseAttendance = pd.read_excel(os.path.join(BASE_DIR, f"courseFiles/{courseFiles[0] if courseFiles[0] != f'{courseName} Calificaciones.xlsx' else courseFiles[1]}"), skiprows=[0,1,2])
     attendanceDataframe = pd.DataFrame(courseAttendance)
 
-    for file in os.listdir(os.path.join(BASE_DIR, "courseFiles")):
-        os.remove(os.path.join(BASE_DIR, f"courseFiles/{file}"))
-  except:
+    print(attendanceDataframe)
 
+    for file in os.listdir(os.path.join(BASE_DIR, "courseFiles")):
+      os.remove(os.path.join(BASE_DIR, f"courseFiles/{file}"))
+  except Exception as e:
+
+    print(e)
     filesSem.release()
 
     return None

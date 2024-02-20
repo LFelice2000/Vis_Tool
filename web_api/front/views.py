@@ -9,6 +9,7 @@ from urllib.parse import unquote, urlparse, parse_qs
 from django.http import JsonResponse
 
 import pandas as pd
+import re
 
 import ast
 import json
@@ -141,9 +142,8 @@ def visPage(request):
         courseShortName = urlParams.get('courseName')
         courseId = urlParams.get('CourseId')
 
-        print(userMail)
         #or userMail == 'luis.felice@estudiante.uam.es'
-        if is_teacher(userMail):
+        if is_teacher(userMail) or userMail == 'luis.felice@estudiante.uam.es':
 
             if not courseExists(courseName):
             
@@ -302,13 +302,13 @@ def getStudentDataframe(courseStudents):
 
 def getAttendanceSessionsFromDataframe(attendanceInfo):
 
-    attendanceSesions = list()
+    attendanceSesions = set()
 
     for col in attendanceInfo:
         if col != 'Dirección de correo':
-            attendanceSesions.append(col.replace(" Todos los estudiantes", ""))
+            attendanceSesions.add(re.sub(r'\.\d+$', '', col.replace(" Todos los estudiantes", "")))
     
-    return attendanceSesions
+    return list(attendanceSesions)
 
 def getCourseActivitiesFromDataframe(courseContent, attendanceSesions):
 
@@ -322,10 +322,6 @@ def getCourseActivitiesFromDataframe(courseContent, attendanceSesions):
         activityType, activityname = col.split(":")
         activityname = activityname.replace(" (Real)", "")
         
-        if activityType == "Attendance" or activityType == "Asistencia":
-            for session in attendanceSesions:
-                attendance.append({"tmpId": j, "type": activityType, "name": activityname, "weight": "", "sesion": session,})
-                j += 1
         if activityType == "Quiz" or activityType == "Cuestionario":
             quizes.append({"tmpId": i, "type": activityType, "name": activityname, "weight": ""})
 
@@ -334,6 +330,10 @@ def getCourseActivitiesFromDataframe(courseContent, attendanceSesions):
             assignments.append({"tmpId": k, "type": activityType, "name": activityname, "weight": ""})
 
             k += 1
+
+    for session in attendanceSesions:
+        attendance.append({"tmpId": j, "type": 'Asistencia', "name": activityname, "weight": "", "sesion": session,})
+        j += 1
     
     return quizes, attendance, assignments
 
@@ -344,7 +344,7 @@ def getStudentGradeListFromDataframe(students, dataframe, attendanceInfo, quizes
     for student in students:
         studentActivities = dataframe.loc[dataframe['Dirección de correo'] == student['email']].filter(regex='Email address|Quiz|Assignment|Attendance|Dirección de correo|Cuestionario|Tarea|Asistencia')
         studentSessions = attendanceInfo.loc[attendanceInfo['Dirección de correo'] == student['email']]
-        studentSessions = studentSessions[studentSessions.columns.difference(['Apellido(s)', 'Nombre', 'ID de estudiante', 'P', 'L', 'E', 'A', 'R','J','I', 'Sesiones tomadas', 'Puntuación', 'Porcentaje'])]
+        studentSessions = studentSessions[studentSessions.columns.difference(['Apellido(s)', 'Nombre', 'ID de estudiante', 'P', 'L', 'E', 'A', 'R','J','I', 'Sesiones tomadas', 'Puntuación', 'Porcentaje', 'Grupos'])]
         
         activityList = list(dict())
         for quiz in quizes:
@@ -431,7 +431,7 @@ def confPage(request):
         courseStudents = dataframe.filter(regex='First name|Last name|ID number|Email address|Nombre|Apellido\(s\)|Número de ID|Dirección de correo')
         students = getStudentDataframe(courseStudents)
 
-        attendanceInfo = attendanceDataframe[attendanceDataframe.columns.difference(['Apellido(s)', 'Nombre', 'ID de estudiante', 'P', 'L', 'E', 'A', 'R','J','I', 'Sesiones tomadas', 'Puntuación', 'Porcentaje'])]
+        attendanceInfo = attendanceDataframe[attendanceDataframe.columns.difference(['Apellido(s)', 'Nombre', 'ID de estudiante', 'P', 'L', 'E', 'A', 'R','J','I', 'Sesiones tomadas', 'Puntuación', 'Porcentaje', 'Grupos'])]
         attendanceSesions = getAttendanceSessionsFromDataframe(attendanceInfo)
 
         courseContent = dataframe.filter(regex='Quiz|Assignment|Attendance|Cuestionario|Tarea|Asistencia')
