@@ -60,7 +60,7 @@ def update(request):
 
         courseContent = dataframe.filter(regex='Quiz|Assignment|Attendance|Cuestionario|Tarea|Asistencia')
         
-        quizes, attendance, assignments = getCourseActivitiesFromDataframe(courseContent, attendanceSesions)
+        quizes, attendance, assignments, repeatedActivities = getCourseActivitiesFromDataframe(courseContent, attendanceSesions)
 
         activities = json.dumps({"quiz": quizes,"assignment": assignments, "asistance": attendance})
 
@@ -315,18 +315,28 @@ def getCourseActivitiesFromDataframe(courseContent, attendanceSesions):
     quizes = list(dict())
     attendance = list(dict())
     assignments = list(dict())
+    repeatedActivities = list()
     i = 0
     j = 0
     k = 0
     for col in courseContent.columns:
         activityType, activityname = col.split(":")
-        activityname = activityname.replace(" (Real)", "")
+        activityname = re.sub(r'\.\d+$', '', activityname.replace(" (Real)", ""))
         
         if activityType == "Quiz" or activityType == "Cuestionario":
-            quizes.append({"tmpId": i, "type": activityType, "name": activityname, "weight": ""})
+            
+            if any(d["name"] == activityname for d in quizes):
+                repeatedActivities.append(activityname)
+
+            else:
+                quizes.append({"tmpId": i, "type": activityType, "name": activityname, "weight": ""})
 
             i += 1
         elif activityType == "Assignment" or activityType == "Tarea":
+
+            if any(d["name"] == activityname for d in assignments):
+                repeatedActivities.append(activityname)
+            
             assignments.append({"tmpId": k, "type": activityType, "name": activityname, "weight": ""})
 
             k += 1
@@ -335,7 +345,7 @@ def getCourseActivitiesFromDataframe(courseContent, attendanceSesions):
         attendance.append({"tmpId": j, "type": 'Asistencia', "name": activityname, "weight": "", "sesion": session,})
         j += 1
     
-    return quizes, attendance, assignments
+    return quizes, attendance, assignments, repeatedActivities
 
 def getStudentGradeListFromDataframe(students, dataframe, attendanceInfo, quizes, attendance, assignments):
     
@@ -436,7 +446,7 @@ def confPage(request):
 
         courseContent = dataframe.filter(regex='Quiz|Assignment|Attendance|Cuestionario|Tarea|Asistencia')
         
-        quizes, attendance, assignments = getCourseActivitiesFromDataframe(courseContent, attendanceSesions)
+        quizes, attendance, assignments, repeatedActivities = getCourseActivitiesFromDataframe(courseContent, attendanceSesions)
 
         studentGradeList = getStudentGradeListFromDataframe(students, dataframe, attendanceInfo, quizes, attendance, assignments)
 
