@@ -374,19 +374,22 @@ def getStudentGradeListFromDataframe(students, dataframe, attendanceInfo, quizes
             studentGrade = None
             if re.match(r'.+?\s\d+$', attend['sesion']):
                 
-                studentGrade = studentSessions[f"{attend['sesion']}"][i].split(" ")[0]
+                studentGrade = studentSessions[f"{attend['sesion']}"][i]
 
             else:
-                studentGrade = studentSessions[f"{attend['sesion']} Todos los estudiantes"][i].split(" ")[0]
+                studentGrade = studentSessions[f"{attend['sesion']} Todos los estudiantes"][i]
 
+            if studentGrade:
 
-            if studentGrade == 'P' or studentGrade == 'L' or studentGrade == 'R':
+                studentGrade = studentGrade.split(" ")[0]
+                
+                if studentGrade == 'P' or studentGrade == 'L' or studentGrade == 'R':
 
-                activityList.append({'type': attend['type'], 'name': attend['name'], 'sesion': attend['sesion'], 'grade': 10})
-            
-            else:
-            
-                activityList.append({'type': attend['type'], 'name': attend['name'], 'sesion': attend['sesion'], 'grade': 0})
+                    activityList.append({'type': attend['type'], 'name': attend['name'], 'sesion': attend['sesion'], 'grade': 10})
+                
+                else:
+                
+                    activityList.append({'type': attend['type'], 'name': attend['name'], 'sesion': attend['sesion'], 'grade': 0})
         
         for assignment in assignments:
             studentGrade = studentActivities[f"{assignment['type']}:{assignment['name']} (Real)"]
