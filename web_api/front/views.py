@@ -342,6 +342,7 @@ def getCourseActivitiesFromDataframe(courseContent, attendanceSesions):
             k += 1
 
     for session in attendanceSesions:
+
         attendance.append({"tmpId": j, "type": 'Asistencia', "name": activityname, "weight": "", "sesion": session,})
         j += 1
     
@@ -369,8 +370,15 @@ def getStudentGradeListFromDataframe(students, dataframe, attendanceInfo, quizes
                 activityList.append({'type': quiz['type'], 'name': quiz['name'], 'grade': studentGrade[i]})
 
         for attend in attendance:
+            
+            studentGrade = None
+            if re.match(r'.+?\s\d+$', attend['sesion']):
+                
+                studentGrade = studentSessions[f"{attend['sesion']}"][i].split(" ")[0]
 
-            studentGrade = studentSessions[f"{attend['sesion']} Todos los estudiantes"][i].split(" ")[0]
+            else:
+                studentGrade = studentSessions[f"{attend['sesion']} Todos los estudiantes"][i].split(" ")[0]
+
 
             if studentGrade == 'P' or studentGrade == 'L' or studentGrade == 'R':
 

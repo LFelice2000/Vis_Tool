@@ -158,6 +158,12 @@ def web_scrap(receive_payload, wd, wd_wait):
 
     time.sleep(15)
 
+    wd.get(f"https://moodle.uam.es/group/index.php?id={courseId}")
+
+    wd_wait.until(EC.element_to_be_clickable((By.ID, "groups")))
+
+    select = Select(wd.find_element(By.ID, 'groups'))
+    print(select.options)
     wd.get(f"https://moodle.uam.es/grade/export/xls/index.php?id={courseId}")
 
     #wd_wait.until(EC.element_to_be_clickable((By.ID, "single_select65c77391cdf1428")))
@@ -207,8 +213,6 @@ def web_scrap(receive_payload, wd, wd_wait):
     courseAttendance = pd.read_excel(os.path.join(BASE_DIR, f"courseFiles/{courseFiles[0] if courseFiles[0] != f'{courseName} Calificaciones.xlsx' else courseFiles[1]}"), skiprows=[0,1,2])
     attendanceDataframe = pd.DataFrame(courseAttendance)
 
-    print(attendanceDataframe)
-
     for file in os.listdir(os.path.join(BASE_DIR, "courseFiles")):
       os.remove(os.path.join(BASE_DIR, f"courseFiles/{file}"))
   except Exception as e:
@@ -252,8 +256,6 @@ class EchoConsumer(AsyncWebsocketConsumer):
       loop = asyncio.get_event_loop()
 
       receive_payload = json.loads(event.get('text'))
-
-      print(receive_payload)
 
       if(receive_payload['type'] == 'login'):
         """
