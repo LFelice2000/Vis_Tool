@@ -64,6 +64,8 @@ def web_scrap_local(receive_payload, wd, wd_wait):
   wd.get(f"http://localhost:8080/mod/attendance/export.php?id={attendanceId}")
 
   wd_wait.until(EC.element_to_be_clickable((By.ID, "id_includenottaken")))
+  wd_wait.until(EC.element_to_be_clickable((By.ID, "id_submitbutton")))
+
 
   wd.find_element(By.ID, "id_includenottaken").click()
   wd.find_element(By.ID, "id_submitbutton").click()
