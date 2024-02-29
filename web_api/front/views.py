@@ -398,7 +398,7 @@ def getStudentGradeListFromDataframe(students, dataframe, attendanceInfo, quizes
                 
                 studentGrade = None
                 if re.match(r'.+?\s\d+$', attend['sesion']):
-                    
+                    print(f"Student sesion: {studentSessions}\nattend: {attend}")
                     try:
                         studentGrade = studentSessions[f"{attend['sesion']}"][i]
                     except Exception as e:
