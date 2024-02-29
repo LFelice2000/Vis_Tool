@@ -198,8 +198,8 @@ def web_scrap(receive_payload, wd, wd_wait):
     courseData = pd.read_excel(os.path.join(BASE_DIR, f"courseFiles/{courseName} Calificaciones.xlsx"))
     activitiesDataframe = pd.DataFrame(courseData)
 
-    courseAttendance = pd.read_excel(os.path.join(BASE_DIR, f"courseFiles/prueba.xlsx"), skiprows=[0,1,2])
-    #courseAttendance = pd.read_excel(os.path.join(BASE_DIR, f"courseFiles/{courseFiles[0] if courseFiles[0] != f'{courseName} Calificaciones.xlsx' else courseFiles[1]}"), skiprows=[0,1,2])
+    #courseAttendance = pd.read_excel(os.path.join(BASE_DIR, f"courseFiles/prueba.xlsx"), skiprows=[0,1,2])
+    courseAttendance = pd.read_excel(os.path.join(BASE_DIR, f"courseFiles/{courseFiles[0] if courseFiles[0] != f'{courseName} Calificaciones.xlsx' else courseFiles[1]}"), skiprows=[0,1,2])
     attendanceDataframe = pd.DataFrame(courseAttendance)
 
     for file in os.listdir(os.path.join(BASE_DIR, "courseFiles")):
