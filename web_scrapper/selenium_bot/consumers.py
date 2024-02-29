@@ -162,19 +162,7 @@ def web_scrap(receive_payload, wd, wd_wait):
 
     wd_wait.until(EC.element_to_be_clickable((By.ID, "groups")))
 
-    select = Select(wd.find_element(By.ID, 'groups'))
-    print(select.options)
     wd.get(f"https://moodle.uam.es/grade/export/xls/index.php?id={courseId}")
-
-    #wd_wait.until(EC.element_to_be_clickable((By.ID, "single_select65c77391cdf1428")))
-
-    #print('element ready')
-
-    #group_select = Select(wd.find_element('name', 'group'))
-
-    #print(group_select)
-    #for option in group_select.options:
-    #  print(option.text)
 
     wd.find_element('id', 'id_submitbutton').click()
 
@@ -210,11 +198,16 @@ def web_scrap(receive_payload, wd, wd_wait):
     courseData = pd.read_excel(os.path.join(BASE_DIR, f"courseFiles/{courseName} Calificaciones.xlsx"))
     activitiesDataframe = pd.DataFrame(courseData)
 
-    courseAttendance = pd.read_excel(os.path.join(BASE_DIR, f"courseFiles/{courseFiles[0] if courseFiles[0] != f'{courseName} Calificaciones.xlsx' else courseFiles[1]}"), skiprows=[0,1,2])
+    courseAttendance = pd.read_excel(os.path.join(BASE_DIR, f"courseFiles/prueba.xlsx"), skiprows=[0,1,2])
+    #courseAttendance = pd.read_excel(os.path.join(BASE_DIR, f"courseFiles/{courseFiles[0] if courseFiles[0] != f'{courseName} Calificaciones.xlsx' else courseFiles[1]}"), skiprows=[0,1,2])
     attendanceDataframe = pd.DataFrame(courseAttendance)
 
     for file in os.listdir(os.path.join(BASE_DIR, "courseFiles")):
-      os.remove(os.path.join(BASE_DIR, f"courseFiles/{file}"))
+      
+      if file == 'prueba.xlsx':
+        print(file)
+      else:
+        os.remove(os.path.join(BASE_DIR, f"courseFiles/{file}"))
   except Exception as e:
 
     print(e)

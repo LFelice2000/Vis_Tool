@@ -353,54 +353,68 @@ def getStudentGradeListFromDataframe(students, dataframe, attendanceInfo, quizes
     i = 0
     studentGradeList = list(dict())
     for student in students:
-        studentActivities = dataframe.loc[dataframe['Dirección de correo'] == student['email']].filter(regex='Email address|Quiz|Assignment|Attendance|Dirección de correo|Cuestionario|Tarea|Asistencia')
-        studentSessions = attendanceInfo.loc[attendanceInfo['Dirección de correo'] == student['email']]
-        studentSessions = studentSessions[studentSessions.columns.difference(['Apellido(s)', 'Nombre', 'ID de estudiante', 'P', 'L', 'E', 'A', 'R','J','I', 'Sesiones tomadas', 'Puntuación', 'Porcentaje', 'Grupos'])]
+        studentActivities = None
+        studentSessions = None
+
+        try:
+            studentActivities = dataframe.loc[dataframe['Dirección de correo'] == student['email']].filter(regex='Email address|Quiz|Assignment|Attendance|Dirección de correo|Cuestionario|Tarea|Asistencia')
+        except:
+            pass
+        
+        try:
+            studentSessions = attendanceInfo.loc[attendanceInfo['Dirección de correo'] == student['email']]
+            studentSessions = studentSessions[studentSessions.columns.difference(['Apellido(s)', 'Nombre', 'ID de estudiante', 'P', 'L', 'E', 'A', 'R','J','I', 'Sesiones tomadas', 'Puntuación', 'Porcentaje', 'Grupos'])]
+        except:
+            pass
         
         activityList = list(dict())
-        for quiz in quizes:
-            studentGrade = studentActivities[f"{quiz['type']}:{quiz['name']} (Real)"]
 
-            if studentGrade[i] == '-':
+        if len(studentActivities):
+        
+            for quiz in quizes:
+                studentGrade = studentActivities[f"{quiz['type']}:{quiz['name']} (Real)"]
 
-                activityList.append({'type': quiz['type'], 'name': quiz['name'], 'grade': 0})
-            
-            else:
-            
-                activityList.append({'type': quiz['type'], 'name': quiz['name'], 'grade': studentGrade[i]})
+                if studentGrade[i] == '-':
 
-        for attend in attendance:
-            
-            studentGrade = None
-            if re.match(r'.+?\s\d+$', attend['sesion']):
-                
-                studentGrade = studentSessions[f"{attend['sesion']}"][i]
-
-            else:
-                studentGrade = studentSessions[f"{attend['sesion']} Todos los estudiantes"][i]
-
-            if studentGrade:
-
-                studentGrade = studentGrade.split(" ")[0]
-                
-                if studentGrade == 'P' or studentGrade == 'L' or studentGrade == 'R':
-
-                    activityList.append({'type': attend['type'], 'name': attend['name'], 'sesion': attend['sesion'], 'grade': 10})
+                    activityList.append({'type': quiz['type'], 'name': quiz['name'], 'grade': 0})
                 
                 else:
                 
-                    activityList.append({'type': attend['type'], 'name': attend['name'], 'sesion': attend['sesion'], 'grade': 0})
+                    activityList.append({'type': quiz['type'], 'name': quiz['name'], 'grade': studentGrade[i]})
+            
+            for assignment in assignments:
+                studentGrade = studentActivities[f"{assignment['type']}:{assignment['name']} (Real)"]
+
+                if studentGrade[i] == '-':
+
+                    activityList.append({'type': assignment['type'], 'name': assignment['name'], 'grade': 0})
+                
+                else:
+                
+                    activityList.append({'type': assignment['type'], 'name': assignment['name'], 'grade': float("{:.2f}".format(studentGrade[i]/10))})
         
-        for assignment in assignments:
-            studentGrade = studentActivities[f"{assignment['type']}:{assignment['name']} (Real)"]
+        if len(studentSessions):
+            for attend in attendance:
+                
+                studentGrade = None
+                if re.match(r'.+?\s\d+$', attend['sesion']):
+                    
+                    studentGrade = studentSessions[f"{attend['sesion']}"][i]
 
-            if studentGrade[i] == '-':
+                else:
+                    studentGrade = studentSessions[f"{attend['sesion']} Todos los estudiantes"][i]
 
-                activityList.append({'type': assignment['type'], 'name': assignment['name'], 'grade': 0})
-            
-            else:
-            
-                activityList.append({'type': assignment['type'], 'name': assignment['name'], 'grade': float("{:.2f}".format(studentGrade[i]/10))})
+                if studentGrade:
+
+                    studentGrade = studentGrade.split(" ")[0]
+
+                    if studentGrade == 'P' or studentGrade == 'L' or studentGrade == 'R':
+
+                        activityList.append({'type': attend['type'], 'name': attend['name'], 'sesion': attend['sesion'], 'grade': 10})
+                    
+                    else:
+                    
+                        activityList.append({'type': attend['type'], 'name': attend['name'], 'sesion': attend['sesion'], 'grade': 0})
 
         studentGradeList.append({'student': student['email'], 'activities': activityList})
         i += 1
