@@ -399,7 +399,10 @@ def getStudentGradeListFromDataframe(students, dataframe, attendanceInfo, quizes
                 studentGrade = None
                 if re.match(r'.+?\s\d+$', attend['sesion']):
                     
-                    studentGrade = studentSessions[f"{attend['sesion']}"][i]
+                    try:
+                        studentGrade = studentSessions[f"{attend['sesion']}"][i]
+                    except Exception as e:
+                        print(e)
 
                 else:
                     studentGrade = studentSessions[f"{attend['sesion']} Todos los estudiantes"][i]
