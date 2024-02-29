@@ -47,9 +47,10 @@ def web_scrap_local(receive_payload, wd, wd_wait):
 
   time.sleep(4)
 
+  wd_wait.until(EC.element_to_be_clickable((By.ID, "id_submitbutton")))
   wd.find_element('id', 'id_submitbutton').click()
 
-  time.sleep(4)
+  time.sleep(10)
 
   wd.get(f"http://localhost:8080/course/view.php?id={courseId}")
 
