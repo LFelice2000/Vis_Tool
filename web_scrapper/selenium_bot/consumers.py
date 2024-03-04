@@ -153,6 +153,8 @@ def web_scrap(receive_payload, wd, wd_wait):
   filesSem.acquire()
 
   courseId = receive_payload['courseId'].replace("/", "")
+  group = receive_payload['group']
+  print(f'the group is {group}')
 
   try:
 
@@ -180,6 +182,11 @@ def web_scrap(receive_payload, wd, wd_wait):
     wd.get(f"https://moodle.uam.es/mod/attendance/export.php?id={attendanceId}")
 
     wd_wait.until(EC.element_to_be_clickable((By.ID, "id_includenottaken")))
+
+    groupsDropDown = Select(wd.find_element(By.ID, 'id_group'))
+    for option in groupsDropDown.options:
+      if option.text == group:
+        option.click()
 
     wd.find_element(By.ID, "id_includenottaken").click()
     wd.find_element(By.ID, "id_submitbutton").click()
@@ -222,10 +229,12 @@ class EchoConsumer(AsyncWebsocketConsumer):
     
     wd_prefs = {"download.default_directory" : os.path.join(BASE_DIR, "courseFiles")}
     wd_options.add_experimental_option("prefs",wd_prefs)
+
     wd_options.add_argument("--no-sandbox")
     wd_options.add_argument("--disable-dev-shm-usage")
     wd_options.add_argument('--headless')
-    
+
+
     latestchromedriver = ChromeDriverManager().install()
     wd_service = Service(executable_path=latestchromedriver)
 

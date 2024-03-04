@@ -54,7 +54,6 @@ class Sesion(models.Model):
 
 class Attendance(models.Model):
     id = models.AutoField(primary_key=True, unique=True)
-    name = models.CharField(max_length=200)
     course = models.ForeignKey(Course, on_delete=models.CASCADE, default=None)
     sesions = models.ManyToManyField(Sesion)
     weight = models.DecimalField(max_digits=4, decimal_places=2, validators=[MaxValueValidator(100), MinValueValidator(0)], default=0)

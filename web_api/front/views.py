@@ -7,6 +7,7 @@ from core.models import *
 from core.utils import *
 from urllib.parse import unquote, urlparse, parse_qs
 from django.http import JsonResponse
+from datetime import datetime
 
 import pandas as pd
 import re
@@ -310,7 +311,7 @@ def getAttendanceSessionsFromDataframe(attendanceInfo):
     
     return list(attendanceSesions)
 
-def getCourseActivitiesFromDataframe(courseContent, attendanceSesions):
+def getCourseActivitiesFromDataframe(courseContent, attendanceSesions, group):
 
     quizes = list(dict())
     attendance = list(dict())
@@ -322,30 +323,35 @@ def getCourseActivitiesFromDataframe(courseContent, attendanceSesions):
     for col in courseContent.columns:
         activityType, activityname = col.split(":")
         activityname = re.sub(r'\.\d+$', '', activityname.replace(" (Real)", ""))
+        actGroup = re.findall(r'\((.*?)\)', activityname)
+
+        if len(actGroup) == 0 or ('NE' not in actGroup[0] and actGroup[0].replace('grupo ', '') == group):
+            
         
-        if activityType == "Quiz" or activityType == "Cuestionario":
-            
-            if any(d["name"] == activityname for d in quizes):
-                repeatedActivities.append(activityname)
+            if activityType == "Quiz" or activityType == "Cuestionario":
+                
+                if any(d["name"] == activityname for d in quizes):
+                    repeatedActivities.append(activityname)
 
-            else:
-                quizes.append({"tmpId": i, "type": activityType, "name": activityname, "weight": ""})
+                else:
+                    quizes.append({"tmpId": i, "type": activityType, "name": activityname, "weight": ""})
 
-            i += 1
-        elif activityType == "Assignment" or activityType == "Tarea":
+                i += 1
+            elif activityType == "Assignment" or activityType == "Tarea":
 
-            if any(d["name"] == activityname for d in assignments):
-                repeatedActivities.append(activityname)
-            
-            assignments.append({"tmpId": k, "type": activityType, "name": activityname, "weight": ""})
+                if any(d["name"] == activityname for d in assignments):
+                    repeatedActivities.append(activityname)
+                
+                assignments.append({"tmpId": k, "type": activityType, "name": activityname, "weight": ""})
 
-            k += 1
+                k += 1
 
     for session in attendanceSesions:
 
-        attendance.append({"tmpId": j, "type": 'Asistencia', "name": activityname, "weight": "", "sesion": session,})
+        attendance.append({"tmpId": j, "type": 'Asistencia', "weight": "", "sesion": session})
         j += 1
     
+    list(map(lambda x: x["sesion"], attendance))
     return quizes, attendance, assignments, repeatedActivities
 
 def getStudentGradeListFromDataframe(students, dataframe, attendanceInfo, quizes, attendance, assignments):
@@ -413,11 +419,11 @@ def getStudentGradeListFromDataframe(students, dataframe, attendanceInfo, quizes
 
                     if studentGrade == 'P' or studentGrade == 'L' or studentGrade == 'R':
 
-                        activityList.append({'type': attend['type'], 'name': attend['name'], 'sesion': attend['sesion'], 'grade': 10})
+                        activityList.append({'type': attend['type'], 'sesion': attend['sesion'], 'grade': 10})
                     
                     else:
                     
-                        activityList.append({'type': attend['type'], 'name': attend['name'], 'sesion': attend['sesion'], 'grade': 0})
+                        activityList.append({'type': attend['type'], 'sesion': attend['sesion'], 'grade': 0})
 
         studentGradeList.append({'student': student['email'], 'activities': activityList})
         i += 1
@@ -456,6 +462,7 @@ def confPage(request):
         courseName = request.POST.get('courseName')
         courseId = request.POST.get('courseId')
         courseShortName = request.POST.get('courseShortName')
+        group = request.POST.get('group')
 
         username = request.POST['username']
         password = request.POST['password']
@@ -474,7 +481,7 @@ def confPage(request):
 
         courseContent = dataframe.filter(regex='Quiz|Assignment|Attendance|Cuestionario|Tarea|Asistencia')
         
-        quizes, attendance, assignments, repeatedActivities = getCourseActivitiesFromDataframe(courseContent, attendanceSesions)
+        quizes, attendance, assignments, repeatedActivities = getCourseActivitiesFromDataframe(courseContent, attendanceSesions, group)
 
         studentGradeList = getStudentGradeListFromDataframe(students, dataframe, attendanceInfo, quizes, attendance, assignments)
 

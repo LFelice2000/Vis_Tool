@@ -32,6 +32,7 @@
                 <div class="mx-2"><h5 id="qtype{{quiz.tmpId}}">{{quiz.type}}:</h5></div>
                 <div class="mx-1 mt-0.5"><p id="qname{{quiz.tmpId}}">{{quiz.name}}</p></div>
                 <select class="form-select mr-3" aria-label="Default select example" style="width: 300px;" id="qoption{{quiz.tmpId}}">
+                    <option>None</option>
                     {% for objective in objectiveList %}    
                     <option>{{objective.name}}</option>
                     {% endfor %}
@@ -51,6 +52,7 @@
                 <div class="mx-2"><h5 id="astype{{assignment.tmpId}}">{{assignment.type}}:</h5></div>
                 <div class="mx-1 mt-0.5"><p id="asname{{assignment.tmpId}}">{{assignment.name}}</p></div>
                 <select class="form-select mr-3" aria-label="Default select example" style="width: 300px;" id="asoption{{assignment.tmpId}}">
+                    <option>None</option>
                     {% for objective in objectiveList %}    
                     <option>{{objective.name}}</option>
                     {% endfor %}
@@ -123,31 +125,32 @@
     $(document).ready(function (){
 
         var activitiesDict = {"quiz": [], "assignment": [], "asistance": []};
+        let findGroupRegex = /(?<=grupo\s)\d+/
         
 
         //Quiz
         $('#addQuiz').on('click', function () {
-
             
             var activitiesInfo = document.getElementById("quizCont").children;
-            
+                        
             if(activitiesDict['quiz'].length != 0) {
                 activitiesDict['quiz'] = [];
             }
 
-            for(var i = 0; i < (activitiesInfo.length - 1); i++) {
+            for(var i = 0; i < (activitiesInfo.length - 2); i++) {
 
                 var typeId = "#qtype" + i.toString();
                 var nameId = "#qname" + i.toString();
                 var optionId = "#qoption" + i.toString();
                 var weigthId = "#qweigth" + i.toString();
 
-                activitiesDict['quiz'].push({'activityType': 'Quiz', 'activityName': $(nameId).html(), 'objective': $(optionId+" :selected").text(), 'weigth': $(weigthId).val()})
+                if($(optionId+" :selected").text() != "None" && $(optionId+" :selected").text().length > 0) {
+                    activitiesDict['quiz'].push({'activityType': 'Quiz', 'activityName': $(nameId).html(), 'objective': $(optionId+" :selected").text(), 'weigth': $(weigthId).val()})
+                }
 
             }
 
             $('#assignmentBtn').trigger("click");
-            
             
         });
 
@@ -156,20 +159,23 @@
 
             
             var activitiesInfo = document.getElementById("assignmentCont").children;
+
+            if($(nameId).html())
             
             if(activitiesDict['assignment'].length != 0) {
                 activitiesDict['assignment'] = [];
             }
 
-            for(var i = 0; i < (activitiesInfo.length - 1); i++) {
+            for(var i = 0; i < (activitiesInfo.length - 2); i++) {
 
                 var typeId = "#astype" + i.toString();
                 var nameId = "#asname" + i.toString();
                 var optionId = "#asoption" + i.toString();
                 var weigthId = "#asweigth" + i.toString();
 
-                activitiesDict['assignment'].push({'activityType': $(typeId).html().replace(':', ''), 'activityName': $(nameId).html(), 'objective': $(optionId+" :selected").text(), 'weigth': $(weigthId).val()})
-                
+                if($(optionId+" :selected").text() != "None" && $(optionId+" :selected").text().length > 0) {
+                    activitiesDict['assignment'].push({'activityType': $(typeId).html().replace(':', ''), 'activityName': $(nameId).html(), 'objective': $(optionId+" :selected").text(), 'weigth': $(weigthId).val()})
+                }
             }
 
             $('#attendanceBtn').trigger("click");
@@ -202,8 +208,8 @@
                 var optionId = "#atoption" + i.toString();
                 var sesionId = "#atses" + i.toString();
 
-                if($(optionId+" :selected").text() != "None") {
-                    activitiesDict['asistance'].push({'activityType': 'Asistencia', 'activityName': $(nameId).val().replace('/',''), 'objective': $(optionId+" :selected").text(), 'weigth': $(weigthId).val(), 'sesion': $(sesionId).text()})
+                if($(optionId+" :selected").text() != "None" && $(optionId+" :selected").text().length > 0) {
+                    activitiesDict['asistance'].push({'activityType': 'Asistencia', 'activityName': $(sesionId).text(), 'objective': $(optionId+" :selected").text(), 'weigth': $(weigthId).val(), 'sesion': $(sesionId).text()})
                 }
 
             }

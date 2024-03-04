@@ -62,7 +62,7 @@ def createCourse(activities, studentList, courseName, courseShortName, teacher, 
 
             for activity in activitiesObj['asistance']:
 
-                act = Attendance(name=activity['activityName'], course=course, weight=float(activity['weigth']))
+                act = Attendance(course=course, weight=float(activity['weigth']))
                 act.save()
                 
             for student in studentGradesObj:
@@ -102,7 +102,7 @@ def createCourse(activities, studentList, courseName, courseShortName, teacher, 
 
                         elif activity['type'] == 'Asistencia':
                             
-                            act = Attendance.objects.filter(name=activity['name'], course=course).first()
+                            act = Attendance.objects.filter(course=course).first()
 
                             for attendanceAct in activitiesObj['asistance']:
 
@@ -181,7 +181,7 @@ def updateCourse(activities, courseName, courseShortName, studentGrades, teacher
                         
                         elif activity['type'] == 'Asistencia':
                             
-                            act = Attendance.objects.filter(name=activity['name'], course=course).first()
+                            act = Attendance.objects.filter(course=course).first()
                             
                             for attendanceAct in activitiesObj['asistance']:
                                 attendanceAssigned = False
