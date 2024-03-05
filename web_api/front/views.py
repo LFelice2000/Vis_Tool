@@ -397,7 +397,7 @@ def getStudentGradeListFromDataframe(students, dataframe, attendanceInfo, quizes
                 
                 else:
                 
-                    activityList.append({'type': assignment['type'], 'name': assignment['name'], 'grade': float("{:.2f}".format(studentGrade[i]/10))})
+                    activityList.append({'type': assignment['type'], 'name': assignment['name'], 'grade': studentGrade[i]})
         
         if len(studentSessions):
             for attend in attendance:
