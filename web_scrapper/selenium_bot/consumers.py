@@ -154,7 +154,6 @@ def web_scrap(receive_payload, wd, wd_wait):
 
   courseId = receive_payload['courseId'].replace("/", "")
   group = receive_payload['group']
-  print(f'the group is {group}')
 
   try:
 
@@ -163,6 +162,26 @@ def web_scrap(receive_payload, wd, wd_wait):
     time.sleep(15)
 
     wd.get(f"https://moodle.uam.es/grade/export/xls/index.php?id={courseId}")
+    wd_wait.until(EC.element_to_be_clickable((By.NAME, "group")))
+    
+    groupExistsFlag = False
+    studentsGroupsDropDown = Select(wd.find_element(By.NAME, 'group'))
+
+    for option in studentsGroupsDropDown.options:
+      if option.text == group:
+        groupExistsFlag = True
+        option.click()
+    
+    if not groupExistsFlag:
+
+      wd.delete_all_cookies()
+      wd.close()
+
+      filesSem.release()
+
+      return -1
+    
+    time.sleep(5)
 
     wd_wait.until(EC.element_to_be_clickable((By.ID, "id_submitbutton")))
     wd.find_element('id', 'id_submitbutton').click()
@@ -220,7 +239,6 @@ def web_scrap(receive_payload, wd, wd_wait):
   filesSem.release()
 
   return {"activitiesDataframe": activitiesDataframe, "attendanceDataframe": attendanceDataframe}
-
 class EchoConsumer(AsyncWebsocketConsumer):
     
     WEB_API_PATH = f"{Path(__file__).resolve().parent.parent.parent.absolute()}/web_api/"
@@ -229,11 +247,9 @@ class EchoConsumer(AsyncWebsocketConsumer):
     
     wd_prefs = {"download.default_directory" : os.path.join(BASE_DIR, "courseFiles")}
     wd_options.add_experimental_option("prefs",wd_prefs)
-
     wd_options.add_argument("--no-sandbox")
     wd_options.add_argument("--disable-dev-shm-usage")
     wd_options.add_argument('--headless')
-
 
     latestchromedriver = ChromeDriverManager().install()
     wd_service = Service(executable_path=latestchromedriver)
@@ -243,7 +259,7 @@ class EchoConsumer(AsyncWebsocketConsumer):
       print("[socket] connect event called")
 
       self.wd = webdriver.Chrome(service=self.wd_service, options=self.wd_options)
-      self.wd_wait = WebDriverWait(self.wd, 10)
+      self.wd_wait = WebDriverWait(self.wd, 20)
 
       await self.accept()
 
@@ -304,6 +320,9 @@ class EchoConsumer(AsyncWebsocketConsumer):
           await self.send(json.dumps(send_payload))
 
           return
+        elif courseInfo == -1:
+          send_payload = {"type": "scrap_error","data": f"Group {receive_payload['group']} does not exists."}
+          await self.send(json.dumps(send_payload))
 
         send_payload = {"type": "scrap_success", "activities": courseInfo["activitiesDataframe"].to_json(orient='records', force_ascii=False, default_handler=str), "attendance": courseInfo["attendanceDataframe"].to_json(orient='records', force_ascii=False, default_handler=str)}
         await self.send(json.dumps(send_payload))

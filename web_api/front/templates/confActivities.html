@@ -42,9 +42,10 @@
             </div>
             {% endfor %}
             
-            <button type='button' class='btn btn-success' id="addQuiz">Confirmar</button>
+            
         </div>
-
+        <button type='button' class='btn btn-success d-flex' id="addQuiz">Confirmar Cuestionarios</button>
+        
         <div class="d-flex flex-column container-wrapper d-none"  id="assignmentCont">
 
             {% for assignment in assignmentList %}
@@ -62,8 +63,8 @@
             </div>
             {% endfor %}
             
-            <button type='button' class='btn btn-success' id="addAssignment">Confirmar</button>
         </div>
+        <button type='button' class='btn btn-success d-none' id="addAssignment">Confirmar Tareas</button>
 
         <div class="d-flex flex-column container-wrapper d-none"  id="attendanceCont">
             
@@ -87,8 +88,8 @@
             </div>
             {% endfor %}
             
-            <button type='button' class='btn btn-success' id="addAttendance">Confirmar</button>
         </div>
+        <button type='button' class='btn btn-success d-none' id="addAttendance">Confirmar Asistencias</button>
 
         <div class="d-flex flex-column container-wrapper d-none"  id="resumeCont">
             <table class="table" id="resumeList">
@@ -101,8 +102,8 @@
                 </thead>
                 <tbody></tbody>
             </table>
-            <button type='submit' class='btn btn-success d-none mb-3' id="submitAll">Confirmar</button>
         </div>
+        <button type='submit' class='btn btn-success d-none mb-3' id="submitAll">Crear Curso</button>
     </div>
 
 </form>
@@ -110,7 +111,7 @@
 
 {% block overlays %}
 
-<div class='overlay d-none' id="overlayCont">
+<div class='overlay d-none' id="creatingCourseOverlay">
     <div class="iframe-container d-flex flex-column justify-content-center align-items-center rounded mx-2">
         <h5>Creando curso...</h5>
         <div class="spinner-border" role="status"></div>
@@ -125,19 +126,20 @@
     $(document).ready(function (){
 
         var activitiesDict = {"quiz": [], "assignment": [], "asistance": []};
-        let findGroupRegex = /(?<=grupo\s)\d+/
-        
 
+        if (!document.getElementById("creatingCourseOverlay").classList.contains("d-none")) {
+            document.getElementById("creatingCourseOverlay").classList.add('d-none')
+        }
         //Quiz
         $('#addQuiz').on('click', function () {
             
             var activitiesInfo = document.getElementById("quizCont").children;
-                        
+
             if(activitiesDict['quiz'].length != 0) {
                 activitiesDict['quiz'] = [];
             }
 
-            for(var i = 0; i < (activitiesInfo.length - 2); i++) {
+            for(var i = 0; i < activitiesInfo.length; i++) {
 
                 var typeId = "#qtype" + i.toString();
                 var nameId = "#qname" + i.toString();
@@ -159,25 +161,22 @@
 
             
             var activitiesInfo = document.getElementById("assignmentCont").children;
-
-            if($(nameId).html())
             
             if(activitiesDict['assignment'].length != 0) {
                 activitiesDict['assignment'] = [];
             }
-
-            for(var i = 0; i < (activitiesInfo.length - 2); i++) {
+            
+            for(var i = 0; i < activitiesInfo.length; i++) {
 
                 var typeId = "#astype" + i.toString();
                 var nameId = "#asname" + i.toString();
                 var optionId = "#asoption" + i.toString();
                 var weigthId = "#asweigth" + i.toString();
-
+                
                 if($(optionId+" :selected").text() != "None" && $(optionId+" :selected").text().length > 0) {
                     activitiesDict['assignment'].push({'activityType': $(typeId).html().replace(':', ''), 'activityName': $(nameId).html(), 'objective': $(optionId+" :selected").text(), 'weigth': $(weigthId).val()})
                 }
             }
-
             $('#attendanceBtn').trigger("click");
             
             
@@ -202,7 +201,7 @@
                 activitiesDict['asistance'] = [];
             }
 
-            for(i = 0; i < (activitiesInfo.length - 2); i++) {
+            for(i = 0; i < activitiesInfo.length; i++) {
 
                 var nameId = "#atname" + i.toString();
                 var optionId = "#atoption" + i.toString();
@@ -223,8 +222,14 @@
 
             if (document.getElementById("assignmentBtn").classList[1] === 'btn-success') {
 
+                document.getElementById("addAssignment").classList.remove("d-none");
+                document.getElementById("addAssignment").classList.add("d-flex");
+
                 if(document.getElementById("quizBtn").classList[1] === 'btn-secondary') {
-                    
+
+                    document.getElementById("addQuiz").classList.remove("d-flex");
+                    document.getElementById("addQuiz").classList.add("d-none");
+
                     document.getElementById("quizCont").classList.add("d-none");
                     document.getElementById("quizCont").classList.remove("d-flex");
 
@@ -254,6 +259,12 @@
                     $('#headerInfo').text('Por favor, inserte el peso de cada actividad: ');
                 }
                 else if (document.getElementById("attendanceBtn").classList[1] === 'btn-secondary') {
+                    
+                    document.getElementById("addAttendance").classList.remove("d-flex");
+                    document.getElementById("addAttendance").classList.add("d-none");
+
+                    document.getElementById("addAttendance").classList.add("d-flex");
+
                     document.getElementById("attendanceCont").classList.add("d-none");
                     document.getElementById("attendanceCont").classList.remove("d-flex");
 
@@ -274,9 +285,15 @@
         $('#attendanceBtn').on('click', function (){
 
             if (document.getElementById("attendanceBtn").classList[1] === 'btn-success') {
+                
+                document.getElementById("addAttendance").classList.remove("d-none");
+                document.getElementById("addAttendance").classList.add("d-flex");
 
                 if(document.getElementById("quizBtn").classList[1] === 'btn-secondary') {
                     
+                    document.getElementById("addQuiz").classList.remove("d-flex");
+                    document.getElementById("addQuiz").classList.add("d-none");
+
                     document.getElementById("quizCont").classList.add("d-none");
                     document.getElementById("quizCont").classList.remove("d-flex");
 
@@ -307,6 +324,9 @@
                 }
                 else if (document.getElementById("assignmentBtn").classList[1] === 'btn-secondary') {
 
+                    document.getElementById("addAssignment").classList.remove("d-flex");
+                    document.getElementById("addAssignment").classList.add("d-none");
+
                     document.getElementById("assignmentCont").classList.add("d-none");
                     document.getElementById("assignmentCont").classList.remove("d-flex");
 
@@ -327,8 +347,15 @@
         $('#quizBtn').on('click', function (){
 
             if (document.getElementById("quizBtn").classList[1] === 'btn-success') {
+
+                document.getElementById("addQuiz").classList.remove("d-none");
+                document.getElementById("addQuiz").classList.add("d-flex");
                 
                 if (document.getElementById("attendanceBtn").classList[1] === 'btn-secondary') {
+                    
+                    document.getElementById("addAttendance").classList.remove("d-flex");
+                    document.getElementById("addAttendance").classList.add("d-none");
+
                     document.getElementById("attendanceCont").classList.add("d-none");
                     document.getElementById("attendanceCont").classList.remove("d-flex");
 
@@ -358,6 +385,9 @@
                     $('#headerInfo').text('Por favor, inserte el peso de cada actividad: ');
                 }
                 else if (document.getElementById("assignmentBtn").classList[1] === 'btn-secondary') {
+                    
+                    document.getElementById("addAssignment").classList.remove("d-flex");
+                    document.getElementById("addAssignment").classList.add("d-none");
 
                     document.getElementById("assignmentCont").classList.add("d-none");
                     document.getElementById("assignmentCont").classList.remove("d-flex");
@@ -383,6 +413,9 @@
                 
                 if(document.getElementById("attendanceBtn").classList[1] === 'btn-secondary') {
                     
+                    document.getElementById("addAttendance").classList.remove("d-flex");
+                    document.getElementById("addAttendance").classList.add("d-none");
+
                     document.getElementById("attendanceCont").classList.add("d-none");
                     document.getElementById("attendanceCont").classList.remove("d-flex");
 
@@ -399,6 +432,9 @@
 
                 } else if (document.getElementById("quizBtn").classList[1] === 'btn-secondary') {
                     
+                    document.getElementById("addQuiz").classList.remove("d-flex");
+                    document.getElementById("addQuiz").classList.add("d-none");
+
                     document.getElementById("quizCont").classList.add("d-none");
                     document.getElementById("quizCont").classList.remove("d-flex");
 
@@ -414,6 +450,9 @@
                     $('#headerInfo').text('Resumen de todas las actividades:');
                 }
                 else if (document.getElementById("assignmentBtn").classList[1] === 'btn-secondary') {
+
+                    document.getElementById("addAssignment").classList.remove("d-flex");
+                    document.getElementById("addAssignment").classList.add("d-none");
 
                     document.getElementById("assignmentCont").classList.add("d-none");
                     document.getElementById("assignmentCont").classList.remove("d-flex");
@@ -517,6 +556,8 @@
         });
 
         $("#submitAll").on('click', function() {
+            
+            document.getElementById("creatingCourseOverlay").classList.remove("d-none");
             $('#activitiesInfo').val(JSON.stringify(activitiesDict));
         });
 
