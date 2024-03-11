@@ -252,11 +252,11 @@ class EchoConsumer(AsyncWebsocketConsumer):
     
     wd_prefs = {"download.default_directory" : os.path.join(BASE_DIR, "courseFiles")}
     wd_options.add_experimental_option("prefs",wd_prefs)
-    '''
+    
     wd_options.add_argument("--no-sandbox")
     wd_options.add_argument("--disable-dev-shm-usage")
     wd_options.add_argument('--headless')
-    '''
+
 
 
     latestchromedriver = ChromeDriverManager().install()
