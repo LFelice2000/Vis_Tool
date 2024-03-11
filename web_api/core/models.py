@@ -62,3 +62,12 @@ class Update(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, default=None)
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, default=None)
     date = models.DateTimeField(default=now, editable=False)
+
+class GlobalScores(models.Model):
+    objective = models.ForeignKey(Objective, on_delete=models.CASCADE, default=None)
+    percentage = models.DecimalField(max_digits=4, decimal_places=2, validators=[MaxValueValidator(100), MinValueValidator(0)], default=0)
+
+class StudentScores(models.Model):
+    objective = models.ForeignKey(Objective, on_delete=models.CASCADE, default=None)
+    student = models.ManyToManyField(Student)
+    percentage = models.DecimalField(max_digits=4, decimal_places=2, validators=[MaxValueValidator(100), MinValueValidator(0)], default=0)

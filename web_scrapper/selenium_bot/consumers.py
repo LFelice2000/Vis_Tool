@@ -162,17 +162,20 @@ def web_scrap(receive_payload, wd, wd_wait):
     time.sleep(15)
 
     wd.get(f"https://moodle.uam.es/grade/export/xls/index.php?id={courseId}")
+    
+    time.sleep(10)
+
     wd_wait.until(EC.element_to_be_clickable((By.NAME, "group")))
     
-    groupExistsFlag = False
+    groupUrlParam = None
     studentsGroupsDropDown = Select(wd.find_element(By.NAME, 'group'))
 
     for option in studentsGroupsDropDown.options:
       if option.text == group:
-        groupExistsFlag = True
-        option.click()
+        groupUrlParam = option.get_attribute('value')
+        
     
-    if not groupExistsFlag:
+    if not groupUrlParam:
 
       wd.delete_all_cookies()
       wd.close()
@@ -181,7 +184,9 @@ def web_scrap(receive_payload, wd, wd_wait):
 
       return -1
     
-    time.sleep(5)
+    wd.get(f"https://moodle.uam.es/grade/export/xls/index.php?id={courseId}&group={groupUrlParam}")
+
+    time.sleep(15)
 
     wd_wait.until(EC.element_to_be_clickable((By.ID, "id_submitbutton")))
     wd.find_element('id', 'id_submitbutton').click()
@@ -247,9 +252,12 @@ class EchoConsumer(AsyncWebsocketConsumer):
     
     wd_prefs = {"download.default_directory" : os.path.join(BASE_DIR, "courseFiles")}
     wd_options.add_experimental_option("prefs",wd_prefs)
+    '''
     wd_options.add_argument("--no-sandbox")
     wd_options.add_argument("--disable-dev-shm-usage")
     wd_options.add_argument('--headless')
+    '''
+
 
     latestchromedriver = ChromeDriverManager().install()
     wd_service = Service(executable_path=latestchromedriver)

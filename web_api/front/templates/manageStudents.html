@@ -108,7 +108,7 @@
                         $('#studentListCont').hide()
                         
                         var objectives = JSON.parse(response.objectives)
-                        var content = ""
+                        var content = `<div class='h4 mb-5'>Progeso de ${selectedStudent}</div>`
                         var rows = 0
 
                         for(const objective in objectives) {

@@ -48,6 +48,7 @@ def update(request):
         courseShortName = request.POST.get("courseShortName")
         teacher = request.POST.get('username')
         courseId = request.POST.get('courseId')
+        group = request.POST.get('group')
 
         dataframe = pd.json_normalize(json.loads(request.POST.get("activities")))
         
@@ -56,18 +57,18 @@ def update(request):
         courseStudents = dataframe.filter(regex='First name|Last name|ID number|Email address|Nombre|Apellido\(s\)|Número de ID|Dirección de correo')
         students = getStudentDataframe(courseStudents)
 
-        attendanceInfo = attendanceDataframe[attendanceDataframe.columns.difference(['Apellido(s)', 'Nombre', 'ID de estudiante', 'P', 'L', 'E', 'A', 'R','J','I', 'Sesiones tomadas', 'Puntuación', 'Porcentaje'])]
+        attendanceInfo = attendanceDataframe[attendanceDataframe.columns.difference(['Apellido(s)', 'Nombre', 'ID de estudiante', 'P', 'L', 'E', 'A', 'R','J','I', 'Sesiones tomadas', 'Puntuación', 'Porcentaje', 'Grupos'])]
         attendanceSesions = getAttendanceSessionsFromDataframe(attendanceInfo)
 
         courseContent = dataframe.filter(regex='Quiz|Assignment|Attendance|Cuestionario|Tarea|Asistencia')
         
-        quizes, attendance, assignments, repeatedActivities = getCourseActivitiesFromDataframe(courseContent, attendanceSesions)
+        quizes, attendance, assignments, repeatedActivities = getCourseActivitiesFromDataframe(courseContent, attendanceSesions, group)
 
         activities = json.dumps({"quiz": quizes,"assignment": assignments, "asistance": attendance})
 
         studentGradeList = getStudentGradeListFromDataframe(students, dataframe, attendanceInfo, quizes, attendance, assignments)
 
-        res = updateCourse(activities, courseName, courseShortName, studentGradeList, teacher, courseId)
+        res = updateCourse(activities, courseName, courseShortName, studentGradeList, teacher, courseId, group)
         if res['status'] == "error":
             return redirect(reverse("error", kwargs={"error": res['error']}))
         
@@ -83,41 +84,9 @@ def teacherPage(request, courseName, courseShortName, teacherMail, courseId):
 
     globalTotal = []
     for objective in getCourseObjectives(courseName):
-                
-        students = getCourseStudents(courseName)
-        
-        globalGradeAcum = 0
-        for stu in students:
-            
-            for activity in getObjectiveActivities(objective.name, currCourse.name):
-                
-                if type(activity) == type(Quiz()):
 
-                    grade = Grade.objects.filter(quiz__id=activity.id, student=stu, course=currCourse).first()
-
-                    if grade:
-
-                        globalGradeAcum += grade.grade * (activity.weight/100)
-
-                elif type(activity) == type(Assignment()):
-
-                    grade = Grade.objects.filter(assignment__id=activity.id, student=stu, course=currCourse).first()
-
-                    if grade:
-
-                        globalGradeAcum += grade.grade * (activity.weight/100)
-                
-                elif type(activity) == type(Sesion()):
-                    
-                    
-                    at = Attendance.objects.filter(sesions=activity).first()
-                    grade = Grade.objects.filter(sesion__id=activity.id, student=stu, course=currCourse).first()
-                    
-                    if grade and at:
-
-                        globalGradeAcum += grade.grade * (at.weight/100)
-
-        globalTotal.append({'name': objective.name, 'globalScore': round(((globalGradeAcum/students.count())*10), 2)})
+        gloScores = getGlobalScore(objective)
+        globalTotal.append({'name': gloScores.objective.name, 'globalScore': gloScores.percentage})
 
     context = {
         "courseName": str(courseName),
@@ -170,8 +139,8 @@ def visPage(request):
         if currCourse:
 
             #Calculamos el progreso personal
-            students = getCourseStudents(courseName)
-
+            student = getStudent(userMail)
+            
             if userMail not in getStudentEmails(courseName):
 
                 context = {
@@ -181,63 +150,13 @@ def visPage(request):
                 return render(request, "error.html", context=context)
 
             personalTotal = []
-            globalTotal = []
+
             for objective in getCourseObjectives(courseName):
                 
-                
-                globalGradeAcum = 0
-                for stu in students:
+                globalScore = getGlobalScore(objective)
+                personalScore = getPersonalScores(objective, student)
                     
-                    personalGradeAcum = 0
-                    for activity in getObjectiveActivities(objective.name, currCourse.name):
-                        
-                        if type(activity) == type(Quiz()):
-
-                            grade = Grade.objects.filter(quiz__id=activity.id, student=stu, course=currCourse).first()
-                            
-                            if grade:
-                                if stu.email == userMail:
-                                    personalGradeAcum += grade.grade * (activity.weight/100)
-
-                                globalGradeAcum += grade.grade * (activity.weight/100)
-
-                        elif type(activity) == type(Assignment()):
-
-                            grade = Grade.objects.filter(assignment__id=activity.id, student=stu, course=currCourse).first()
-
-                            if grade:
-                                if stu.email == userMail:
-                                    personalGradeAcum += grade.grade * (activity.weight/100)
-
-                                globalGradeAcum += grade.grade * (activity.weight/100)
-                        
-                        elif type(activity) == type(Sesion()):
-                            
-                            
-                            at = Attendance.objects.filter(sesions=activity).first()
-                            grade = Grade.objects.filter(sesion__id=activity.id, student=stu, course=currCourse).first()
-                            
-                            if grade and at:
-                                if stu.email == userMail:
-                                    personalGradeAcum += grade.grade * (at.weight/100)
-
-                                globalGradeAcum += grade.grade * (at.weight/100)
-
-                    if stu.email == userMail:
-                        personalResults = {'name': objective.name, 'personalScore': float(round((personalGradeAcum*10), 2))}
-                    
-                        personalTotal.append(personalResults)
-                    
-                globalTotal.append({'objective': objective.name, 'globalScore': float(round(((globalGradeAcum/students.count())*10), 2))})
-
-            
-            for result in personalTotal:
-                for globalResult in globalTotal:
-
-                    if result['name'] == globalResult['objective']:
-
-                        result['global'] = globalResult['globalScore']
-            
+                personalTotal.append({'name': objective.name, 'globalScore': float(globalScore.percentage), 'personalScore': float(personalScore.percentage)})
 
             update = Update.objects.filter(course=currCourse).first()
             studentName = Student.objects.filter(email=userMail).first().name
@@ -495,7 +414,8 @@ def confPage(request):
             'attendanceList': attendance,
             'assignmentList': assignments,
             'courseId': courseId,
-            'courseShortName': courseShortName
+            'courseShortName': courseShortName,
+            'group': group
         }
         
         return render(request, "confActivities.html", context=context)
@@ -517,8 +437,9 @@ def confWeigth(request):
     objectiveList = request.POST.get("objectiveList")
     activitiesInfo = request.POST.get("activitiesInfo")
     courseId = request.POST.get('courseId')
+    group = request.POST.get('group')
 
-    res = createCourse(activitiesInfo, students, courseName, courseShortName, teacher, studentGrades, objectiveList, courseId)
+    res = createCourse(activitiesInfo, students, courseName, courseShortName, teacher, studentGrades, objectiveList, courseId, group)
 
     if res['status'] == "error":
         return redirect(reverse("error", kwargs={"error": res['error']}))
@@ -651,53 +572,21 @@ def studentInfo(request, courseName, courseShortName, teacherMail,courseId):
 
     studentMail = request.POST.get('studentMail')
 
-    print(studentMail)
-
     currCourse = getCurrCourse(courseName)
-    students = getCourseStudents(courseName)
+    student = getStudent(studentMail)
 
-    if studentMail not in getStudentEmails(courseName):
+    if studentMail not in getStudentEmails(courseName) or not student:
 
         JsonResponse({'state': 'error'})
 
     personalTotal = []
     for objective in getCourseObjectives(currCourse.name):
+
+        stuScores = getPersonalScores(objective, student)
         
-        for stu in students:
-            
-            personalGradeAcum = 0
-            for activity in getObjectiveActivities(objective.name, currCourse.name):
-                
-                if type(activity) == type(Quiz()):
+        if stuScores:
+            personalResults = {'name': objective.name, 'personalScore': float(stuScores.percentage)}
 
-                    grade = Grade.objects.filter(quiz__id=activity.id, student=stu, course=currCourse).first()
-                    
-                    if grade:
-                        if stu.email == studentMail:
-                            personalGradeAcum += grade.grade * (activity.weight/100)
-
-                elif type(activity) == type(Assignment()):
-
-                    grade = Grade.objects.filter(assignment__id=activity.id, student=stu, course=currCourse).first()
-
-                    if grade:
-                        if stu.email == studentMail:
-                            personalGradeAcum += grade.grade * (activity.weight/100)
-                
-                elif type(activity) == type(Sesion()):
-                    
-                    
-                    at = Attendance.objects.filter(sesions=activity).first()
-                    grade = Grade.objects.filter(sesion__id=activity.id, student=stu, course=currCourse).first()
-                    
-                    if grade and at:
-                        if stu.email == studentMail:
-                            personalGradeAcum += grade.grade * (at.weight/100)
-
-
-            if stu.email == studentMail:
-                personalResults = {'name': objective.name, 'personalScore': float(round((personalGradeAcum*10), 2))}
-            
-                personalTotal.append(personalResults)
+            personalTotal.append(personalResults)
 
     return JsonResponse({'state': 'succeess', 'objectives': json.dumps(personalTotal)})
