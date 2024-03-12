@@ -42,6 +42,7 @@
         
             <input type="hidden" name="activities" id="activities"/>
             <input type="hidden" name="attendance" id="attendance" />
+            <input type="hidden" name="students" id="students" />            
             <input type="hidden" name="courseId" id="courseId" value="{{courseId}}" />
             <input type="hidden" name="courseName" id="courseName" value="{{courseName}}" />
             <input type="hidden" name="courseShortName" id="courseShortName" value="{{courseShortName}}" />
@@ -79,6 +80,7 @@
             <input type="hidden" name="objList" value="{{objList}}" />
             <input type="hidden" name="activities" id="activities"/>
             <input type="hidden" name="attendance" id="attendance" />
+            <input type="hidden" name="students" id="students" />
             <input type="hidden" name="courseId" id="courseId" value="{{courseId}}" />
             <input type="hidden" name="courseName" id="courseName" value="{{courseName}}" />
             <input type="hidden" name="courseShortName" id="courseShortName" value="{{courseShortName}}" />
@@ -183,8 +185,8 @@
             }
             */
 
-            const url = 'wss://nabu.ii.uam.es:8000/selenium_bot'
-            //const url = 'ws://127.0.0.1:8000/selenium_bot'
+            //const url = 'wss://nabu.ii.uam.es:8000/selenium_bot'
+            const url = 'ws://127.0.0.1:8000/selenium_bot'
             const ws = new WebSocket(url)
 
             ws.onopen = function(e) {
@@ -226,6 +228,7 @@
 
                     $("#activities").val(payload['activities'])
                     $("#attendance").val(payload['attendance'])
+                    $('#students').val(payload['students'])
                     
                     $('#loginForm').submit()
 

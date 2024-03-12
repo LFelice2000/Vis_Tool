@@ -382,17 +382,19 @@ def confPage(request):
         courseId = request.POST.get('courseId')
         courseShortName = request.POST.get('courseShortName')
         group = request.POST.get('group')
-
+        students = request.POST.get('students')
+        
         username = request.POST['username']
         password = request.POST['password']
 
         dataframe = pd.json_normalize(json.loads(request.POST.get("activities")))
-        
         attendanceDataframe = pd.json_normalize(json.loads(request.POST.get("attendance")))
+        studentsDataframe = pd.json_normalize(json.loads(request.POST.get('students'))).dropna(subset=['Grupos'])
 
         teacher = Teacher.objects.filter(email=username)
         
-        courseStudents = dataframe.filter(regex='First name|Last name|ID number|Email address|Nombre|Apellido\(s\)|Número de ID|Dirección de correo')
+        courseStudents = studentsDataframe[studentsDataframe['Grupos'].str.contains(group)]
+        courseStudents = studentsDataframe.filter(regex="Nombre|Apellido\(s\)|Dirección de correo")
         students = getStudentDataframe(courseStudents)
 
         attendanceInfo = attendanceDataframe[attendanceDataframe.columns.difference(['Apellido(s)', 'Nombre', 'ID de estudiante', 'P', 'L', 'E', 'A', 'R','J','I', 'Sesiones tomadas', 'Puntuación', 'Porcentaje', 'Grupos'])]
