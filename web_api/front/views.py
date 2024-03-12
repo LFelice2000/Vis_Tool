@@ -113,7 +113,7 @@ def visPage(request):
         courseId = urlParams.get('CourseId')
 
         #or userMail == 'luis.felice@estudiante.uam.es'
-        if is_teacher(userMail) or userMail == 'luis.felice@estudiante.uam.es':
+        if is_teacher(userMail):
 
             if not courseExists(courseName):
             
@@ -393,8 +393,7 @@ def confPage(request):
 
         teacher = Teacher.objects.filter(email=username)
         
-        courseStudents = studentsDataframe[studentsDataframe['Grupos'].str.contains(group)]
-        courseStudents = studentsDataframe.filter(regex="Nombre|Apellido\(s\)|Dirección de correo")
+        courseStudents = studentsDataframe[studentsDataframe['Grupos'].str.contains(group)].filter(regex="Nombre|Apellido\(s\)|Dirección de correo")
         students = getStudentDataframe(courseStudents)
 
         attendanceInfo = attendanceDataframe[attendanceDataframe.columns.difference(['Apellido(s)', 'Nombre', 'ID de estudiante', 'P', 'L', 'E', 'A', 'R','J','I', 'Sesiones tomadas', 'Puntuación', 'Porcentaje', 'Grupos'])]

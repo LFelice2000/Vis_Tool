@@ -135,12 +135,13 @@
         $('#addQuiz').on('click', function () {
             
             var activitiesInfo = document.getElementById("quizCont").children;
+            console.log(activitiesInfo)
 
             if(activitiesDict['quiz'].length != 0) {
                 activitiesDict['quiz'] = [];
             }
 
-            for(var i = 0; i < activitiesInfo.length; i++) {
+            for(var i = 0; i <= activitiesInfo.length; i++) {
 
                 var typeId = "#qtype" + i.toString();
                 var nameId = "#qname" + i.toString();
@@ -167,7 +168,7 @@
                 activitiesDict['assignment'] = [];
             }
             
-            for(var i = 0; i < activitiesInfo.length; i++) {
+            for(var i = 0; i <= activitiesInfo.length; i++) {
 
                 var typeId = "#astype" + i.toString();
                 var nameId = "#asname" + i.toString();
@@ -189,20 +190,12 @@
             
             var activitiesInfo = document.getElementById("attendanceCont").children;
             var weigthId = "#atweigth";
-            
-            var numObjectives = 0;
-            for(var i = 0; i < (activitiesInfo.length - 2); i++) {
-                var optionId = "#atoption" + i.toString();
-                if($(optionId+" :selected").text() != 'None') {
-                    numObjectives++;
-                }
-            }
 
             if(activitiesDict['asistance'].length != 0) {
                 activitiesDict['asistance'] = [];
             }
 
-            for(i = 0; i < activitiesInfo.length; i++) {
+            for(i = 0; i <= activitiesInfo.length; i++) {
 
                 var nameId = "#atname" + i.toString();
                 var optionId = "#atoption" + i.toString();
