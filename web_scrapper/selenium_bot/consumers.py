@@ -161,32 +161,23 @@ def web_scrap(receive_payload, wd, wd_wait):
 
     time.sleep(15)
 
-    wd.get(f"https://moodle.uam.es/grade/export/xls/index.php?id={courseId}")
+    wd.get(f"https://moodle.uam.es/user/index.php?id={courseId}")
+
+    
+
+    wd_wait.until(EC.element_to_be_clickable((By.ID, "select-all-participants")))
+    wd.find_element(By.ID, "select-all-participants").click()
+
+    wd_wait.until(EC.element_to_be_clickable((By.ID, "formactionid")))
+    
+    exportFormat = Select(wd.find_element(By.ID, 'formactionid'))
+    for option in exportFormat.options:
+      if option.get_attribute('value') == "bulkchange.php?operation=download_participants&dataformat=excel":
+        option.click()
     
     time.sleep(10)
-
-    wd_wait.until(EC.element_to_be_clickable((By.NAME, "group")))
     
-    groupUrlParam = None
-    studentsGroupsDropDown = Select(wd.find_element(By.NAME, 'group'))
-
-    for option in studentsGroupsDropDown.options:
-      if option.text == group:
-        groupUrlParam = option.get_attribute('value')
-        
-    
-    if not groupUrlParam:
-
-      wd.delete_all_cookies()
-      wd.close()
-
-      filesSem.release()
-
-      return -1
-    
-    wd.get(f"https://moodle.uam.es/grade/export/xls/index.php?id={courseId}&group={groupUrlParam}")
-
-    time.sleep(15)
+    wd.get(f"https://moodle.uam.es/grade/export/xls/index.php?id={courseId}")
 
     wd_wait.until(EC.element_to_be_clickable((By.ID, "id_submitbutton")))
     wd.find_element('id', 'id_submitbutton').click()
@@ -225,10 +216,14 @@ def web_scrap(receive_payload, wd, wd_wait):
     
     courseName = receive_payload['courseName']
 
+    courseStudents = pd.read_excel(os.path.join(BASE_DIR, f"courseFiles/courseid_{courseId}_participants.xlsx"))
+    studentsDataframe = pd.DataFrame(courseStudents)
+    
     courseData = pd.read_excel(os.path.join(BASE_DIR, f"courseFiles/{courseName} Calificaciones.xlsx"))
     activitiesDataframe = pd.DataFrame(courseData)
 
-    courseAttendance = pd.read_excel(os.path.join(BASE_DIR, f"courseFiles/{courseFiles[0] if courseFiles[0] != f'{courseName} Calificaciones.xlsx' else courseFiles[1]}"), skiprows=[0,1,2])
+    attendanceFilename = next((filename for filename in os.listdir(os.path.join(BASE_DIR, "courseFiles")) if 'Asistencias' in filename), None)
+    courseAttendance = pd.read_excel(os.path.join(BASE_DIR, f"courseFiles/{attendanceFilename}"), skiprows=[0,1,2])
     attendanceDataframe = pd.DataFrame(courseAttendance)
 
     for file in os.listdir(os.path.join(BASE_DIR, "courseFiles")):
@@ -237,13 +232,18 @@ def web_scrap(receive_payload, wd, wd_wait):
   except Exception as e:
 
     print(e)
+
+    for file in os.listdir(os.path.join(BASE_DIR, "courseFiles")):
+      
+        os.remove(os.path.join(BASE_DIR, f"courseFiles/{file}"))
+      
     filesSem.release()
 
     return None
   
   filesSem.release()
 
-  return {"activitiesDataframe": activitiesDataframe, "attendanceDataframe": attendanceDataframe}
+  return {"activitiesDataframe": activitiesDataframe, "attendanceDataframe": attendanceDataframe, "studentsDataframe": studentsDataframe}
 class EchoConsumer(AsyncWebsocketConsumer):
     
     WEB_API_PATH = f"{Path(__file__).resolve().parent.parent.parent.absolute()}/web_api/"
@@ -256,7 +256,7 @@ class EchoConsumer(AsyncWebsocketConsumer):
     wd_options.add_argument("--no-sandbox")
     wd_options.add_argument("--disable-dev-shm-usage")
     wd_options.add_argument('--headless')
-
+    
 
 
     latestchromedriver = ChromeDriverManager().install()
@@ -332,7 +332,7 @@ class EchoConsumer(AsyncWebsocketConsumer):
           send_payload = {"type": "scrap_error","data": f"Group {receive_payload['group']} does not exists."}
           await self.send(json.dumps(send_payload))
 
-        send_payload = {"type": "scrap_success", "activities": courseInfo["activitiesDataframe"].to_json(orient='records', force_ascii=False, default_handler=str), "attendance": courseInfo["attendanceDataframe"].to_json(orient='records', force_ascii=False, default_handler=str)}
+        send_payload = {"type": "scrap_success", "activities": courseInfo["activitiesDataframe"].to_json(orient='records', force_ascii=False, default_handler=str), "attendance": courseInfo["attendanceDataframe"].to_json(orient='records', force_ascii=False, default_handler=str), "students": courseInfo["studentsDataframe"].to_json(orient='records', force_ascii=False, default_handler=str)}
         await self.send(json.dumps(send_payload))
     
     async def websocket_disconnect(self, event):
