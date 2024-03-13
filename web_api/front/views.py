@@ -298,8 +298,9 @@ def getStudentGradeListFromDataframe(students, dataframe, attendanceInfo, quizes
         
             for quiz in quizes:
                 studentGrade = studentActivities[f"{quiz['type']}:{quiz['name']} (Real)"]
-
-                if studentGrade:
+                print(studentGrade)
+                
+                if len(studentGrade):
                     if studentGrade[i] == '-':
 
                         activityList.append({'type': quiz['type'], 'name': quiz['name'], 'grade': 0})
@@ -311,7 +312,7 @@ def getStudentGradeListFromDataframe(students, dataframe, attendanceInfo, quizes
             for assignment in assignments:
                 studentGrade = studentActivities[f"{assignment['type']}:{assignment['name']} (Real)"]
 
-                if studentGrade:
+                if len(studentGrade):
                     if studentGrade[i] == '-':
 
                         activityList.append({'type': assignment['type'], 'name': assignment['name'], 'grade': 0})
@@ -334,7 +335,7 @@ def getStudentGradeListFromDataframe(students, dataframe, attendanceInfo, quizes
                 else:
                     studentGrade = studentSessions[f"{attend['sesion']} Todos los estudiantes"][i]
 
-                if studentGrade:
+                if len(studentGrade):
 
                     studentGrade = studentGrade.split(" ")[0]
 
