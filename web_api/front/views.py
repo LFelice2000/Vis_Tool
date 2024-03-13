@@ -299,24 +299,26 @@ def getStudentGradeListFromDataframe(students, dataframe, attendanceInfo, quizes
             for quiz in quizes:
                 studentGrade = studentActivities[f"{quiz['type']}:{quiz['name']} (Real)"]
 
-                if studentGrade[i] == '-':
+                if studentGrade:
+                    if studentGrade[i] == '-':
 
-                    activityList.append({'type': quiz['type'], 'name': quiz['name'], 'grade': 0})
-                
-                else:
-                
-                    activityList.append({'type': quiz['type'], 'name': quiz['name'], 'grade': studentGrade[i]})
+                        activityList.append({'type': quiz['type'], 'name': quiz['name'], 'grade': 0})
+                    
+                    else:
+                    
+                        activityList.append({'type': quiz['type'], 'name': quiz['name'], 'grade': studentGrade[i]})
             
             for assignment in assignments:
                 studentGrade = studentActivities[f"{assignment['type']}:{assignment['name']} (Real)"]
 
-                if studentGrade[i] == '-':
+                if studentGrade:
+                    if studentGrade[i] == '-':
 
-                    activityList.append({'type': assignment['type'], 'name': assignment['name'], 'grade': 0})
-                
-                else:
-                
-                    activityList.append({'type': assignment['type'], 'name': assignment['name'], 'grade': studentGrade[i]})
+                        activityList.append({'type': assignment['type'], 'name': assignment['name'], 'grade': 0})
+                    
+                    else:
+                    
+                        activityList.append({'type': assignment['type'], 'name': assignment['name'], 'grade': studentGrade[i]})
         
         if len(studentSessions):
             for attend in attendance:
