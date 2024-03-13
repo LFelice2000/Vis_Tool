@@ -28,7 +28,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-'''
+
 SECURE_SSL_REDIRECT = True
 
 HTTPS_PROTOCOL = 'https'
@@ -36,7 +36,7 @@ HTTPS_PROTOCOL = 'https'
 HTTPS_PORT = 443
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-'''
+
 
 
 # Application definition
@@ -96,7 +96,7 @@ DATABASES = {
         'NAME': 'postgres',
         'USER': 'postgres',
         'PASSWORD': 'alefelice01',
-        'HOST': 'localhost',
+        'HOST': 'db',
         'PORT': '5432',
     }
 }
