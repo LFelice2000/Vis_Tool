@@ -115,7 +115,7 @@ def visPage(request):
         courseId = urlParams.get('CourseId')
 
         #or userMail == 'luis.felice@estudiante.uam.es'
-        if is_teacher(userMail):
+        if is_teacher(userMail) or userMail == 'luis.felice@estudiante.uam.es':
 
             if not courseExists(courseName):
             
@@ -297,31 +297,30 @@ def getStudentGradeListFromDataframe(students, dataframe, attendanceInfo, quizes
         activityList = list(dict())
 
         if len(studentActivities):
-            print(studentActivities)
+            
             for quiz in quizes:
                 
                 studentGrade = studentActivities[f"{quiz['type']}:{quiz['name']} (Real)"]
-                
-                if len(studentGrade):
-                    if studentGrade[i] == '-':
 
-                        activityList.append({'type': quiz['type'], 'name': quiz['name'], 'grade': 0})
-                    
-                    else:
-                    
-                        activityList.append({'type': quiz['type'], 'name': quiz['name'], 'grade': studentGrade[i]})
+                if '-' == str(studentGrade.iloc[0]):
+
+                    activityList.append({'type': quiz['type'], 'name': quiz['name'], 'grade': 0})
+                
+                else:
+                
+                    activityList.append({'type': quiz['type'], 'name': quiz['name'], 'grade': studentGrade.iloc[0]})
             
             for assignment in assignments:
                 studentGrade = studentActivities[f"{assignment['type']}:{assignment['name']} (Real)"]
 
-                if len(studentGrade):
-                    if studentGrade[i] == '-':
+            
+                if '-' == str(studentGrade.iloc[0]):
 
-                        activityList.append({'type': assignment['type'], 'name': assignment['name'], 'grade': 0})
-                    
-                    else:
-                    
-                        activityList.append({'type': assignment['type'], 'name': assignment['name'], 'grade': studentGrade[i]})
+                    activityList.append({'type': assignment['type'], 'name': assignment['name'], 'grade': 0})
+                
+                else:
+                
+                    activityList.append({'type': assignment['type'], 'name': assignment['name'], 'grade': studentGrade.iloc[0]})
         
         if len(studentSessions):
             for attend in attendance:
@@ -337,17 +336,15 @@ def getStudentGradeListFromDataframe(students, dataframe, attendanceInfo, quizes
                 else:
                     studentGrade = studentSessions[f"{attend['sesion']} Todos los estudiantes"][i]
 
-                if len(studentGrade):
+                studentGrade = studentGrade.split(" ")[0]
 
-                    studentGrade = studentGrade.split(" ")[0]
+                if studentGrade == 'P' or studentGrade == 'L' or studentGrade == 'R':
 
-                    if studentGrade == 'P' or studentGrade == 'L' or studentGrade == 'R':
-
-                        activityList.append({'type': attend['type'], 'sesion': attend['sesion'], 'grade': 10})
-                    
-                    else:
-                    
-                        activityList.append({'type': attend['type'], 'sesion': attend['sesion'], 'grade': 0})
+                    activityList.append({'type': attend['type'], 'sesion': attend['sesion'], 'grade': 10})
+                
+                else:
+                
+                    activityList.append({'type': attend['type'], 'sesion': attend['sesion'], 'grade': 0})
 
         studentGradeList.append({'student': student['email'], 'activities': activityList})
         i += 1
@@ -542,7 +539,6 @@ def removeStudent(request, courseName, courseShortName, teacherMail,courseId):
 
         student = request.POST.get("studentToDelete")
 
-        print(student)
         if not deleteStudent(student, courseName):
             print('error')
 
