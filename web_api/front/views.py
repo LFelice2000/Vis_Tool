@@ -67,6 +67,8 @@ def update(request):
         activities = json.dumps({"quiz": quizes,"assignment": assignments, "asistance": attendance})
 
         studentGradeList = getStudentGradeListFromDataframe(students, dataframe, attendanceInfo, quizes, attendance, assignments)
+        if not studentGradeList:
+            return redirect(reverse("error", kwargs={"error": "unknown error"}))
 
         res = updateCourse(activities, courseName, courseShortName, studentGradeList, teacher, courseId, group)
         if res['status'] == "error":
@@ -284,21 +286,21 @@ def getStudentGradeListFromDataframe(students, dataframe, attendanceInfo, quizes
         try:
             studentActivities = dataframe.loc[dataframe['Dirección de correo'] == student['email']].filter(regex='Email address|Quiz|Assignment|Attendance|Dirección de correo|Cuestionario|Tarea|Asistencia')
         except:
-            pass
+            return None
         
         try:
             studentSessions = attendanceInfo.loc[attendanceInfo['Dirección de correo'] == student['email']]
             studentSessions = studentSessions[studentSessions.columns.difference(['Apellido(s)', 'Nombre', 'ID de estudiante', 'P', 'L', 'E', 'A', 'R','J','I', 'Sesiones tomadas', 'Puntuación', 'Porcentaje', 'Grupos'])]
         except:
-            pass
+            return None
         
         activityList = list(dict())
 
         if len(studentActivities):
-        
+            print(studentActivities)
             for quiz in quizes:
+                
                 studentGrade = studentActivities[f"{quiz['type']}:{quiz['name']} (Real)"]
-                print(studentGrade)
                 
                 if len(studentGrade):
                     if studentGrade[i] == '-':
