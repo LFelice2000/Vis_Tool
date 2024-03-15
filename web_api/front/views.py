@@ -351,6 +351,18 @@ def getStudentGradeListFromDataframe(students, dataframe, attendanceInfo, quizes
 
     return studentGradeList
 
+def convertir_fecha(cadena):
+
+    if re.findall(r'\b\d{4}$', cadena):
+        cadena = re.sub(r'\b\d{4}$', '', cadena)
+
+    if 'PM' in cadena:
+        cadena = cadena.replace('PM', ' pm')
+    else:
+        cadena = cadena.replace('AM', ' am')
+    
+    return datetime.strptime(cadena, "%d %b %Y %I.%M %p")
+
 @csrf_exempt
 @xframe_options_exempt
 def confPage(request):
@@ -393,13 +405,19 @@ def confPage(request):
         attendanceDataframe = pd.json_normalize(json.loads(request.POST.get("attendance")))
         studentsDataframe = pd.json_normalize(json.loads(request.POST.get('students'))).dropna(subset=['Grupos'])
 
+        print(request.POST.get('students'))
+
         teacher = Teacher.objects.filter(email=username)
         
         courseStudents = studentsDataframe[studentsDataframe['Grupos'].str.contains(group)].filter(regex="Nombre|Apellido\(s\)|Dirección de correo")
         students = getStudentDataframe(courseStudents)
 
+        print(students)
+
         attendanceInfo = attendanceDataframe[attendanceDataframe.columns.difference(['Apellido(s)', 'Nombre', 'ID de estudiante', 'P', 'L', 'E', 'A', 'R','J','I', 'Sesiones tomadas', 'Puntuación', 'Porcentaje', 'Grupos'])]
         attendanceSesions = getAttendanceSessionsFromDataframe(attendanceInfo)
+
+        #attendanceSesions = sorted(attendanceSesions, key=convertir_fecha)
 
         courseContent = dataframe.filter(regex='Quiz|Assignment|Attendance|Cuestionario|Tarea|Asistencia')
         
