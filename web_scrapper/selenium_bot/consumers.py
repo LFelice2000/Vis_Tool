@@ -163,10 +163,12 @@ def web_scrap(receive_payload, wd, wd_wait):
 
     wd.get(f"https://moodle.uam.es/user/index.php?id={courseId}")
 
-    
-
     wd_wait.until(EC.element_to_be_clickable((By.ID, "select-all-participants")))
-    wd.find_element(By.ID, "select-all-participants").click()
+    
+    if wd.find_element(By.ID, "checkall"):
+      wd.find_element(By.ID, "checkall").click()
+    else:
+      wd.find_element(By.ID, "select-all-participants").click()
 
     wd_wait.until(EC.element_to_be_clickable((By.ID, "formactionid")))
     
