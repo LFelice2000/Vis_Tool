@@ -165,9 +165,10 @@ def web_scrap(receive_payload, wd, wd_wait):
 
     wd_wait.until(EC.element_to_be_clickable((By.ID, "select-all-participants")))
     
-    if wd.find_element(By.ID, "checkall"):
+    try:
+      wd.find_element(By.ID, "checkall")
       wd.find_element(By.ID, "checkall").click()
-    else:
+    except:
       wd.find_element(By.ID, "select-all-participants").click()
 
     wd_wait.until(EC.element_to_be_clickable((By.ID, "formactionid")))

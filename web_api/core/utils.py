@@ -219,18 +219,20 @@ def updateCourse(activities, courseName, courseShortName, studentGrades, teacher
                                 
                                 grade = Grade.objects.filter(quiz__id=act.id, student__id=stu.id).first()
 
-                                if grade and grade.grade != activity['grade']:
-                                    Grade.objects.filter(id=grade.id).update(grade=float(activity['grade']))
+                                if grade:
+
+                                    if grade.grade != activity['grade']:
+                                        Grade.objects.filter(id=grade.id).update(grade=float(activity['grade']))
 
                                     if not act.objective.name in globalGradeAcum:
-                                        globalGradeAcum[act.objective.name] = grade.grade * (act.weight/100)
+                                        globalGradeAcum[act.objective.name] = float(activity['grade']) * float(act.weight/100)
                                     else:
-                                        globalGradeAcum[act.objective.name] += grade.grade * (act.weight/100)
+                                        globalGradeAcum[act.objective.name] += float(activity['grade']) * float(act.weight/100)
 
                                     if not act.objective.name in studentProgress:
-                                        studentProgress[act.objective.name] = grade.grade * (act.weight/100)
+                                        studentProgress[act.objective.name] = float(activity['grade']) * float(act.weight/100)
                                     else:
-                                        studentProgress[act.objective.name] += grade.grade * (act.weight/100)
+                                        studentProgress[act.objective.name] += float(activity['grade']) * float(act.weight/100)
 
                         elif activity['type'] == 'Tarea':
 
@@ -240,22 +242,24 @@ def updateCourse(activities, courseName, courseShortName, studentGrades, teacher
                                 
                                 grade = Grade.objects.filter(assignment__id=act.id, student__id=stu.id).first()
 
-                                if grade and grade.grade != activity['grade']:
-                                    Grade.objects.filter(id=grade.id).update(grade=float(activity['grade']))
+                                if grade:
+
+                                    if grade.grade != activity['grade']:
+                                        Grade.objects.filter(id=grade.id).update(grade=float(activity['grade']))
                                     
                                     if not act.objective.name in globalGradeAcum:
-                                        globalGradeAcum[act.objective.name] = grade.grade * (act.weight/100)
+                                        globalGradeAcum[act.objective.name] = float(activity['grade']) * float(act.weight/100)
                                     else:
-                                        globalGradeAcum[act.objective.name] += grade.grade * (act.weight/100)
+                                        globalGradeAcum[act.objective.name] += float(activity['grade']) * float(act.weight/100)
                                     
                                     if not act.objective.name in studentProgress:
-                                        studentProgress[act.objective.name] = grade.grade * (act.weight/100)
+                                        studentProgress[act.objective.name] = float(activity['grade']) * float(act.weight/100)
                                     else:
-                                        studentProgress[act.objective.name] += grade.grade * (act.weight/100)
+                                        studentProgress[act.objective.name] += float(activity['grade']) * float(act.weight/100)
                                         
                         
                         elif activity['type'] == 'Asistencia':
-                            
+                            '''
                             act = Attendance.objects.filter(course=course).first()
                             
                             for attendanceAct in activitiesObj['asistance']:
@@ -272,18 +276,45 @@ def updateCourse(activities, courseName, courseShortName, studentGrades, teacher
 
                                             grade = Grade.objects.filter(sesion__id=sesion.id, student__id=stu.id).first()
 
-                                            if grade and grade.grade != activity['grade']:
-                                                Grade.objects.filter(id=grade.id).update(grade=float(activity['grade']))
+                                            if grade:
+
+                                                if grade.grade != activity['grade']:
+                                                    Grade.objects.filter(id=grade.id).update(grade=float(activity['grade']))
                                                 
                                                 if not sesion.objective.name in globalGradeAcum:
-                                                    globalGradeAcum[sesion.objective.name] = grade.grade * (act.weight/100)
+                                                    globalGradeAcum[sesion.objective.name] = float(activity['grade']) * float(act.weight/100)
                                                 else:
-                                                    globalGradeAcum[sesion.objective.name] += grade.grade * (act.weight/100)
+                                                    globalGradeAcum[sesion.objective.name] += float(activity['grade']) * float(act.weight/100)
                                                 
                                                 if not sesion.objective.name in studentProgress:
-                                                    studentProgress[sesion.objective.name] = grade.grade * (act.weight/100)
+                                                    studentProgress[sesion.objective.name] = float(activity['grade']) * float(act.weight/100)
                                                 else:
-                                                    studentProgress[sesion.objective.name] += grade.grade * (act.weight/100)
+                                                    studentProgress[sesion.objective.name] += float(activity['grade']) * float(act.weight/100)
+                            '''
+                            act = Attendance.objects.filter(course=course).first()
+                            
+                            attendanceAssigned = False
+                            if activity['sesion'] in getAttendaceSessions(courseName):
+                                attendanceAssigned = True
+
+                            if act and attendanceAssigned:
+                                
+                                sesion = act.sesions.filter(name=activity['sesion']).first()
+                                grade = Grade.objects.filter(sesion__id=sesion.id, student__id=stu.id).first()
+
+                                if grade.grade != activity['grade']:
+                                    Grade.objects.filter(id=grade.id).update(grade=float(activity['grade']))
+                                            
+                                if not sesion.objective.name in globalGradeAcum:
+                                    globalGradeAcum[sesion.objective.name] = float(activity['grade']) * float(act.weight/100)
+                                else:
+                                    globalGradeAcum[sesion.objective.name] += float(activity['grade']) * float(act.weight/100)
+                                
+                                if not sesion.objective.name in studentProgress:
+                                    studentProgress[sesion.objective.name] = float(activity['grade']) * float(act.weight/100)
+                                else:
+                                    studentProgress[sesion.objective.name] += float(activity['grade']) * float(act.weight/100)
+                    
                     for objectiveName in studentProgress:
                         obj = Objective.objects.filter(name=objectiveName, course=course).first()
                         
