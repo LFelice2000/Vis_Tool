@@ -158,7 +158,7 @@
                                 barColor = "bg-warning"
                             }
                             //Si mi personalScore > media global + 5
-                            else if (personalScore >= (globalScore + 5)) {
+                            else if (personalScore >= (globalScore - 5) && personalScore <= (globalScore + 5)) {
                                 barColor = "bg-primary"
                             }
                             else {
@@ -170,7 +170,7 @@
                             $(`#pbar${count}`).removeClass("progress-bar-animated progress-bar-striped");
 
                             $(`#gbar${count}`).addClass("bg-primary");
-                            $(`#gbar${count}`).css("width", "0px").animate({width: `${personalScore}%`}, 500);
+                            $(`#gbar${count}`).css("width", "0px").animate({width: `${globalScore}%`}, 500);
                             $(`#gbar${count}`).removeClass("progress-bar-animated progress-bar-striped");
                         }
                         
