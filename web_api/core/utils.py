@@ -47,18 +47,27 @@ def createCourse(activities, studentList, courseName, courseShortName, teacher, 
 
             for activity in activitiesObj['quiz']:
 
-                obj = Objective.objects.filter(name=activity['objective'], course=course)
+                obj = []
+                for objecive in activity['objective']:
+                    obj.append(Objective.objects.filter(name=objecive, course=course).first())
                 
-                act = Quiz(name=activity['activityName'], weight=float(activity['weigth']), objective=obj[0], course=course)
-                act.save()
+                if len(obj) > 0:
+                    act = Quiz(name=activity['activityName'], weight=float(activity['weigth']), course=course)
+                    act.save()
+
+                    act.objective.add(*obj)
 
             for activity in activitiesObj['assignment']:
 
-                obj = Objective.objects.filter(name=activity['objective'], course=course)
+                obj = []
+                for objecive in activity['objective']:
+                    obj.append(Objective.objects.filter(name=objecive, course=course).first())
 
-                if obj:
-                    act = Assignment(name=activity['activityName'], weight=float(activity['weigth']), objective=obj[0], course=course)
+                if len(obj) > 0:
+                    act = Assignment(name=activity['activityName'], weight=float(activity['weigth']), course=course)
                     act.save()
+
+                    act.objective.add(*obj)
 
             for activity in activitiesObj['asistance']:
 
@@ -88,15 +97,16 @@ def createCourse(activities, studentList, courseName, courseShortName, teacher, 
                                 act.grade.add(grade)
                                 act.save()
 
-                                if not act.objective.name in globalGradeAcum:
-                                    globalGradeAcum[act.objective.name] = float(grade.grade) * float(act.weight/100)
-                                else:
-                                    globalGradeAcum[act.objective.name] += float(grade.grade) * float(act.weight/100)
-                                
-                                if not act.objective.name in studentProgress:
-                                    studentProgress[act.objective.name] = float(grade.grade) * float(act.weight/100)
-                                else:
-                                    studentProgress[act.objective.name] += float(grade.grade) * float(act.weight/100)
+                                for objective in act.objective.all():
+                                    if not objective.name in globalGradeAcum:
+                                        globalGradeAcum[objective.name] = float(grade.grade) * float(act.weight/100)
+                                    else:
+                                        globalGradeAcum[objective.name] += float(grade.grade) * float(act.weight/100)
+                                    
+                                    if not objective.name in studentProgress:
+                                        studentProgress[objective.name] = float(grade.grade) * float(act.weight/100)
+                                    else:
+                                        studentProgress[objective.name] += float(grade.grade) * float(act.weight/100)
                             
                         elif activity['type'] == 'Tarea':
 
@@ -112,15 +122,16 @@ def createCourse(activities, studentList, courseName, courseShortName, teacher, 
                                 act.grade.add(grade)
                                 act.save()
 
-                                if not act.objective.name in globalGradeAcum:
-                                    globalGradeAcum[act.objective.name] = float(grade.grade) * float(act.weight/100)
-                                else:
-                                    globalGradeAcum[act.objective.name] += float(grade.grade) * float(act.weight/100)
-
-                                if not act.objective.name in studentProgress:
-                                    studentProgress[act.objective.name] = float(grade.grade) * float(act.weight/100)
-                                else:
-                                    studentProgress[act.objective.name] += float(grade.grade) * float(act.weight/100)
+                                for objective in act.objective.all():
+                                    if not objective.name in globalGradeAcum:
+                                        globalGradeAcum[objective.name] = float(grade.grade) * float(act.weight/100)
+                                    else:
+                                        globalGradeAcum[objective.name] += float(grade.grade) * float(act.weight/100)
+                                    
+                                    if not objective.name in studentProgress:
+                                        studentProgress[objective.name] = float(grade.grade) * float(act.weight/100)
+                                    else:
+                                        studentProgress[objective.name] += float(grade.grade) * float(act.weight/100)
 
                         elif activity['type'] == 'Asistencia':
                             
@@ -224,15 +235,17 @@ def updateCourse(activities, courseName, courseShortName, studentGrades, teacher
                                     if grade.grade != activity['grade']:
                                         Grade.objects.filter(id=grade.id).update(grade=float(activity['grade']))
 
-                                    if not act.objective.name in globalGradeAcum:
-                                        globalGradeAcum[act.objective.name] = float(activity['grade']) * float(act.weight/100)
-                                    else:
-                                        globalGradeAcum[act.objective.name] += float(activity['grade']) * float(act.weight/100)
+                                    for objective in act.objective.all():
 
-                                    if not act.objective.name in studentProgress:
-                                        studentProgress[act.objective.name] = float(activity['grade']) * float(act.weight/100)
-                                    else:
-                                        studentProgress[act.objective.name] += float(activity['grade']) * float(act.weight/100)
+                                        if not objective.name in globalGradeAcum:
+                                            globalGradeAcum[objective.name] = float(activity['grade']) * float(act.weight/100)
+                                        else:
+                                            globalGradeAcum[objective.name] += float(activity['grade']) * float(act.weight/100)
+
+                                        if not objective.name in studentProgress:
+                                            studentProgress[objective.name] = float(activity['grade']) * float(act.weight/100)
+                                        else:
+                                            studentProgress[objective.name] += float(activity['grade']) * float(act.weight/100)
 
                         elif activity['type'] == 'Tarea':
 
@@ -247,15 +260,17 @@ def updateCourse(activities, courseName, courseShortName, studentGrades, teacher
                                     if grade.grade != activity['grade']:
                                         Grade.objects.filter(id=grade.id).update(grade=float(activity['grade']))
                                     
-                                    if not act.objective.name in globalGradeAcum:
-                                        globalGradeAcum[act.objective.name] = float(activity['grade']) * float(act.weight/100)
-                                    else:
-                                        globalGradeAcum[act.objective.name] += float(activity['grade']) * float(act.weight/100)
-                                    
-                                    if not act.objective.name in studentProgress:
-                                        studentProgress[act.objective.name] = float(activity['grade']) * float(act.weight/100)
-                                    else:
-                                        studentProgress[act.objective.name] += float(activity['grade']) * float(act.weight/100)
+                                    for objective in act.objective.all():
+
+                                        if not objective.name in globalGradeAcum:
+                                            globalGradeAcum[objective.name] = float(activity['grade']) * float(act.weight/100)
+                                        else:
+                                            globalGradeAcum[objective.name] += float(activity['grade']) * float(act.weight/100)
+                                        
+                                        if not objective.name in studentProgress:
+                                            studentProgress[objective.name] = float(activity['grade']) * float(act.weight/100)
+                                        else:
+                                            studentProgress[objective.name] += float(activity['grade']) * float(act.weight/100)
                                         
                         
                         elif activity['type'] == 'Asistencia':
@@ -272,7 +287,7 @@ def updateCourse(activities, courseName, courseShortName, studentGrades, teacher
 
                                 if grade.grade != activity['grade']:
                                     Grade.objects.filter(id=grade.id).update(grade=float(activity['grade']))
-                                            
+           
                                 if not sesion.objective.name in globalGradeAcum:
                                     globalGradeAcum[sesion.objective.name] = float(activity['grade']) * float(act.weight/100)
                                 else:

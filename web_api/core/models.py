@@ -36,7 +36,7 @@ class Quiz(models.Model):
     name = models.CharField(max_length=200)
     grade = models.ManyToManyField(Grade)
     course = models.ForeignKey(Course, on_delete=models.CASCADE, default=None)
-    objective = models.ForeignKey(Objective, on_delete=models.CASCADE, default=None)
+    objective = models.ManyToManyField(Objective)
     weight = models.DecimalField(max_digits=4, decimal_places=2, validators=[MaxValueValidator(100), MinValueValidator(0)], default=0)
 
 class Assignment(models.Model):
@@ -44,7 +44,7 @@ class Assignment(models.Model):
     name = models.CharField(max_length=200)
     grade = models.ManyToManyField(Grade)
     course = models.ForeignKey(Course, on_delete=models.CASCADE, default=None)
-    objective = models.ForeignKey(Objective, on_delete=models.CASCADE, default=None)
+    objective = models.ManyToManyField(Objective)
     weight = models.DecimalField(max_digits=4, decimal_places=2, validators=[MaxValueValidator(100), MinValueValidator(0)], default=0)
 
 class Sesion(models.Model):

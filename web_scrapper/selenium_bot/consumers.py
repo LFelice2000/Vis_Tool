@@ -305,7 +305,8 @@ class EchoConsumer(AsyncWebsocketConsumer):
           return
 
         token_attemp = 0
-        while token != None:
+        token_confirmed = False
+        while token_confirmed == False: 
 
           if token_attemp == 3:
             
@@ -318,6 +319,9 @@ class EchoConsumer(AsyncWebsocketConsumer):
           await self.send(json.dumps(send_payload))
 
           token = await loop.run_in_executor(None, functools.partial(web_token_confirm_app, self.wd, self.wd_wait))
+
+          if not token:
+            token_confirmed = True
 
           token_attemp += 1
 

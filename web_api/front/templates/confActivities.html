@@ -32,12 +32,24 @@
             <div class='d-flex my-2 gap-3' id="q{{quiz.tmpId}}">
                 <div class="mx-2"><h5 id="qtype{{quiz.tmpId}}">{{quiz.type}}:</h5></div>
                 <div class="mx-1 mt-0.5"><p id="qname{{quiz.tmpId}}">{{quiz.name}}</p></div>
-                <select class="form-select mr-3" aria-label="Default select example" style="width: 300px;" id="qoption{{quiz.tmpId}}">
-                    <option>None</option>
+                
+                <div class="dropdown" id="qoption{{quiz.tmpId}}">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      Objetivos
+                    </button>
+                    <ul class="dropdown-menu">
                     {% for objective in objectiveList %}    
-                    <option>{{objective.name}}</option>
+                        <li class="dropdown-item">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" />
+                                <label class="form-check-label">{{objective.name}}</label>
+                            </div>
+                        </li>
                     {% endfor %}
-                </select>
+
+                    </ul>
+                </div>
+                
                 <input class="mb-2 px-3" min="0" max="100" id="qweigth{{quiz.tmpId}}" type="number" onkeypress="return false" name="qweigth{{quiz.tmpId}}" value="0" style="width: 11%; heigth: 10px;"/>
                 <div class=""><p class="">  %</p></div>
             </div>
@@ -53,12 +65,24 @@
             <div class='d-flex my-2 gap-3' id="as{{assignment.tmpId}}">
                 <div class="mx-2"><h5 id="astype{{assignment.tmpId}}">{{assignment.type}}:</h5></div>
                 <div class="mx-1 mt-0.5"><p id="asname{{assignment.tmpId}}">{{assignment.name}}</p></div>
-                <select class="form-select mr-3" aria-label="Default select example" style="width: 300px;" id="asoption{{assignment.tmpId}}">
-                    <option>None</option>
+
+                <div class="dropdown" id="asoption{{assignment.tmpId}}">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      Objetivos
+                    </button>
+                    <ul class="dropdown-menu">
                     {% for objective in objectiveList %}    
-                    <option>{{objective.name}}</option>
+                        <li class="dropdown-item">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" />
+                                <label class="form-check-label">{{objective.name}}</label>
+                            </div>
+                        </li>
                     {% endfor %}
-                </select>
+
+                    </ul>
+                </div>
+
                 <input class="mb-2 px-3" min="0" max="100" id="asweigth{{assignment.tmpId}}" type="number" onkeypress="return false" name="asweigth{{assignment.tmpId}}" value="0" style="width: 11%; heigth: 10px;"/>
                 <div class=""><p class="">  %</p></div>
             </div>
@@ -135,7 +159,6 @@
         $('#addQuiz').on('click', function () {
             
             var activitiesInfo = document.getElementById("quizCont").children;
-            console.log(activitiesInfo)
 
             if(activitiesDict['quiz'].length != 0) {
                 activitiesDict['quiz'] = [];
@@ -147,9 +170,17 @@
                 var nameId = "#qname" + i.toString();
                 var optionId = "#qoption" + i.toString();
                 var weigthId = "#qweigth" + i.toString();
+                var optionsId = optionId  + ' ul li'
+                var selectedObjectives = []
+                
+                $(optionsId).each(function() {
+                    if ($(this).find('.form-check-input').is(':checked')) {
+                        selectedObjectives.push($(this).find('.form-check-label').text())
+                    }
+                })
 
-                if($(optionId+" :selected").text() != "None" && $(optionId+" :selected").text().length > 0) {
-                    activitiesDict['quiz'].push({'activityType': 'Quiz', 'activityName': $(nameId).html(), 'objective': $(optionId+" :selected").text(), 'weigth': $(weigthId).val()})
+                if(selectedObjectives.length > 0) {
+                    activitiesDict['quiz'].push({'activityType': 'Quiz', 'activityName': $(nameId).html(), 'objective': selectedObjectives, 'weigth': $(weigthId).val()})
                 }
 
             }
@@ -174,11 +205,21 @@
                 var nameId = "#asname" + i.toString();
                 var optionId = "#asoption" + i.toString();
                 var weigthId = "#asweigth" + i.toString();
+                var optionsId = optionId  + ' ul li'
+                var selectedObjectives = []
                 
-                if($(optionId+" :selected").text() != "None" && $(optionId+" :selected").text().length > 0) {
-                    activitiesDict['assignment'].push({'activityType': $(typeId).html().replace(':', ''), 'activityName': $(nameId).html(), 'objective': $(optionId+" :selected").text(), 'weigth': $(weigthId).val()})
+                $(optionsId).each(function() {
+                    if ($(this).find('.form-check-input').is(':checked')) {
+                        selectedObjectives.push($(this).find('.form-check-label').text())
+                    }
+                })
+
+                
+                if(selectedObjectives.length > 0) {
+                    activitiesDict['assignment'].push({'activityType': $(typeId).html().replace(':', ''), 'activityName': $(nameId).html(), 'objective': selectedObjectives, 'weigth': $(weigthId).val()})
                 }
             }
+
             $('#attendanceBtn').trigger("click");
             
             
@@ -469,30 +510,32 @@
                 $('#resumeList tbody tr').remove();
             }
             
-            var totalWeigth = 0;
             var rowCounter = 1;
             var objectivesWeigth = {};
             var objectiveActivities = {};
 
             for(var i = 0; i < activitiesDict['quiz'].length; i++) {
-                if (Object.keys(objectivesWeigth).includes(activitiesDict['quiz'][i]['objective'])) {
-                    objectivesWeigth[activitiesDict['quiz'][i]['objective']] += parseInt(activitiesDict['quiz'][i]['weigth'])
-                    objectiveActivities[activitiesDict['quiz'][i]['objective']].push({"type": "Quiz", "name": activitiesDict['quiz'][i]['activityName'], "weigth": activitiesDict['quiz'][i]['weigth']})
-                } else {
-                    objectivesWeigth[activitiesDict['quiz'][i]['objective']] = parseInt(activitiesDict['quiz'][i]['weigth'])
-                    objectiveActivities[activitiesDict['quiz'][i]['objective']] = [{"type": "Quiz", "name": activitiesDict['quiz'][i]['activityName'], "weigth": activitiesDict['quiz'][i]['weigth']}]
+                for(var j = 0; j < activitiesDict['quiz'][i]['objective'].length; j++) {
+                    if (Object.keys(objectivesWeigth).includes(activitiesDict['quiz'][i]['objective'][j])) {
+                        objectivesWeigth[activitiesDict['quiz'][i]['objective'][j]] += parseInt(activitiesDict['quiz'][i]['weigth'])
+                        objectiveActivities[activitiesDict['quiz'][i]['objective'][j]].push({"type": "Quiz", "name": activitiesDict['quiz'][i]['activityName'], "weigth": activitiesDict['quiz'][i]['weigth']})
+                    } else {
+                        objectivesWeigth[activitiesDict['quiz'][i]['objective'][j]] = parseInt(activitiesDict['quiz'][i]['weigth'])
+                        objectiveActivities[activitiesDict['quiz'][i]['objective'][j]] = [{"type": "Quiz", "name": activitiesDict['quiz'][i]['activityName'], "weigth": activitiesDict['quiz'][i]['weigth']}]
+                    }
                 }
 
-                totalWeigth += parseInt(activitiesDict['quiz'][i]['weigth'])
             }
 
             for(i = 0; i < activitiesDict['assignment'].length; i++) {
-                if (Object.keys(objectivesWeigth).includes(activitiesDict['assignment'][i]['objective'])) {
-                    objectivesWeigth[activitiesDict['assignment'][i]['objective']] += parseInt(activitiesDict['assignment'][i]['weigth'])
-                    objectiveActivities[activitiesDict['assignment'][i]['objective']].push({"type": "Assignment", "name": activitiesDict['assignment'][i]['activityName'], "weigth": activitiesDict['assignment'][i]['weigth']})
-                } else {
-                    objectivesWeigth[activitiesDict['assignment'][i]['objective']] = parseInt(activitiesDict['assignment'][i]['weigth'])
-                    objectiveActivities[activitiesDict['assignment'][i]['objective']] = [{"type": "Assignment", "name": activitiesDict['assignment'][i]['activityName'], "weigth": activitiesDict['assignment'][i]['weigth']}]
+                for(j = 0; j < activitiesDict['assignment'][i]['objective'].length; j++) {
+                    if (Object.keys(objectivesWeigth).includes(activitiesDict['assignment'][i]['objective'][j])) {
+                        objectivesWeigth[activitiesDict['assignment'][i]['objective'][j]] += parseInt(activitiesDict['assignment'][i]['weigth'])
+                        objectiveActivities[activitiesDict['assignment'][i]['objective'][j]].push({"type": "Assignment", "name": activitiesDict['assignment'][i]['activityName'], "weigth": activitiesDict['assignment'][i]['weigth']})
+                    } else {
+                        objectivesWeigth[activitiesDict['assignment'][i]['objective'][j]] = parseInt(activitiesDict['assignment'][i]['weigth'])
+                        objectiveActivities[activitiesDict['assignment'][i]['objective'][j]] = [{"type": "Assignment", "name": activitiesDict['assignment'][i]['activityName'], "weigth": activitiesDict['assignment'][i]['weigth']}]
+                    }
                 }
 
                 totalWeigth += parseInt(activitiesDict['assignment'][i]['weigth'])
@@ -506,14 +549,14 @@
                     objectivesWeigth[activitiesDict['asistance'][i]['objective']] = parseInt(activitiesDict['asistance'][i]['weigth'])
                     objectiveActivities[activitiesDict['asistance'][i]['objective']] = [{"type": "Asistance", "name": activitiesDict['asistance'][i]['activityName'], "weigth": activitiesDict['asistance'][i]['weigth']}]
                 }
-
-                totalWeigth += parseInt(activitiesDict['asistance'][i]['weigth'])
             }
 
+            console.log(objectivesWeigth)
+
             var numObjectives = Object.keys(objectivesWeigth).length;
-            var realWeight = (totalWeigth/numObjectives);
             var rowString = "";
             var objectivesWeightCorrect = true;
+            var totalWeigth = 0;
 
             for(i = 0; i < Object.keys(objectivesWeigth).length; i++) {
                 
@@ -525,9 +568,11 @@
                 } 
                 
                 $('#resumeList tbody').append(rowString);
+
+                totalWeigth += objectivesWeigth[Object.keys(objectivesWeigth)[i]]
             }
             
-
+            var realWeight = (totalWeigth/numObjectives);
             var color = "green;";
 
             if (realWeight != 100 || !objectivesWeightCorrect) {
