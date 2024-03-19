@@ -71,13 +71,8 @@
     
             $('.progress .progress-bar').each(function() {
                 var finalWidth = parseFloat($(this).text());
-                var barColor = "bg-success";
+                var barColor = "bg-primary";
     
-                if(finalWidth < 50) {
-                    barColor = "bg-danger"
-                } else if (finalWidth < 70) {
-                    barColor = "bg-warning"
-                }
     
                 $(this).addClass(barColor);
                 $(this).css("width", "0px").animate({width: finalWidth+"%"}, 500);

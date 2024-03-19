@@ -111,10 +111,20 @@
                         var content = `<div class='h4 mb-5'>Progeso de ${selectedStudent}</div>`
                         var rows = 0
 
+                        content += `
+                            <div class="container-fluid d-flex flex-column justify-content-center mt-4">
+                                <div class="row mb-4">
+                                    <div class="col-md-4"><h3 class="text-center"></div>
+                                    
+                                    <div class="col-md-4"><h3 class="text-center">Media del Grupo</h3></div>
+                                    <div class="col-md-4"><h3 class="text-center">Progreso Personal</h3></div>
+                                </div>
+                            `
                         for(const objective in objectives) {
 
                             var id = `bar${rows}`
-
+                            
+                            //El estudiante ve las 2 columnas personal y media de grupo
                             content += `
                             <div class="row">
                                 <div class="col-md-4">
@@ -122,7 +132,12 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="progress" role="progressbar">
-                                        <div id="${id}" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%">${objectives[objective].personalScore}%</div>
+                                        <div id="g${id}" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%">${objectives[objective].globalScore}%</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="progress" role="progressbar">
+                                        <div id="p${id}" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%">${objectives[objective].personalScore}%</div>
                                     </div>
                                 </div>
                             </div>
@@ -130,25 +145,33 @@
                             
                             rows += 1
                         }
+                        content += '</div>'
 
                         $('#studentPersonalinfo').html(content)
                         
                         for (var count = 0; count < rows; count++) {
-                            var personalScore = parseFloat($(`#bar${count}`).html().replace('%', ''))
-
-                            if (personalScore < 50) {
+                            var personalScore = parseFloat($(`#pbar${count}`).html().replace('%', ''))
+                            var globalScore = parseFloat($(`#gbar${count}`).html().replace('%', ''))
+                            
+                            //Si mi personalScore < media global - 5
+                            if (personalScore < (globalScore - 5)) {
                                 barColor = "bg-warning"
                             }
-                            else if (personalScore >= 50 && personalScore <= 60) {
+                            //Si mi personalScore > media global + 5
+                            else if (personalScore >= (globalScore + 5)) {
                                 barColor = "bg-primary"
                             }
                             else {
                                 barColor = "bg-success"
                             }
     
-                            $(`#bar${count}`).addClass(barColor);
-                            $(`#bar${count}`).css("width", "0px").animate({width: `${personalScore}%`}, 500);
-                            $(`#bar${count}`).removeClass("progress-bar-animated progress-bar-striped");
+                            $(`#pbar${count}`).addClass(barColor);
+                            $(`#pbar${count}`).css("width", "0px").animate({width: `${personalScore}%`}, 500);
+                            $(`#pbar${count}`).removeClass("progress-bar-animated progress-bar-striped");
+
+                            $(`#gbar${count}`).addClass("bg-primary");
+                            $(`#gbar${count}`).css("width", "0px").animate({width: `${personalScore}%`}, 500);
+                            $(`#gbar${count}`).removeClass("progress-bar-animated progress-bar-striped");
                         }
                         
                         $('#studentPersonalCont').show()

@@ -602,9 +602,10 @@ def studentInfo(request, courseName, courseShortName, teacherMail,courseId):
     for objective in getCourseObjectives(currCourse.name):
 
         stuScores = getPersonalScores(objective, student)
+        globalScores = getGlobalScore(objective)
         
         if stuScores:
-            personalResults = {'name': objective.name, 'personalScore': float(stuScores.percentage)}
+            personalResults = {'name': objective.name, 'personalScore': float(stuScores.percentage), 'globalScore': float(globalScores.percentage)}
 
             personalTotal.append(personalResults)
 

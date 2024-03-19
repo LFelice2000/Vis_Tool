@@ -8,8 +8,8 @@
             "name": "Python: Django",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/web_scrapper/manage.py",
-            "args": ["runserver", "8000"],
+            "program": "${workspaceFolder}/web_api/manage.py",
+            "args": ["runserver", "4000"],
             "console": "integratedTerminal",
             "justMyCode": true,
             "django": true
