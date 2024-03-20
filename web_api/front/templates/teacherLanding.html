@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<p class="h3 mt-5">Porfavor selecciona que curso quieres ver</p>
+
+<ul class="list-group" id="objList">
+    {% for group in teacherGroups %}
+    <a class="list-group-item text-decoration-none text-body" href="{% url 'teacherAdmin' courseName=courseName courseShortName=courseShortName teacherMail=teacherMail courseId=courseId group=group %}">{{courseName}} {{group}}</a>
+    
+    {% endfor %}
+</ul>
+
+{% endblock %}
+
+{% block overlays %}
+<div class='container-fluid overlay d-none m-auto' id="overlayCont">
+    <div class="iframe-container d-flex flex-column justify-content-center align-items-center rounded mx-2" id='overlaynorm'>
+        <p class="h5">Cargando el Curso</p>
+        <div class="spinner-border" role="status"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    $(document).ready(function() {
+
+        $('.list-group-item').on('mouseover', function() {
+            $(this).css('background-color', 'rgba(0,0,0, .06)');
+            $(this).css('cursor', 'pointer');
+    
+        });
+
+        $('.list-group-item').on('mouseout', function() {
+            $(this).css('background-color', 'rgba(0,0,0, .0)');
+        });
+    })
+
+</script>
+
+
+{% endblock %}

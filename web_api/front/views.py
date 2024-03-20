@@ -83,25 +83,47 @@ def update(request):
     
 @csrf_exempt
 @xframe_options_exempt
-def teacherPage(request, courseName, courseShortName, teacherMail, courseId):
+def teacherPage(request, courseName, courseShortName, teacherMail, courseId, group):
 
-    currCourse = getCurrCourse(courseName)
+    if teacherMail in getGroupTeachers(courseName, group):
 
-    globalTotal = []
-    for objective in getCourseObjectives(courseName):
+        globalTotal = []
+        for objective in getCourseObjectives(courseName, group):
 
-        gloScores = getGlobalScore(objective)
-        globalTotal.append({'name': gloScores.objective.name, 'globalScore': gloScores.percentage})
+            gloScores = getGlobalScore(objective)
+            globalTotal.append({'name': gloScores.objective.name, 'globalScore': gloScores.percentage})
 
-    context = {
-        "courseName": str(courseName),
-        "teacherMail": teacherMail,
-        "courseId": courseId,
-        'courseShortName':courseShortName,
-        'globalObjectives': globalTotal
-    }
+        context = {
+            "courseName": str(courseName),
+            "teacherMail": teacherMail,
+            "courseId": courseId,
+            'courseShortName':courseShortName,
+            'globalObjectives': globalTotal,
+            'group': group
+        }
 
-    return render(request, "teacherAdmin.html", context=context)
+        return render(request, "teacherAdmin.html", context=context)
+
+    return redirect(reverse("error", kwargs={"error": "error"}))
+
+
+@csrf_exempt
+@xframe_options_exempt
+def teacherlanding(request, courseName, courseShortName, teacherMail, courseId):
+
+    if request.method == 'GET':
+
+        context = {
+            'teacherMail': teacherMail,
+            'courseId': courseId,
+            'courseName': courseName,
+            'courseShortName': courseShortName,
+            'teacherGroups': getTeacheGroups(teacherMail, courseName)
+        }
+
+        return render(request, 'teacherLanding.html', context=context)
+
+    return render(request, "error.html")
 
 @csrf_exempt
 @xframe_options_exempt
@@ -118,7 +140,7 @@ def visPage(request):
         courseId = urlParams.get('CourseId')
 
         #or userMail == 'luis.felice@estudiante.uam.es'
-        if is_teacher(userMail) or userMail == 'luis.felice@estudiante.uam.es':
+        if is_teacher(userMail) :
 
             if not courseExists(courseName):
             
@@ -132,61 +154,68 @@ def visPage(request):
                 return render(request, 'confObjectives.html', context=context)
             elif userMail in getTeachersInCourse(courseName):
 
-                return redirect(reverse('teacherAdmin', kwargs={"courseName":courseName, 'courseShortName': courseShortName, 'teacherMail': userMail, 'courseId': courseId}))
+                groups = getTeacheGroups(userMail, courseName)
+
+                if len(groups) > 1:
+                    return redirect(reverse('teacherLanding', kwargs={"courseName":courseName, 'courseShortName': courseShortName, 'teacherMail': userMail, 'courseId': courseId}))
+                
+                return redirect(reverse('teacherAdmin', kwargs={"courseName":courseName, 'courseShortName': courseShortName, 'teacherMail': userMail, 'courseId': courseId, 'group': groups[0]}))
             
             context = {
                 "error": "Error desconocido."
             }
             return render(request, "error.html", context=context)
 
-        currCourse = getCurrCourse(courseName)
+        stuGroup = getStudentGroup(userMail, courseName)
 
-        if currCourse:
+        if stuGroup:
+            currCourse = getCurrCourse(courseName, stuGroup)
 
-            #Calculamos el progreso personal
-            student = getStudent(userMail)
-            
-            if userMail not in getStudentEmails(courseName):
+            if currCourse:
 
-                context = {
-                    "error": "El estudiante no esta registrado en la herramienta."
-                }
-
-                return render(request, "error.html", context=context)
-
-            personalTotal = []
-
-            for objective in getCourseObjectives(courseName):
+                student = getStudent(userMail)
                 
-                globalScore = getGlobalScore(objective)
-                personalScore = getPersonalScores(objective, student)
+                if userMail not in getStudentEmails(courseName, stuGroup):
+
+                    context = {
+                        "error": "El estudiante no esta registrado en la herramienta."
+                    }
+
+                    return render(request, "error.html", context=context)
+
+                personalTotal = []
+
+                for objective in getCourseObjectives(courseName, stuGroup):
                     
-                personalTotal.append({'name': objective.name, 'globalScore': float(globalScore.percentage), 'personalScore': float(personalScore.percentage)})
+                    globalScore = getGlobalScore(objective)
+                    personalScore = getPersonalScores(objective, student)
+                        
+                    personalTotal.append({'name': objective.name, 'globalScore': float(globalScore.percentage), 'personalScore': float(personalScore.percentage)})
 
-            update = Update.objects.filter(course=currCourse).first()
-            studentName = Student.objects.filter(email=userMail).first().name
+                update = Update.objects.filter(course=currCourse).first()
+                studentName = Student.objects.filter(email=userMail).first().name
 
-            context = None
+                context = None
 
-            if update:
-                context = {
-                    'objectives': personalTotal,
-                    'objectivesJson': json.dumps(personalTotal),
-                    'student': studentName,
-                    'update': update,
-                    'updateBy': update.teacher
-                }
-            else:
-                context = {
-                    'objectivesJson': json.dumps(personalTotal),
-                    'objectives': personalTotal,
-                    'student': studentName,
-                }
+                if update:
+                    context = {
+                        'objectives': personalTotal,
+                        'objectivesJson': json.dumps(personalTotal),
+                        'student': studentName,
+                        'update': update,
+                        'updateBy': update.teacher
+                    }
+                else:
+                    context = {
+                        'objectivesJson': json.dumps(personalTotal),
+                        'objectives': personalTotal,
+                        'student': studentName,
+                    }
 
-            return render(request, "visPage.html", context=context)
+                return render(request, "visPage.html", context=context)
         
         context = {
-            "error": "La herramienta no esta configurada para este curso"
+            "error": "La herramienta no esta configurada para este curso o grupo"
         }
             
         return render(request, "error.html", context=context)
@@ -387,7 +416,8 @@ def confPage(request):
             'updateFlag': updateFlag,
             'teacher': teacher,
             'courseId': courseId,
-            'courseShortName': courseShortName
+            'courseShortName': courseShortName,
+            'group': getCourseGroup(courseName)
         }
             
         return render(request, "confPage.html", context=context)
@@ -464,7 +494,7 @@ def confWeigth(request):
     if res['status'] == "error":
         return redirect(reverse("error", kwargs={"error": res['error']}))
 
-    return redirect(reverse("teacherAdmin", kwargs={"courseName":courseName, 'courseShortName':courseShortName, "teacherMail":teacher, 'courseId': courseId}))
+    return redirect(reverse("teacherAdmin", kwargs={"courseName":courseName, 'courseShortName':courseShortName, "teacherMail":teacher, 'courseId': courseId, 'group': group}))
 
 @xframe_options_exempt
 def error(request, error):
@@ -477,39 +507,41 @@ def error(request, error):
 
 @csrf_exempt
 @xframe_options_exempt
-def manageStudent(request, courseName, courseShortName, teacherMail,courseId):
+def manageStudent(request, courseName, courseShortName, teacherMail,courseId, group):
 
-    students = getStudentEmails(courseName)
+    students = getStudentEmails(courseName, group)
 
     context = {
         'courseName': courseName,
         'courseShortName': courseShortName,
         'teacherMail': teacherMail,
         'courseId': courseId,
-        'students': students
+        'students': students,
+        'group': group
     }
 
     return render(request, "manageStudents.html", context=context)
 
 @csrf_exempt
 @xframe_options_exempt
-def manageTeacher(request, courseName, courseShortName, teacherMail,courseId):
+def manageTeacher(request, courseName, courseShortName, teacherMail,courseId, group):
 
-    teachers = getTeachersInCourse(courseName)
+    teachers = getGroupTeachers(courseName, group)
 
     context = {
         'courseName': courseName,
         'courseShortName': courseShortName,
         'teacherMail': teacherMail,
         'courseId': courseId,
-        'teachers': teachers
+        'teachers': teachers,
+        'group': group
     }
 
     return render(request, "manageTeachers.html", context=context)
 
 @csrf_exempt
 @xframe_options_exempt
-def addTeacher(request, courseName, courseShortName, teacherMail,courseId):
+def addTeacher(request, courseName, courseShortName, teacherMail,courseId, group):
 
 
     if request.method == 'POST':
@@ -520,24 +552,25 @@ def addTeacher(request, courseName, courseShortName, teacherMail,courseId):
 
             if not teacherExists(teacher):
 
-                createTeacher(teacher, courseName)
+                createTeacher(teacher, courseName, group)
             else:
-                addTeacherToCourse(courseName, teacher)
+                addTeacherToCourse(courseName, teacher, group)
 
-        return redirect(reverse("manageTeacher", kwargs={'courseName': courseName, 'courseShortName': courseShortName, 'teacherMail': teacherMail, 'courseId': courseId}))
+        return redirect(reverse("manageTeacher", kwargs={'courseName': courseName, 'courseShortName': courseShortName, 'teacherMail': teacherMail, 'courseId': courseId, 'group': group}))
     
     context = {
         'courseName': courseName,
         'courseShortName': courseShortName,
         'teacherMail': teacherMail,
-        'courseId': courseId
+        'courseId': courseId,
+        'group': group
     }
 
     return render(request, "addTeacher.html", context=context)
 
 @csrf_exempt
 @xframe_options_exempt
-def removeTeacher(request, courseName, courseShortName, teacherMail,courseId):
+def removeTeacher(request, courseName, courseShortName, teacherMail,courseId, group):
 
     if request.method == 'POST':
 
@@ -546,24 +579,24 @@ def removeTeacher(request, courseName, courseShortName, teacherMail,courseId):
         if not deleteTeacher(teacher, courseName):
             print('error')
 
-        return redirect(reverse("manageTeacher", kwargs={'courseName': courseName, 'courseShortName': courseShortName, 'teacherMail': teacherMail, 'courseId': courseId}))
+        return redirect(reverse("manageTeacher", kwargs={'courseName': courseName, 'courseShortName': courseShortName, 'teacherMail': teacherMail, 'courseId': courseId, 'group': group}))
     
 @csrf_exempt
 @xframe_options_exempt
-def removeStudent(request, courseName, courseShortName, teacherMail,courseId):
+def removeStudent(request, courseName, courseShortName, teacherMail,courseId, group):
 
     if request.method == 'POST':
 
         student = request.POST.get("studentToDelete")
 
-        if not deleteStudent(student, courseName):
+        if not deleteStudent(student, courseName, group):
             print('error')
 
-        return redirect(reverse("manageTeacher", kwargs={'courseName': courseName, 'courseShortName': courseShortName, 'teacherMail': teacherMail, 'courseId': courseId}))
+        return redirect(reverse("manageStudent", kwargs={'courseName': courseName, 'courseShortName': courseShortName, 'teacherMail': teacherMail, 'courseId': courseId, 'group': group}))
 
 @csrf_exempt
 @xframe_options_exempt
-def addStudent(request, courseName, courseShortName, teacherMail,courseId):
+def addStudent(request, courseName, courseShortName, teacherMail,courseId, group):
 
 
     if request.method == 'POST':
@@ -572,34 +605,35 @@ def addStudent(request, courseName, courseShortName, teacherMail,courseId):
 
         for student in students:
 
-            addStudentToCourse(json.loads(student), courseName)
+            addStudentToCourse(json.loads(student), courseName, group)
 
-        return redirect(reverse("teacherAdmin", kwargs={'courseName': courseName, 'courseShortName': courseShortName, 'teacherMail': teacherMail, 'courseId': courseId}))
+        return redirect(reverse("teacherAdmin", kwargs={'courseName': courseName, 'courseShortName': courseShortName, 'teacherMail': teacherMail, 'courseId': courseId, 'group': group}))
     
     context = {
         'courseName': courseName,
         'courseShortName': courseShortName,
         'teacherMail': teacherMail,
-        'courseId': courseId
+        'courseId': courseId,
+        'group': group
     }
 
     return render(request, "addStudent.html", context=context)
 
 @csrf_exempt
 @xframe_options_exempt
-def studentInfo(request, courseName, courseShortName, teacherMail,courseId):
+def studentInfo(request, courseName, courseShortName, teacherMail,courseId, group):
 
     studentMail = request.POST.get('studentMail')
 
-    currCourse = getCurrCourse(courseName)
+    currCourse = getCurrCourse(courseName, group)
     student = getStudent(studentMail)
 
-    if studentMail not in getStudentEmails(courseName) or not student:
+    if studentMail not in getStudentEmails(courseName, group) or not student:
 
         JsonResponse({'state': 'error'})
 
     personalTotal = []
-    for objective in getCourseObjectives(currCourse.name):
+    for objective in getCourseObjectives(currCourse.name, group):
 
         stuScores = getPersonalScores(objective, student)
         globalScores = getGlobalScore(objective)
@@ -610,3 +644,17 @@ def studentInfo(request, courseName, courseShortName, teacherMail,courseId):
             personalTotal.append(personalResults)
 
     return JsonResponse({'state': 'succeess', 'objectives': json.dumps(personalTotal)})
+
+@csrf_exempt
+@xframe_options_exempt
+def confNewCourse(request, courseName, courseShortName, teacherMail, courseId, group):
+
+    context = {
+        "courseName": courseName, 
+        "courseShortName": courseShortName, 
+        "teacherMail": teacherMail, 
+        "courseId": courseId,
+        "group": group
+    }
+
+    return render(request, "confNewCourseObjectives.html", context=context)

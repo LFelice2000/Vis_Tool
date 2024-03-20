@@ -1,5 +1,8 @@
 {% extends "base.html" %}
 
+{% block goBack %}
+{% endblock %}
+
 {% block content %}
 
 <div class="mx-auto mt-5 d-flex flex-column justify-content-center align-items-center wrapper">
@@ -14,7 +17,7 @@
 
 
 <h4>Resumen Objetivos</h4>
-<form method="post">
+<form method="post" action="{% url 'index' %}">
     {% csrf_token %}
     <ul class="list-group" id="objList">
     </ul>

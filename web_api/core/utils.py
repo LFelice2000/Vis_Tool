@@ -340,9 +340,9 @@ def updateCourse(activities, courseName, courseShortName, studentGrades, teacher
 
     return {"status": "success"}
 
-def getCourseObjectives(courseName):
+def getCourseObjectives(courseName, group):
 
-    course = Course.objects.filter(name=courseName).first()
+    course = Course.objects.filter(name=courseName, group=group).first()
     if not course:
         return None
 
@@ -352,13 +352,13 @@ def getTeacher(email):
 
     return Teacher.objects.filter(email=email).first()
 
-def getCurrCourse(courseName):
+def getCurrCourse(courseName, group):
 
-    return Course.objects.filter(name=courseName).first()
+    return Course.objects.filter(name=courseName, group=group).first()
 
-def getCourseStudents(courseName):
+def getCourseStudents(courseName, group):
 
-    course = Course.objects.filter(name=courseName).first()
+    course = Course.objects.filter(name=courseName, group=group).first()
 
     if course:
         students = Student.objects.filter(course=course).all()
@@ -429,9 +429,9 @@ def getStudentAttendanceGrades(courseName, studentMail):
 
     return None
 
-def getStudentEmails(courseName):
+def getStudentEmails(courseName, group):
 
-    students = getCourseStudents(courseName)
+    students = getCourseStudents(courseName, group)
 
     if students:
         emails = [s.email for s in students]
@@ -510,9 +510,9 @@ def getCourseTeacherEmails(courseName):
     
     return None
 
-def createTeacher(email, courseName):
+def createTeacher(email, courseName, group):
 
-    course = Course.objects.filter(name=courseName).first()
+    course = Course.objects.filter(name=courseName, group=group).first()
 
     if course:
         try:
@@ -533,9 +533,9 @@ def teacherExists(email):
 
     return Teacher.objects.filter(email=email).first()
 
-def addTeacherToCourse(courseName, email):
+def addTeacherToCourse(courseName, email, group):
 
-    course = Course.objects.filter(name=courseName).first()
+    course = Course.objects.filter(name=courseName, group=group).first()
 
     if course:
         try:
@@ -552,9 +552,9 @@ def addTeacherToCourse(courseName, email):
     
     return None
 
-def addStudentToCourse(student, courseName):
+def addStudentToCourse(student, courseName, group):
 
-    course = Course.objects.filter(name=courseName).first()
+    course = Course.objects.filter(name=courseName, group=group).first()
 
     if course:
 
@@ -608,9 +608,9 @@ def deleteTeacher(teacher, courseName):
     
     return None
 
-def deleteStudent(student, courseName):
+def deleteStudent(student, courseName, group):
 
-    course = Course.objects.filter(name=courseName).first()
+    course = Course.objects.filter(name=courseName, group=group).first()
 
     if course:
 
@@ -640,3 +640,29 @@ def getPersonalScores(objective, student):
 def getStudent(studentMail):
 
     return Student.objects.filter(email=studentMail).first()
+
+def getCourseGroup(courseName):
+
+    return Course.objects.filter(name=courseName).first().group
+
+def getCourseGroups(courseName):
+
+    return [course.group for course in Course.objects.filter(name=courseName).all()]
+
+def getTeacheGroups(teacherMail, courseName):
+
+    return [teacherGroup.group for teacherGroup in Course.objects.filter(name=courseName, teacher__email=teacherMail).all()]
+
+def getGroupTeachers(courseName, group):
+
+    teachers = Teacher.objects.filter(course__name=courseName, course__group=group).all()
+
+    if teachers:
+        return [teacher.email for teacher in teachers]
+
+def getStudentGroup(userMail, courseName):
+
+    group = Course.objects.filter(student__email=userMail, name=courseName).first()
+
+    if group:
+        return group.group

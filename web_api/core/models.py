@@ -10,11 +10,14 @@ from django.utils.timezone import now
 class Course(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=200)
-    group = models.IntegerField(unique=True, default=-1)
+    group = models.IntegerField(default=-1)
+
+    class Meta:
+        unique_together = ('name', 'group')
 
 class Teacher(models.Model):
     id = models.AutoField(primary_key=True, unique=True)
-    email = models.CharField(max_length=200, unique=True)
+    email = models.CharField(max_length=200)
     course = models.ManyToManyField(Course)
 
 class Student(models.Model):

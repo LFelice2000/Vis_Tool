@@ -15,19 +15,22 @@
             {% block navbar %}
             <nav class="container-fluid navbar d-flex mt-3">
                 <div class="d-flex gap-3">
-                    <a class="btn btn-success" href="{% url 'manageTeacher' courseName=courseName courseShortName=courseShortName teacherMail=teacherMail courseId=courseId %}">Gestionar Profesores</a>
-                    <a class="btn btn-success" href="{% url 'manageStudent' courseName=courseName courseShortName=courseShortName teacherMail=teacherMail courseId=courseId %}">Gestionar Estudiantes</a>
+                    <a class="btn btn-success" href="{% url 'manageTeacher' courseName=courseName courseShortName=courseShortName teacherMail=teacherMail courseId=courseId group=group %}">Gestionar Profesores</a>
+                    <a class="btn btn-success" href="{% url 'manageStudent' courseName=courseName courseShortName=courseShortName teacherMail=teacherMail courseId=courseId group=group%}" >Gestionar Estudiantes</a>
+                    <a class="btn btn-success disabled" href="{% url 'index' %}">Gestionar Cursos</a>
                 </div>
                
                 <img class="img-fluid" src="{% static "images/VisUAM_logo_header.png" %}"/>
 
                 <form class="d-flex align-self-end mr-3" method="GET" action="{% url 'confPage' %}">
-                    <button type="submit" class="btn btn-primary-outline nav-item nav-link" id='updateBtn'><i class="bi bi-cloud-upload"></i></button>
-
+                    <button type="submit" class="btn btn-primary-outline nav-item nav-link" id='updateBtn' data-toggle="tooltip" data-placement="bottom" title="actualizar curso"><i class="bi bi-cloud-upload"></i></button>
+                    <a class="btn btn-outline" href="{% url 'confNewCourse' courseName=courseName courseShortName=courseShortName teacherMail=teacherMail courseId=courseId group=group %}" data-toggle="tooltip" data-placement="bottom" title="crear curso nuevo"> <i class="bi bi-plus-square"></i></a>
+                    
                     <input type="hidden" name="courseName" id="courseName" value="{{courseName}}" />
                     <input type="hidden" name="courseShortName" value="{{courseShortName}}"/>
                     <input type="hidden" name="teacherMail" id="courseName" value="{{teacherMail}}" />
                     <input type="hidden" name="courseId" id='courseId' value="{{courseId}}"/>
+                    <input type="hidden" name="group" id='group' value="{{group}}"/>
                     <input type="hidden" name="updateFlag" id="updateFlag" value="1" />
                 </form>
             </nav>
@@ -37,7 +40,7 @@
         {% block content %}
 
             <div class="container-fluid mt-3">
-                <p class="mt-5 h5">Curso: {{courseName}}</p>
+                <p class="mt-5 h5">Curso: {{courseName}} {{group}}</p>
                 <div class="container-fluid d-flex flex-column justify-content-center mt-4">
                     <div class="row mb-4">
                         <div class="col-md-4"><h3 class="text-center"></div>
