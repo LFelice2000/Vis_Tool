@@ -34,6 +34,9 @@ class Objective(models.Model):
     name = models.CharField(max_length=200)
     course = models.ForeignKey(Course, on_delete=models.CASCADE, default=None)
 
+    class Meta:
+        unique_together = ('name', 'course')
+
 class Quiz(models.Model):
     id = models.AutoField(primary_key=True, unique=True)
     name = models.CharField(max_length=200)
