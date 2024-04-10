@@ -77,7 +77,7 @@ def update(request):
         if res['status'] == "error":
             return redirect(reverse("error", kwargs={"error": res['error']}))
         
-        return redirect(reverse("teacherAdmin", kwargs={"courseName":courseName, "courseShortName": courseShortName, "teacherMail":teacher, 'courseId': courseId}))
+        return redirect(reverse("teacherAdmin", kwargs={"courseName":courseName, "courseShortName": courseShortName, "teacherMail":teacher, 'courseId': courseId, 'group': group}))
 
 
     
@@ -140,7 +140,7 @@ def visPage(request):
         courseId = urlParams.get('CourseId')
 
         #or userMail == 'luis.felice@estudiante.uam.es'
-        if is_teacher(userMail) :
+        if is_teacher(userMail):
 
             if not courseExists(courseName):
             
