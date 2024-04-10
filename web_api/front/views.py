@@ -407,6 +407,7 @@ def confPage(request):
         teacher = request.GET.get('teacherMail')
         courseId = request.GET.get('courseId')
         updateFlag = request.GET.get('updateFlag')
+        group = request.GET.get('group')
 
         if request.GET.get('updateFlag') != None:
             updateFlag = 1
@@ -417,7 +418,7 @@ def confPage(request):
             'teacher': teacher,
             'courseId': courseId,
             'courseShortName': courseShortName,
-            'group': getCourseGroup(courseName)
+            'group': group
         }
             
         return render(request, "confPage.html", context=context)

@@ -17,7 +17,7 @@
                 <div class="d-flex gap-3">
                     <a class="btn btn-success" href="{% url 'manageTeacher' courseName=courseName courseShortName=courseShortName teacherMail=teacherMail courseId=courseId group=group %}">Gestionar Profesores</a>
                     <a class="btn btn-success" href="{% url 'manageStudent' courseName=courseName courseShortName=courseShortName teacherMail=teacherMail courseId=courseId group=group%}" >Gestionar Estudiantes</a>
-                    <a class="btn btn-success disabled" href="{% url 'index' %}">Gestionar Cursos</a>
+                    <a class="btn btn-success" href="{% url 'teacherLanding' courseName=courseName courseShortName=courseShortName teacherMail=teacherMail courseId=courseId %}">Gestionar Cursos</a>
                 </div>
                
                 <img class="img-fluid" src="{% static "images/VisUAM_logo_header.png" %}"/>
